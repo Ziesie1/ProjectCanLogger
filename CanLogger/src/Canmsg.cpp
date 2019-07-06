@@ -1,5 +1,5 @@
-#include "can.h"    
-#include <Arduino.h>    
+#include <Arduino.h>
+#include "Canmsg.h"    
     
 Canmsg::Canmsg()
 :stdIdentifier{0x100},extIdentifier{0},isExtIdentifier{false},

@@ -1,5 +1,5 @@
-#ifndef CANMSG
-#define CANMSG
+#ifndef CANMSG_HPP
+#define CANMSG_HPP
 
 class Canmsg
 {
