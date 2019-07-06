@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include "can.h"
 
 void setup() {
   // put your setup code here, to run once:
@@ -7,6 +8,12 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  Serial.println("Hello World!");
-  delay(1000);
+  if(Serial.available() > 0){
+    char x=Serial.read();
+    Serial.print("char recieved: ");
+    Serial.println(x);
+    Canmsg msg{};
+    msg.PrintSerial();
+    //Serial.println(static_cast<String>(msg)); //soll später PrintSerial ersetzen
+  }
 }
