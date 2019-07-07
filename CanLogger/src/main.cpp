@@ -20,12 +20,17 @@ void setup() {
 
 void loop() {
 
-  if(Serial.available() > 0){
-    char x=Serial.read();
+}
+
+void serialEvent() {
+  while (Serial.available()) {
+    char inChar = (char)Serial.read();
+    /*
+      Eine Ausgabe nicht beim Interrupt erlaubt, hier nur Testweise. // Bis das gesamt Konzept feststeht.
+    */
     Serial.print("char recieved: ");
-    Serial.println(x);
+    Serial.println(inChar);
     Canmsg msg{};
-    msg.PrintSerial();
-    //Serial.println(static_cast<String>(msg)); //soll später PrintSerial ersetzen
+    Serial.println(msg);
   }
 }

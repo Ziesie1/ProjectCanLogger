@@ -1,55 +1,21 @@
 #include <Arduino.h>
 #include "Canmsg.h"    
-    
+
+/*
+    Canmsg::Canmsg()
+    Zu Testzwecken, Standartwerte
+*/
 Canmsg::Canmsg()
-:stdIdentifier{0x100},extIdentifier{0},isExtIdentifier{false},
-rtr{false},time{0x1000},canLength{maxLength}
+    :stdIdentifier{0x100},extIdentifier{0},isExtIdentifier{false},
+        rtr{false},time{0x1000},canLength{maxLength}
 {
-    for(char i=0;i<this->maxLength;i++)
+    for(byte i=0;i<this->maxLength;i++)
     {
         canBytes[i]=static_cast<char>(0x01+(0x22*i));
     }
 }
 
-void Canmsg::PrintSerial(void) const
-{
-    if(this->isExtIdentifier)
-    {
-        Serial.print("Identifier: ");
-        Serial.print(String(this->stdIdentifier<<18|this->extIdentifier,HEX));
-        Serial.print("h");
-    }
-    else
-    {
-        Serial.print("Identifier: ");
-        Serial.print(String(this->stdIdentifier,HEX));
-        Serial.print("h");
-    }
-    Serial.print(" RTR: ");
-    Serial.print(String(this->rtr));
-    Serial.print(" Time: ");
-    Serial.print(String(this->time,HEX));
-    Serial.print("h");
-	Serial.print(" Laenge: ");
-    Serial.print(String(this->canLength,HEX));
-    Serial.print("h");
-    Serial.print(" Inhalt: ");
-    for(char i=0;i<this->canLength;i++)
-    {
-        if(this->canBytes[i]<0x10)
-        {
-            Serial.print("0");
-        }
-        Serial.print(String(this->canBytes[i],HEX));
-        if(i<canLength-1)
-        {
-            Serial.print(".");
-        }   
-    }
-    Serial.println(" h");
-}
 
-/*
 Canmsg::operator String() const
 {
     String s="Identifier: ";
@@ -68,7 +34,7 @@ Canmsg::operator String() const
 	s+="h Laenge: ";
     s+=String(this->canLength,HEX);
     s+="h Inhalt: ";
-    for(char i=0;i<this->canLength;i++)
+    for(byte i=0;i<this->canLength;i++)
     {
         if(this->canBytes[i]<0x10)
         {
@@ -83,5 +49,5 @@ Canmsg::operator String() const
     s+=" h";
     return s;
 }
-*/
+
 
