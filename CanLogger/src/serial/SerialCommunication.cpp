@@ -1,20 +1,20 @@
-#include "serial/SerialCommunikation.hpp"
+#include "serial/SerialCommunication.hpp"
 
-SerialCommunikation utilities::scom {}; // Dient zur geordneten seriellen Kommunikation im Projekt
+SerialCommunication utilities::scom {}; // Dient zur geordneten seriellen Kommunikation im Projekt
 
-SerialCommunikation::SerialCommunikation()
+SerialCommunication::SerialCommunication()
 { }
 
-SerialCommunikation::SerialCommunikation(HardwareSerial& serial)
+SerialCommunication::SerialCommunication(HardwareSerial& serial)
     :serial {&serial}
 { }
 
-void SerialCommunikation::workWith(HardwareSerial& serial)
+void SerialCommunication::workWith(HardwareSerial& serial)
 {
     this->serial = &serial;
 }
 
-void SerialCommunikation::print(String const& message) const
+void SerialCommunication::print(String const& message) const
 {
     if(this->serial == nullptr)
     {
@@ -23,7 +23,7 @@ void SerialCommunikation::print(String const& message) const
     this->serial->print(message);
 }
 
-void SerialCommunikation::println(String const& message) const
+void SerialCommunication::println(String const& message) const
 {
     if(this->serial == nullptr)
     {
@@ -32,7 +32,7 @@ void SerialCommunikation::println(String const& message) const
     this->serial->println(message);
 }
 
-SerialCommunikation const& SerialCommunikation::operator<<(String const& message) const
+SerialCommunication const& SerialCommunication::operator<<(String const& message) const
 {
     if(this->serial == nullptr)
     {
@@ -42,7 +42,7 @@ SerialCommunikation const& SerialCommunikation::operator<<(String const& message
     return *this;
 }
 
-SerialCommunikation const& SerialCommunikation::operator<<(char const& message) const
+SerialCommunication const& SerialCommunication::operator<<(char const& message) const
 {
     if(this->serial == nullptr)
     {
@@ -52,7 +52,7 @@ SerialCommunikation const& SerialCommunikation::operator<<(char const& message) 
     return *this;
 }
 
-void SerialCommunikation::printError(String const& message) const
+void SerialCommunication::printError(String const& message) const
 {
     if(this->serial == nullptr)
     {
@@ -72,7 +72,7 @@ void SerialCommunikation::printError(String const& message) const
     
 }
 
-void SerialCommunikation::printDebug(String const& message) const
+void SerialCommunication::printDebug(String const& message) const
 {
     if(this->serial == nullptr)
     {
@@ -80,13 +80,13 @@ void SerialCommunikation::printDebug(String const& message) const
     }
     if(this->debugMode)
     {
-        this->serial->print(SerialCommunikation::DEBUG_CHAR);
+        this->serial->print(SerialCommunication::DEBUG_CHAR);
         this->serial->print(' ');
         this->serial->println(message);
     }
 }
 
-void SerialCommunikation::showDebugMessages(bool mode)
+void SerialCommunication::showDebugMessages(bool mode)
 {
     this->debugMode = mode;
 }
