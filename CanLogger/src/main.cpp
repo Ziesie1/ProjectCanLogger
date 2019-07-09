@@ -6,10 +6,12 @@
 Adafruit_ILI9341 display = Adafruit_ILI9341{PC9, PA8, PA10, PB5, PC8}; // use Software Serial
 //Adafruit_ILI9341 display = Adafruit_ILI9341{PC9, PA8, PC8}; // use Hardware Serial
 
-
+Canmsg msg{};
 
 void setup() {
   Serial.begin(115200);
+    
+  //CANutil::Init();
 
   display.begin();
   display.fillScreen(ILI9341_BLACK);
@@ -25,7 +27,9 @@ void loop() {
     Serial.print("char recieved: ");
     Serial.println(x);
     Canmsg msg{};
-    msg.PrintSerial();
-    //Serial.println(static_cast<String>(msg)); //soll später PrintSerial ersetzen
+    Serial.println(static_cast<String>(msg));
+    //msg.Send();
   }
+
+  delay(400);
 }

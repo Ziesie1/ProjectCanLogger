@@ -1,5 +1,14 @@
+/* 
+Um die CAN-funktion nutzen zu können muss in der Detei "stm32f3xx_hal_conf.h"
+die Zeile 55 entkommentiert werden ("//" löschen). 
+Die Zeile muss dann lauten: "#define HAL_CAN_MODULE_ENABLED"
+*/
+
+
 #ifndef CANMSG_HPP
 #define CANMSG_HPP
+
+#define CAN_MSG_CAN_BUFFER_REC_SIZE 50
 
 class Canmsg
 {
@@ -12,9 +21,20 @@ class Canmsg
 	unsigned char canLength;
 	unsigned char canBytes[maxLength];
 public:
-    Canmsg();
-    void PrintSerial(void) const;
-    //operator String() const;  //Der compiler erkennt String aus mir unbekannten Gründen nicht
+	Canmsg();
+    explicit operator String() const;  //Der compiler erkennt String aus mir unbekannten Gründen nicht
+	//operator= (Canmsg &const other);
+	void Send(void) const;
+	void Recieve(bool const fifo);
 };
+
+namespace CANutil
+{
+	void Init(void);
+	bool CheckMailbox(bool const fifo);
+	static Canmsg bufferCanRecMessages[CAN_MSG_CAN_BUFFER_REC_SIZE];
+	static int bufferCanRecPointer;
+	void CanCheck(void);
+}
 
 #endif //CANMSG
