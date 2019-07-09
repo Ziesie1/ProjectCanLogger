@@ -3,6 +3,7 @@
 #include <Adafruit_ILI9341.h>
 #include <SdFat.h>
 #include "Canmsg.h"
+#include "serial/SerialCommunikation.hpp"
 
 Adafruit_ILI9341 display = Adafruit_ILI9341{PC9, PA8, PA10, PB5, PC8}; // use Software Serial
 //Adafruit_ILI9341 display = Adafruit_ILI9341{PC9, PA8, PC8}; // use Hardware Serial
@@ -12,9 +13,12 @@ SdFat sdKarte{};
 #define errorExit(msg) errorHalt(F(msg))
 #define initError(msg) initErrorHalt(F(msg))
 
+using namespace utilities;
 
 void setup() {
   Serial.begin(115200);
+  scom.workWith(Serial); // scom Hardwareserial zuweisen
+  scom.showDebugMessages(true); // Debugmodus einschalten
 
   display.begin();
   display.fillScreen(ILI9341_BLACK);
@@ -24,18 +28,22 @@ void setup() {
   // Erster Schreibvorgang auf der SD-Karte
   delay(1000);
   if (!sdKarte.begin(SD_CS, SD_SCK_MHZ(18))) {
-    Serial.println("### Fehler beim Initialsieren der SD-Karte.");
-    sdKarte.initErrorPrint();
+    scom.printError("Bei der Initialisierung der SD-Karte trat ein Fehler auf.\nIst die Karte eingesteckt?");
+    //sdKarte.initErrorPrint();
   }
 
   if (!sdKarte.exists("/CPP4Live")) {
     if (!sdKarte.mkdir("/CPP4Live")) {
-      Serial.println("### Fehler beim erstellen von Ordner CPP4Live.");
-      sdKarte.errorPrint();
+      scom.printError("Der Ordner /CPP4Live konnte nicht erstellt werden.");
+      //sdKarte.errorPrint();
+    }else{
+      scom.printDebug("/CPP4Live wurde erstellt");
     }
+  }else{
+    scom.printDebug("/CPP4Live existiert bereits");
   }
 
-
+  scom << "CanLogger ist Initialisiert" << endz;
 }
 
 void loop() {
@@ -48,9 +56,9 @@ void serialEvent() {
     /*
       Eine Ausgabe nicht beim Interrupt erlaubt, hier nur Testweise. // Bis das gesamt Konzept feststeht.
     */
-    Serial.print("char recieved: ");
-    Serial.println(inChar);
+    scom << "Zeichen empfangen:" << inChar << endz;
+
     Canmsg msg{};
-    Serial.println(msg);
+    scom << msg << endz;
   }
 }
