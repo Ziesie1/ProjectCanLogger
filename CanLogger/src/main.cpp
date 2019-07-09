@@ -11,10 +11,6 @@ Adafruit_ILI9341 display = Adafruit_ILI9341{PC9, PA8, PA10, PB5, PC8}; // use So
 
 using namespace utilities; // für scom
 
-
-
-
-
 void setup() {
   Serial.begin(115200);
   scom.workWith(Serial); // scom Hardwareserial zuweisen
@@ -27,17 +23,12 @@ void setup() {
   display.setTextSize(3);
   display.print("Test eines Textes...");
 
-  
-
   scom << "CanLogger ist Initialisiert" << endz;
 }
 
 void loop() {
   
-  
-  
 }
-
 
 
 void serialEvent() {
