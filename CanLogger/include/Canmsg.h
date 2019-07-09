@@ -7,19 +7,22 @@ Die Zeile muss dann lauten: "#define HAL_CAN_MODULE_ENABLED"
 
 #ifndef CANMSG_HPP
 #define CANMSG_HPP
+#include <string.h>
 
-#define CAN_MSG_CAN_BUFFER_REC_SIZE 50
+#define CAN_MSG_CAN_BUFFER_REC_SIZE 50// umändern auf constexpr
+
 
 class Canmsg
 {
-    static constexpr char maxLength = 8;
+    static constexpr byte maxLength = 8;
     char16_t stdIdentifier;	//Standart identifier or MSB of the extended identifier
 	char32_t extIdentifier; //LSBs of the Extended identifier
 	bool isExtIdentifier; //Message has extended identifier
 	bool rtr;
 	char16_t time;
-	unsigned char canLength;
-	unsigned char canBytes[maxLength];
+	byte canLength;
+	byte canBytes[maxLength];
+	
 public:
 	Canmsg();
     explicit operator String() const;  //Der compiler erkennt String aus mir unbekannten Gründen nicht

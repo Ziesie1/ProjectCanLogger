@@ -1,11 +1,15 @@
 #include <Arduino.h>
 #include "Canmsg.h"    
-    
+
+/*
+    Canmsg::Canmsg()
+    Zu Testzwecken, Standartwerte
+*/
 Canmsg::Canmsg()
-:stdIdentifier{0x100},extIdentifier{0x0},isExtIdentifier{false},
-rtr{false},time{0x1000},canLength{maxLength}
+    :stdIdentifier{0x100},extIdentifier{0},isExtIdentifier{false},
+        rtr{false},time{0x1000},canLength{maxLength}
 {
-    for(unsigned char i=0;i<this->maxLength;i++)
+    for(byte i=0;i<this->maxLength;i++)
     {
         canBytes[i]=static_cast<char>(0x01+(0x22*i));
     }
@@ -29,7 +33,7 @@ Canmsg::operator String() const
 	s+="h Laenge: ";
     s+=String(this->canLength,HEX);
     s+="h Inhalt: ";
-    for(unsigned char i=0;i<this->canLength;i++)
+    for(byte i=0;i<this->canLength;i++)
     {
         if(this->canBytes[i]<0x10)
         {
