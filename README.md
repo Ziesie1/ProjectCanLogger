@@ -14,8 +14,8 @@
 ## Einleitung
 
 Bei diesem Projekt handelt es sich um eine studentische Gruppenarbeit an der [Ostfalia Hochschule für angewandte Wissenschaften](https://www.ostfalia.de/cms/de/) in Wolfenbüttel. Betreut wird die Arbeit von Prof. Dr.-Ing. Karl-Dieter Tieste von der Fakultät Elektrotechnik.
-Ziel des Projektes ist die programierung eines [Can Loggers](https://de.wikipedia.org/wiki/Datenlogger). Dieser soll eingehende [CAN-Bus](https://de.wikipedia.org/wiki/Controller_Area_Network) über ein (Display) grafisch darstellen und zusätzlich die Möglichkeit bereitstellen diese auf einer [SD Speicherkarte](https://de.wikipedia.org/wiki/SD-Karte) abzuspeichern.  
-Als Hardweare Grundlage dient das [STM32 Nucleo-64 development](https://www.st.com/en/evaluation-tools/nucleo-f303re.html#) Bord mit der [STM32F303RE MCU](STM32F303RE) MCU. Dieses Bord wird durch eine zusätzlich erstellte Platine ergänzt. Hier sind unter Anderem ein [Drehdrücksteller](), ein [Taster](), ein [CAN-Controller]() und ein [QVAG 2.2 TFT SPI 240X230] Farbdisplay verbaut. Das Display verfügt auf der Unterseite über ein SD Speicherkarten-Sockel.  
+Ziel des Projektes ist die programierung eines [Can Loggers](https://de.wikipedia.org/wiki/Datenlogger). Dieser soll eingehende [CAN-Bus-Nachrichten](https://de.wikipedia.org/wiki/Controller_Area_Network) über ein (Display) grafisch darstellen und zusätzlich die Möglichkeit bieten diese auf einer [SD Speicherkarte](https://de.wikipedia.org/wiki/SD-Karte) abzuspeichern.  
+Als Hardwearegrundlage dient das [STM32 Nucleo-64 development board](https://www.st.com/en/evaluation-tools/nucleo-f303re.html#) mit der [STM32F303RE](STM32F303RE) MCU. Dieses Bord wird durch eine zusätzlich erstellte Platine ergänzt. Hier sind unter Anderem ein [Drehdrücksteller](), ein [Taster](), ein [CAN-Controller]() und ein [QVAG 2.2 TFT SPI 240X230]() Farbdisplay verbaut. Das Display verfügt auf der Unterseite über einen SD-Speicherkarten-Sockel.  
 Programiert wird in der Entwicklungsumgebung [Microsoft Visual Studio Code](https://code.visualstudio.com/) mit [C++](https://de.wikipedia.org/wiki/C%2B%2B).
 
 
@@ -59,6 +59,7 @@ Programiert wird in der Entwicklungsumgebung [Microsoft Visual Studio Code](http
 | C         |           | GND       | 
 | SW        | CN10\|27  | PB4       | 
 | GND       |           | GND       | 
+
 *SW wird beim Drücken des Drehdrückstellers auf Masse gelegt.*
 
 <a name="#tasterPins"></a>
@@ -70,7 +71,7 @@ Programiert wird in der Entwicklungsumgebung [Microsoft Visual Studio Code](http
 | 2         | CN10\|34     | PC4       | 
 | GND       |              | GND       | 
 
-*1 und 2 liegen auf dem selben Potential. Wird der NO-Taster betätigt werden beide Pins auf Masse gelegt. Dies führt zu einem Spannungsabfall an CN10\|34 PCB.*
+*1 und 2 liegen auf dem selben Potenzial. Wird der NO-Taster betätigt werden beide Pins auf Masse gelegt. Dies führt zu einem Spannungsabfall an CN10\|34 PCB.*
 
 <a name="#CAN-Controller-Pins"></a>
 ### CAN-Controller-Pins
