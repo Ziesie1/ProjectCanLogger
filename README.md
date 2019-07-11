@@ -10,49 +10,48 @@
     * [CAN-Controller-Pins](#canControllerPins)
 * [Quellen und Hilfen](#QandH)
 
-<a name="Einleitung"></a>
+<a name="einleitung"></a>
 ## Einleitung
 
 Bei diesem Projekt handelt es sich um eine studentische Gruppenarbeit an der [Ostfalia Hochschule für angewandte Wissenschaften](https://www.ostfalia.de/cms/de/) in Wolfenbüttel. Betreut wird die Arbeit von Prof. Dr.-Ing. Karl-Dieter Tieste von der Fakultät Elektrotechnik.
-Ziel des Projektes ist die programierung eines [Can Loggers](https://de.wikipedia.org/wiki/Datenlogger). Dieser soll eingehende [CAN-Bus-Nachrichten](https://de.wikipedia.org/wiki/Controller_Area_Network) über ein (Display) grafisch darstellen und zusätzlich die Möglichkeit bieten diese auf einer [SD Speicherkarte](https://de.wikipedia.org/wiki/SD-Karte) abzuspeichern.  
-Als Hardwearegrundlage dient das [STM32 Nucleo-64 development board](https://www.st.com/en/evaluation-tools/nucleo-f303re.html#) mit der [STM32F303RE](STM32F303RE) MCU. Dieses Bord wird durch eine zusätzlich erstellte Platine ergänzt. Hier sind unter Anderem ein [Drehdrücksteller](), ein [Taster](), ein [CAN-Controller]() und ein [QVAG 2.2 TFT SPI 240X230]() Farbdisplay verbaut. Das Display verfügt auf der Unterseite über einen SD-Speicherkarten-Sockel.  
-Programiert wird in der Entwicklungsumgebung [Microsoft Visual Studio Code](https://code.visualstudio.com/) mit [C++](https://de.wikipedia.org/wiki/C%2B%2B).
+Ziel des Projektes ist die Programmierung eines [Can Loggers](https://de.wikipedia.org/wiki/Datenlogger). Dieser soll eingehende [CAN-Bus-Nachrichten](https://de.wikipedia.org/wiki/Controller_Area_Network) über ein (Display) grafisch darstellen und zusätzlich die Möglichkeit bieten diese auf einer [SD Speicherkarte](https://de.wikipedia.org/wiki/SD-Karte) abzuspeichern.  
+Als Hardwearegrundlage dient das [STM32 Nucleo-64 development board](https://www.st.com/en/evaluation-tools/nucleo-f303re.html#) mit der [STM32F303RE](STM32F303RE) MCU. Dieses Bord wird durch eine zusätzlich erstellte Platine ergänzt. Hier sind unter anderem ein [Drehdrücksteller](), ein [Taster](), ein [CAN-Controller]() und ein [QVAG 2.2 TFT SPI 240X230]() Farbdisplay verbaut. Das Display verfügt auf der Unterseite über einen SD-Speicherkarten-Sockel.  
+Programmiert wird in der Entwicklungsumgebung [Microsoft Visual Studio Code](https://code.visualstudio.com/) mit [C++](https://de.wikipedia.org/wiki/C%2B%2B).
 
 
-<a name="#pinbelegung"></a>
+<a name="pinbelegung"></a>
 ## Pinbelegung
 
-<a name="#displayPins"></a>
+<a name="displayPins"></a>
 ### Display-Pins
 
-| Display   | Bord      |           | 
+| Display   | Board-Pin | Morpho    | 
 | :-------- | :-------- | :-------- |
-| SDOI/MISO |           |           |
+| SDOI/MISO | NC        | NC        |
 | LED       | CN7\|6    | E5V       |
 | SCK       | CN10\|29  | PB5       |
 | SDI/MOSI  | CN10\|33  | PA10      |
 | DC/RS     | CN10\|23  | PA8       |
 | RESET     | CN10\|2   | PC8       |
 | CS        | CN10\|1   | PC9       |
-| GND       |           | GND       |
-| VCC       |           | VCC       |
+| GND       | GND       | GND       |
+| VCC       | VCC       | VCC       |
 
-<a name="#sdKartenPins"></a>
+<a name="sdKartenPins"></a>
 ### SD-Karten-Pins
 
-| Sockel    | Bord      |           | 
+| Sockel    | Bord-Pin  | Morpho    | 
 | :-------- | :-------- | :-------- |
-| SD_CS     | Inhalt    |           | 
-| SD_MoSI   | Inhalt    |           | 
-| SD_MOSO   | Inhalt    |           | 
-| SD_SCK    | Inhalt    |           | 
-| SD_DC/RS  | Inhalt    |           | 
-| F_CS      | Inhalt    |           | 
+| SD_CS     | CN10\|17  | PB6       | 
+| SD_MOSI   | CN10\|15  | PA7       | 
+| SD_MISO   | CN10\|13  | PA6       | 
+| SD_SCK    | CN10\|11  | PA5       | 
+| F_CS      | NC        | NC        | 
 
-<a name="#encoderPins"></a>
+<a name="encoderPins"></a>
 ### Encoder-Pins
 
-| Encoder   | Bord      |           | 
+| Encoder   | Bord-Pin  | Morpho    | 
 | :-------- | :-------- | :-------- |
 | A         | CN10\|19  | PC7       | 
 | B         | CN10\|4   | PC6       | 
@@ -62,10 +61,10 @@ Programiert wird in der Entwicklungsumgebung [Microsoft Visual Studio Code](http
 
 *SW wird beim Drücken des Drehdrückstellers auf Masse gelegt.*
 
-<a name="#tasterPins"></a>
+<a name="tasterPins"></a>
 ### Taster-Pins
 
-| Taster    | Bord         |           | 
+| Taster    | Bord-Pin     | Morpho    | 
 | :-------- | :--------    | :-------- |
 | 1         |              | VCC       | 
 | 2         | CN10\|34     | PC4       | 
@@ -73,10 +72,10 @@ Programiert wird in der Entwicklungsumgebung [Microsoft Visual Studio Code](http
 
 *1 und 2 liegen auf dem selben Potenzial. Wird der NO-Taster betätigt werden beide Pins auf Masse gelegt. Dies führt zu einem Spannungsabfall an CN10\|34 PCB.*
 
-<a name="#CAN-Controller-Pins"></a>
+<a name="canControllerPins"></a>
 ### CAN-Controller-Pins
 
-|CAN-Controller| Bord      |           |
+|CAN-Controller| Bord-Pin  | Morpho    |
 | :----------- | :-------- | :-------- |
 |              | Inhalt    |           |
 |              | Inhalt    |           |
@@ -88,7 +87,7 @@ Programiert wird in der Entwicklungsumgebung [Microsoft Visual Studio Code](http
 
 
 
-<a name="#QandH"></a>
+<a name="QandH"></a>
 ## Quellen und Hilfen
 
 * [Einführung Marcdown](https://www.markdownguide.org/basic-syntax/#overview)
