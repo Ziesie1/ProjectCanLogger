@@ -16,16 +16,21 @@ public:
     SerialCommunication(HardwareSerial& serial);
     
     void workWith(HardwareSerial& serial);
-    void print(String const& message) const ;
-    void println(String const& message) const;
-    SerialCommunication const& operator<<(String const& message) const;
-    SerialCommunication const& operator<<(char const& message) const;
+    // Ausgabe einer normalen Nachricht - ohne Zeilenumbruch
+    template<typename T>
+    void print(T const& message) const ;
+    // Ausgabe einer normalen Nachricht - mit Zeilenumbruch
+    template<typename T>
+    void println(T const& message) const;
+    // Ausgabe einer normalen Nachricht - ohne Zeilenumbruch
+    template<typename T>
+    SerialCommunication const& operator<<(T const& message) const;
     // Ausgabe einer Fehlermeldung
     void printError(String const& message) const;
     // Ausgabe von Debugnachrichten
     void printDebug(String const& message) const;
+    // Aktivierung/Deaktivierung von Debugnachrichten
     void showDebugMessages(bool mode);
-
 };
 
 
@@ -35,6 +40,7 @@ namespace utilities
     extern SerialCommunication scom;
 }
 
+#include "serial/SerialCommunication.inl"
 
 
 #endif

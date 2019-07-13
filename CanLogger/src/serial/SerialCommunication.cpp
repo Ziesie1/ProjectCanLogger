@@ -14,44 +14,6 @@ void SerialCommunication::workWith(HardwareSerial& serial)
     this->serial = &serial;
 }
 
-void SerialCommunication::print(String const& message) const
-{
-    if(this->serial == nullptr)
-    {
-        return;
-    }
-    this->serial->print(message);
-}
-
-void SerialCommunication::println(String const& message) const
-{
-    if(this->serial == nullptr)
-    {
-        return;
-    }
-    this->serial->println(message);
-}
-
-SerialCommunication const& SerialCommunication::operator<<(String const& message) const
-{
-    if(this->serial == nullptr)
-    {
-        return *this;
-    }
-    this->serial->print(message);
-    return *this;
-}
-
-SerialCommunication const& SerialCommunication::operator<<(char const& message) const
-{
-    if(this->serial == nullptr)
-    {
-        return *this;
-    }
-    this->serial->print(message);
-    return *this;
-}
-
 void SerialCommunication::printError(String const& message) const
 {
     if(this->serial == nullptr)
