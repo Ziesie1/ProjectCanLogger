@@ -1,62 +1,97 @@
 #include <Arduino.h>
 #include "buttons/Encoder.hpp"
+#include "serial/SerialCommunication.hpp"
+
+using namespace utilities;
 
 //Variablen zur Auswertung des Drehencoders
-int oldval = 1;
 constexpr int encoderPinA = PC7;
 constexpr int encoderPinB = PC6;
+constexpr int encoderPinTaster = PB4;
 volatile int encoderPos = 0;
-int encoder0PinALast = LOW;
-boolean rotating = false;
-boolean A_set = false;            
-boolean B_set = false;
+volatile boolean tasterSet = false;            
+unsigned long aktuelleZeitEncoder = 0;
+unsigned long aktuelleZeitEncoderTaster = 0;
+unsigned long alteZeitEncoder = 0;
+unsigned long alteZeitEncoderTaster = 0;
+unsigned long entprellZeitEncoder = 50;
+unsigned long entprellZeitEncoderTaster = 50;
+unsigned long diffEncoder;
+unsigned long diffEncoderTaster;
 
-void doEncoderA(){
 
-  if ( rotating ) {
-    delay (1);  // wait a little until the bouncing is done
-    if( digitalRead(encoderPinA) != A_set ) {  // debounce once more
-      A_set = !A_set;
-      if ( A_set && !B_set ){ 
-        encoderPos ++;
-      rotating = false; 
-      } // no more debouncing until loop() hits again
+//Interrupt Service Routinen
+
+void doEncoderA()
+{
+  aktuelleZeitEncoder = millis();
+  diffEncoder = aktuelleZeitEncoder-alteZeitEncoder;
+  if( diffEncoder > entprellZeitEncoder)
+  {
+    if(digitalRead(encoderPinB) == HIGH ) 
+    { 
+    
+      encoderPos ++;
+      
     }
-  }
-}
-void doEncoderB(){
-
-  if ( rotating ){
-    delay (1);
-    if( digitalRead(encoderPinB) != B_set ) {
-      B_set = !B_set;
-      //  adjust counter - 1 if B leads A
-      if( B_set && !A_set ){ 
-        encoderPos --;
-        rotating = false;
-      }
+    else
+    {
+      encoderPos--;
     }
-  }
+  
+    
+    alteZeitEncoder = aktuelleZeitEncoder;
+    scom.println(encoderPos);
+   }
+  
+
+
 }
 
+
+void doEncoderTast()
+{
+  aktuelleZeitEncoderTaster = millis();
+  diffEncoderTaster = aktuelleZeitEncoderTaster - alteZeitEncoderTaster;
+  if(diffEncoderTaster > entprellZeitEncoderTaster)
+  {
+    if(tasterSet)
+    {
+      tasterSet = false;
+    }
+    else
+    {
+      tasterSet = true;
+    }
+   
+    	alteZeitEncoderTaster = aktuelleZeitEncoderTaster;
+      scom<<"Interrupt ausgelöst"<<endz;
+      scom<<tasterSet<<endz;
+  }
+
+  
+}
 
 void initEncoder()
 {
-    pinMode (encoderPinA, INPUT);
+  
+  
+
+  pinMode (encoderPinA, INPUT);
   pinMode (encoderPinB, INPUT);
+  pinMode (encoderPinTaster, INPUT);
 
-  //digitalWrite(encoderPinA,HIGH);
-  //digitalWrite(encoderPinB,HIGH);
+  digitalWrite(encoderPinA,LOW);
+  digitalWrite(encoderPinB,LOW);
+  digitalWrite(encoderPinTaster,LOW);
 
-  //attachInterrupt(0,doEncoderA,CHANGE);
-  //attachInterrupt(1,doEncoderB,CHANGE);
+  attachInterrupt(digitalPinToInterrupt(encoderPinA),doEncoderA,FALLING);//Auswertung von PinB ist beim verbauten Encoder aufgrund der Rastpunkte nicht sinnvoll
+  attachInterrupt(digitalPinToInterrupt(encoderPinTaster),doEncoderTast,CHANGE);
+  
+  scom << "Encoder ist Initialisiert" << endz;
 }
-void loopEncoder()
+
+int getEncoderValue()
 {
-  rotating = true;
-  if(oldval != encoderPos)
-  {
-    Serial.println(encoderPos);
-    oldval = encoderPos;
-  }
+  return encoderPos;
 }

@@ -5,6 +5,6 @@
 
 void initEncoder();
 void loopEncoder();
-
+int getEncoderValue();
 
 #endif
