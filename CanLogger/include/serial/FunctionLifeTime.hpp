@@ -10,13 +10,10 @@ class FunctionLifeTime
     uint32_t time;
 
 public:
-    FunctionLifeTime();
     FunctionLifeTime(String const& functionName);
     ~FunctionLifeTime();
 };
 
-
-#define FUNCTION_TIME FunctionLifeTime{};
-#define FUNCTION_TIME_X(x) FunctionLifeTime{x};
+#define FUNCTION_TIME_X(x) FunctionLifeTime functionlifetime{x};
 
 #endif

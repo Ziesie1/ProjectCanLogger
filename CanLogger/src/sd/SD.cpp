@@ -16,15 +16,17 @@ constexpr char FILE_NAME_CAN[] = "log_";
 constexpr char FILE_TYPE_CAN[] = ".txt";
 
 SdFat sdKarte {};
+XFile canLogFile {sdKarte};
 
 void init_SD()
 {
-    // Erster Schreibvorgang auf der SD-Karte
+    // SD-Karte Initialisiern
     if (!sdKarte.begin(SD_CS, SD_SCK_MHZ(18))) {
         scom.printError("Bei der Initialisierung der SD-Karte trat ein Fehler auf.\nIst die Karte eingesteckt?");
         //sdKarte.initErrorPrint();
     }
 
+    // Ordner /can_log erstellen
     if (!sdKarte.exists(DIRECOTRY_CAN)) {
         if (!sdKarte.mkdir(DIRECOTRY_CAN)) {
             String str = "Der Ordner ";
@@ -43,37 +45,42 @@ void init_SD()
         scom.printDebug(str);
     }
 
-    if (sdKarte.chdir(DIRECOTRY_CAN)) { // Verzeichnis gesetzt
-        String dateiName = FILE_NAME_CAN;
-        dateiName += 0;
-        dateiName += FILE_TYPE_CAN;
+}
 
-        XFile file1;
-        if (!file1.open(dateiName.c_str(), O_RDWR | O_CREAT | O_TRUNC)) {
-            String str = dateiName;
-            str += " konnte nicht geöffnet/erstellt werden.";
-            scom.printError(str);
-        }
+void createNewCanLogFile()
+{
+    canLogFile.setFilePath(DIRECOTRY_CAN);
 
-        // write data to /Dir1/test.bin on sd1
-        String serialAusgabe = "";
-        file1.writeStr("Dies ist ein erster test, ob die Datei richtig beschrieben wird!\n");
-        uint32_t zeit = millis();
-        for(int i = 0; i < 10; i++)
-        {
-            String ausgabe = "Ich bin auf das Ergebnis gespannt. [";
-            ausgabe += i;
-            ausgabe += "]\n";
+    int number = 0;
+    do  // freie log_X.txt Datei finden
+    {
+        String str = FILE_NAME_CAN;
+        str += number;
+        str += FILE_TYPE_CAN;
+        canLogFile.setFileName(str);
+        number++;
+    } while (canLogFile.exists());
+    
+    scom.printDebug(canLogFile.getFileName());
+     
+    canLogFile.writeStr("identifier(dez);RTR bit;time stamp(hex);data length(dez);byte 1(hex);byte 2(hex);byte 3(hex);byte 4(hex);byte 5(hex);byte 6(hex);byte 7(hex);byte 8(hex)\n");
 
-            zeit = millis();
-            file1.appendStr(ausgabe);
-            serialAusgabe += String(millis()-zeit);
-            serialAusgabe += " ms\n";
-            
-        }
-        scom.printDebug(serialAusgabe);
-        
+}
+
+String getFullLogFilePath()
+{
+    return canLogFile.getTotalFilePath();
+}
 
 
+void saveNewCanMessage(Canmsg const& msg)
+{
+    bool result = canLogFile.appendStr(static_cast<String>(msg)+'\n');
+    if(result == false)
+    {
+        String str = "Die folgende Can-Nachricht konnte nicht gespeichert werden:\n";
+        str += static_cast<String>(msg);
+        str += "\nIst die Speicherkarte noch eingesteckt?";
+        scom.printError(str);
     }
 }

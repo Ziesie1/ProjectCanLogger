@@ -4,11 +4,6 @@
 
 using namespace utilities;
 
-FunctionLifeTime::FunctionLifeTime()
-{
-    this->time = millis();
-}
-
 FunctionLifeTime::FunctionLifeTime(String const& functionName)
     :function {functionName}
 {
@@ -19,7 +14,7 @@ FunctionLifeTime::~FunctionLifeTime()
 {
     uint32_t diff = millis() - this->time;
     String str = this->function;
-    str += ": in ";
+    str += ": lief ";
     str += diff;
     str += " ms";
     scom.printDebug(str);
