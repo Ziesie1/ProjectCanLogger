@@ -1,5 +1,11 @@
 #include <Arduino.h>
-#include "Canmsg.h"    
+#include "Canmsg.hpp"  
+#include "stm32f3xx_ll_gpio.h"
+  
+
+static CAN_HandleTypeDef hcan;
+
+
 
 /*
     Canmsg::Canmsg()
@@ -51,57 +57,26 @@ Canmsg::operator String() const
 
  
 void CANutil::Init(void)
-{
-	//ToDo: 	Hier CAN Initialisierung einfügen
-	// STM32F303RET6 PLLCLK is 72 MHz
-	// Clock for CAN is APB1CLOCK with 36 MHz
-	// To get multiple of 1MHz setup CAN State Machine with 18 Cycles
-	// https://www.mikrocontroller.net/topic/200078
-	// BS1 = 12 TQ, BS2 = 5 TQ + Sync = 1 TQ, Sum: 18TQ
+{	
 	
-	/*
-	 alte berechnung:
-	CAN_TS1 = BS1-1, CAN_TS2 = BS2-1;  
-	#define CAN_TS1 11
-	#define CAN_TS2 4
-	#define CAN_SJW 1		
-	*/
-
-	//BRP = Prescalor - 1
-	// 1   Mbit Prescalor 2, 
-	#define CAN_1000_KBIT 1
-	// 500 kBit Prescalor 4
-	#define CAN_500_KBIT 3
-	// 400 kBit Prescalor 5
-	#define CAN_400_KBIT 4
-	// 250 kBit Prescalor 8
-	#define CAN_250_KBIT 7
-	// 200 kBit Prescalor 10
-	#define CAN_200_KBIT 9
-	// 125 kBit Prescalor 16
-	#define CAN_125_KBIT 15
-	// 125 kBit Prescalor 20
-  	#define CAN_100_KBIT 19
-
-	// Select baud rate
- 	 #define CAN_BRP CAN_500_KBIT
-
 	//set up CAN-Mode
-	CAN_HandleTypeDef hcan;
-
+	 
+	hcan.Instance = CAN1;
 	hcan.Init.Mode = CAN_MODE_NORMAL;
 	hcan.Init.TimeTriggeredMode = ENABLE;
 	hcan.Init.TimeSeg2 = CAN_BS2_5TQ;
 	hcan.Init.TimeSeg1 = CAN_BS1_12TQ;
 	hcan.Init.SyncJumpWidth = CAN_SJW_1TQ;
-	hcan.Init.Prescaler = CAN_BRP;
+	hcan.Init.Prescaler = 6;
 	hcan.Init.AutoBusOff = DISABLE;
 	hcan.Init.AutoRetransmission = DISABLE;
 	hcan.Init.AutoWakeUp = DISABLE;
 	hcan.Init.ReceiveFifoLocked = DISABLE;
 	hcan.Init.TransmitFifoPriority = DISABLE;
 
-	HAL_CAN_MspInit(&hcan);
+
+
+	//HAL_CAN_MspInit(&hcan);
 	__HAL_RCC_CAN1_CLK_ENABLE();
 	__HAL_RCC_GPIOB_CLK_ENABLE();
 	
@@ -122,16 +97,18 @@ void CANutil::Init(void)
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
+	
 	//IRQ
-	/*
+	
 	IRQn_Type irqn = CAN_RX1_IRQn;
 	HAL_NVIC_SetPriority(irqn,1,5);
 	HAL_NVIC_EnableIRQ(irqn);
-	HAL_CAN_IRQHandler(&hcan);
-	*/
+	HAL_CAN_IRQHandler(&hcan);//hier steigt er aus
+	
 
 	//initialize CAN-periphery
-	HAL_CAN_Init(&hcan);
+	HAL_CAN_Init(&hcan); //ansonsten steigt er hier aus -> liegt es vielleicht an hcan??? obwohl es weiter oben mit hcan zu funktionieren scheint
+	//am besten mal ein Beispiel für CAN mit HAL bibo raussuchen
 
 	//Messagefilter
 	CAN_FilterTypeDef canFilter;
@@ -149,41 +126,92 @@ void CANutil::Init(void)
 	CANutil::bufferCanRecPointer=0;
 
 	HAL_CAN_Start(&hcan);
+	
+	//altes C-Programm:
+/*	LL_GPIO_InitTypeDef GPIO_InitStruct;
 
-	//CAN->MCR |= CAN_MCR_INRQ; /* Enter CAN Init Mode */
-	//while ((CAN->MSR & CAN_MSR_INAK) != static_cast<uint32_t>(CAN_MSR_INAK)) /* Wait 4 Init */
+	GPIO_InitStruct.Pin = CAN_TX_Pin;
+	GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
+	GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_HIGH;
+	GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+	GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+	GPIO_InitStruct.Alternate = CAN_TX_GPIO_ALTERNATE;
+	LL_GPIO_Init(CAN_TX_GPIO_Port, &GPIO_InitStruct);
+
+	GPIO_InitStruct.Pin = CAN_RX_Pin;
+	GPIO_InitStruct.Alternate = CAN_RX_GPIO_ALTERNATE;
+	GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
+	GPIO_InitStruct.OutputType = LL_GPIO_MODE_INPUT;
+	GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
+	LL_GPIO_Init(CAN_RX_GPIO_Port, &GPIO_InitStruct);
+*/
+/* 
+	//ToDo: 	Hier CAN Initialisierung einfügen
+	// STM32F303RET6 PLLCLK is 72 MHz
+	// Clock for CAN is APB1CLOCK with 36 MHz
+	// To get multiple of 1MHz setup CAN State Machine with 18 Cycles
+	// https://www.mikrocontroller.net/topic/200078
+	// BS1 = 12 TQ, BS2 = 5 TQ + Sync = 1 TQ, Sum: 18TQ
+	// CAN_TS1 = BS1-1, CAN_TS2 = BS2-1; 
+	#define CAN_TS1 11
+	#define CAN_TS2 4
+	#define CAN_SJW 1		
+	
+	// 1   Mbit Prescalor 2, BRP = Prescalor - 1
+	#define CAN_1000_KBIT 1
+	// 500 kBit Prescalor 4
+	#define CAN_500_KBIT 3
+	// 400 kBit Prescalor 5
+	#define CAN_400_KBIT 4
+	// 250 kBit Prescalor 8
+	#define CAN_250_KBIT 7
+	// 200 kBit Prescalor 10
+	#define CAN_200_KBIT 9
+	// 125 kBit Prescalor 16
+	#define CAN_125_KBIT 15
+	// 125 kBit Prescalor 20
+  #define CAN_100_KBIT 19
+
+// Select baud rate
+  #define CAN_BRP CAN_500_KBIT
+*/	
+	
+//	CAN->MCR |= CAN_MCR_INRQ; /* Enter CAN Init Mode */
+//	while ((CAN->MSR & CAN_MSR_INAK) != CAN_MSR_INAK) /* Wait 4 Init */
 	{
 ;		/* add time out here for a robust application */
 	}
-	//CAN->MCR &= ~CAN_MCR_SLEEP; /* Release from Sleep Mode */
-	//CAN->BTR = (CAN_SJW << 24 | CAN_TS2 << 20 | CAN_TS1 << 16 | CAN_BRP); /* Set Timing */
+//	CAN->MCR &=~ CAN_MCR_SLEEP; /* Release from Sleep Mode */
+//	CAN->BTR = (CAN_SJW << 24 | CAN_TS2 << 20 | CAN_TS1 << 16 | CAN_BRP); /* Set Timing */
 
-	//CAN->MCR |= CAN_MCR_TTCM; //enable Time triggered Communication
+//	CAN->MCR |= CAN_MCR_TTCM; //enable Time triggered Communication
 	
 	// Initializing Filter to store any incomming Messages in FIFO 0 
-	//CAN->FMR |= CAN_FMR_FINIT; /* Enter Filter initialization Mode */										 
-	//CAN->FA1R &= ~CAN_FA1R_FACT0; // deaktivate Filter 0
+//	CAN->FMR |= CAN_FMR_FINIT; /* Enter Filter initialization Mode */										 
+//	CAN->FA1R &=~ CAN_FA1R_FACT0; // deaktivate Filter 0
 	
-	//CAN->FS1R |= CAN_FS1R_FSC0; //set 32-bit scale configuration for filter 0
-	//CAN->FM1R &= ~CAN_FM1R_FBM0; //set 32-bit mask mode for filter 0
+//	CAN->FS1R |= CAN_FS1R_FSC0; //set 32-bit scale configuration for filter 0
+//	CAN->FM1R &=~ CAN_FM1R_FBM0; //set 32-bit mask mode for filter 0
 	
-	//CAN->sFilterRegister[0].FR1 = 0; //init 32-bit mask for filter 0
-	//CAN->sFilterRegister[0].FR2 = 0; //let everything through for filter 0
+//	CAN->sFilterRegister[0].FR1 = 0; //init 32-bit mask for filter 0
+//	CAN->sFilterRegister[0].FR2 = 0; //let everything through for filter 0
 	
-	//CAN->FFA1R &= ~CAN_FFA1R_FFA0; //assign filter 0 to FIFO 0
-	//CAN->FA1R |= CAN_FA1R_FACT0; //activate Filter 0
+//	CAN->FFA1R &=~ CAN_FFA1R_FFA0; //assign filter 0 to FIFO 0
+//	CAN->FA1R |= CAN_FA1R_FACT0; //activate Filter 0
 	
-	//CAN->FMR &= ~CAN_FMR_FINIT; /* Leave Filter initialization Mode */
+//	CAN->FMR &=~ CAN_FMR_FINIT; /* Leave Filter initialization Mode */
 	
 	//Interrupt Einstellungen
-	//CAN->IER |= CAN_IER_FMPIE0; //enable interrupt for FIFO 0 if message available, Register: CAN_IER
-	//NVIC_EnableIRQ(CAN_RX0_IRQn); //Interrupt hinzufügen
+//	CAN->IER |= CAN_IER_FMPIE0; //enable interrupt for FIFO 0 if message available, Register: CAN_IER
+//	NVIC_EnableIRQ(CAN_RX0_IRQn); //Interrupt hinzufügen
 	
-	//CAN->MCR &= ~CAN_MCR_INRQ; /* Leave CAN Init Mode */
-	//while ((CAN->MSR & CAN_MSR_INAK) == CAN_MSR_INAK) /* Wait 4 Init Finished */
+//	CAN->MCR &=~ CAN_MCR_INRQ; /* Leave CAN Init Mode */
+//	while ((CAN->MSR & CAN_MSR_INAK) == CAN_MSR_INAK) /* Wait 4 Init Finished */
 	{
 	;	/* add time out here for a robust application */
 	}
+
+	
 }
 
 /*
@@ -204,6 +232,8 @@ bool CANutil::CheckMailbox(bool const fifo)
 		return CAN->RF1R & CAN_RF1R_FMP1;
 	}
 }
+
+
 
 /*
 Liest eine im FIFO liegende Nachricht ein
@@ -244,7 +274,7 @@ return:	void
 */
 void Canmsg::Send(void) const
 {
-	if (  CAN->sTxMailBox[0].TIR & CAN_TI0R_TXRQ)
+	/*/if (  CAN->sTxMailBox[0].TIR & CAN_TI0R_TXRQ)
 	{
 		Serial.println("Can FIFO ist busy");
 	}
@@ -270,7 +300,32 @@ void Canmsg::Send(void) const
 			ti0R |= this->stdIdentifier << CAN_TI0R_STID_Pos | CAN_TI0R_TXRQ; //Standard identifier setzen
 		}
 		CAN->sTxMailBox[0].TIR = ti0R;
+	}*/
+	CAN_TxHeaderTypeDef header;
+
+	header.ExtId = this->isExtIdentifier;
+	header.StdId = this->stdIdentifier;
+	header.RTR = this->rtr;
+	if(this->isExtIdentifier)
+	{
+		header.IDE = CAN_ID_EXT;	
 	}
+	else
+	{
+		header.IDE = CAN_ID_STD;
+	}
+	header.DLC = this->canLength;
+	header.TransmitGlobalTime = DISABLE;
+	uint8_t data[8];
+	for(int i=0;i<this->canLength;i++)
+	{
+		data[i]=this->canBytes[i];
+	}
+	uint32_t mailbox = CAN_TX_MAILBOX0;
+	while(HAL_CAN_GetTxMailboxesFreeLevel(&hcan)!=0U)
+	{
+	}
+	HAL_CAN_AddTxMessage(&hcan,&header,data,&mailbox);
 }
 
 /*

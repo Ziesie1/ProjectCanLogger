@@ -7,10 +7,8 @@ Die Zeile muss dann lauten: "#define HAL_CAN_MODULE_ENABLED"
 
 #ifndef CANMSG_HPP
 #define CANMSG_HPP
-#include <string.h>
 
 #define CAN_MSG_CAN_BUFFER_REC_SIZE 50// umändern auf constexpr
-
 
 class Canmsg
 {
