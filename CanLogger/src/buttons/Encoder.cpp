@@ -21,7 +21,7 @@ unsigned long diffEncoderTaster;
 
 
 //Interrupt Service Routinen
-
+//Um ein Prellen zu verhindern wird die Aufrufzeit des Interrupts verwendet
 void doEncoderA()
 {
   aktuelleZeitEncoder = millis();
