@@ -4,69 +4,48 @@
 
 using namespace utilities;
 
-constexpr int tasterPin = PC4;
-int zustandTaster = 0;
-int zustandTasteralt = 0;
-unsigned long aktuelleZeitTaster = 0;
-unsigned long alteZeitTaster = 0;
-unsigned long entprellZeitTaster = 50;
-unsigned long diff = 0;
+namespace singleTaster{
+    constexpr int TASTER_PIN = PC4;
+    constexpr unsigned long ENTPRELL_ZEIT_TASTER = 50;
 
-// Interruptroutine, die aufgrund der Pinbelegung nicht genutzt werden kann
-void doTasterPin()
-{
-    aktuelleZeitTaster = millis();
-    diff = aktuelleZeitTaster - alteZeitTaster;
-    if(diff > entprellZeitTaster)
-    {
-        if(zustandTaster)
-        {
-            zustandTaster = false;
-        }
-        else
-        {
-            zustandTaster = true;
-        }
-        
-        scom<<"Interrupt Taster 2"<<endz;
-        scom<<zustandTaster<<endz;
-    }
+    bool zustandTasteralt = false;
+    unsigned long alteZeitTaster = 0;
+
+    bool tasterPressed = false;
 }
+
+using namespace singleTaster;
 
 //Initialisierung des Tasters
 void initTaster()
 {
-    pinMode(tasterPin,INPUT);
-    digitalWrite(tasterPin,HIGH);
-
-    scom<<"Taster initialisiert"<<endz;
+    pinMode(TASTER_PIN, INPUT);
+    scom.printDebug("Taster initialisiert");
 }
 
-//Entprellen: Zustand wird nach der eingestellten Entprellzeit erneut abgefragt und ggf. korrigiert
-//Der Tasterausgang wird beim Betätigen auf Masse gezogen -> Verneinung beim Lesen des Tasters
-boolean entprellen(int pin)
+// muss füe die funktionalität des Tasters ständig aufgerufen werden
+void loopTaster()
 {
-    boolean zustand = !digitalRead(pin);
-    delay(entprellZeitTaster);
-    if(!digitalRead(pin) == zustand)
+    if(millis() - alteZeitTaster >= ENTPRELL_ZEIT_TASTER)
     {
-        return zustand;
-    }
-    else
-    {
-        return !digitalRead(pin);
+        bool pinStatus = !digitalRead(TASTER_PIN);
+        if(pinStatus != zustandTasteralt)
+        {
+            zustandTasteralt = pinStatus;
+            alteZeitTaster = millis();
+            if(pinStatus)
+            {
+                tasterPressed = true;
+            }
+            scom << "Zustand Taster2: " << pinStatus << endz; // später auskommentieren
+        }
     }
 }
 
-//Der Zustand ( gedrückt == 1 ; unbetätigt == 0) wird beim Wechsel im seriellen Monitor ausgegeben
-void auswertungTaster()
+bool wasSingleTasterPressed()
 {
-    zustandTaster = entprellen(tasterPin);
-    if(zustandTaster != zustandTasteralt)
-    {
-        scom<<zustandTaster<<endz;
-        zustandTasteralt = zustandTaster;
-        
-    }
+    bool ret = tasterPressed;
+    tasterPressed = false;
+    return ret;
 }
 

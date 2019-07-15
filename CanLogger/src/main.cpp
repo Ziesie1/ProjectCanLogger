@@ -19,6 +19,8 @@ void setup() {
   scom.showDebugMessages(true); // Debugmodus einschalten
   
   init_SD();
+  initEncoder();
+  initTaster();
 
   display.begin();
   display.fillScreen(ILI9341_BLACK);
@@ -26,14 +28,10 @@ void setup() {
   display.print("Test eines Textes...");
 
   scom << "CanLogger ist Initialisiert" << endz;
-
-  initEncoder();
-  initTaster();
 }
 
 void loop() {
-
- auswertungTaster();
+  loopTaster();
   
 }
 
