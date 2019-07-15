@@ -34,7 +34,7 @@ Canmsg msg{};
 
 void loop() {
   delay(3000);
-  msg.Send();
+  msg.Send();//no real send just yet
   Serial.println(static_cast<String>(msg));
   delay(2000);
 }
