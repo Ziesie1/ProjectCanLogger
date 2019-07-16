@@ -23,7 +23,7 @@ void initTaster()
     scom.printDebug("Taster initialisiert");
 }
 
-// muss füe die funktionalität des Tasters ständig aufgerufen werden
+// muss für die funktionalität des Tasters ständig aufgerufen werden
 void loopTaster()
 {
     if(millis() - alteZeitTaster >= ENTPRELL_ZEIT_TASTER)

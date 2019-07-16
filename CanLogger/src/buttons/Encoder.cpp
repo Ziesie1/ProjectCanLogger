@@ -10,12 +10,13 @@ namespace encoder{
   constexpr int ENCODER_PIN_B = PC6;
   constexpr int ENCODER_PIN_TASTER = PB4;
 
-  constexpr unsigned long entprellZeitEncoder = 50; // in ms
-  constexpr unsigned long entprellZeitEncoderTaster = 50; // in ms
+  constexpr unsigned long ENTRPRELL_ZEIT_ENCODER = 50; // in ms
+  constexpr unsigned long ENTPRELL_ZEIT_ENCODER_TASTER = 50; // in ms
 
   volatile int encoderPos = 0;
+  volatile bool encoderPosChanged = false;
   volatile bool tasterSet = false;
-  volatile bool tasterPressed = false;       
+  volatile bool tasterPressed = false;
   volatile unsigned long alteZeitEncoder = 0;
   volatile unsigned long alteZeitEncoderTaster = 0;
 }
@@ -26,9 +27,9 @@ using namespace encoder;
 //Um ein Prellen zu verhindern wird die Aufrufzeit des Interrupts verwendet
 void doEncoderA()
 {
-  unsigned long diffEncoder = millis()-alteZeitEncoder;
-  if( diffEncoder > entprellZeitEncoder)
+  if (millis() - alteZeitEncoder > ENTRPRELL_ZEIT_ENCODER)
   {
+    encoderPosChanged = true;
     if(digitalRead(ENCODER_PIN_B) == HIGH ) 
     { 
       encoderPos ++;
@@ -43,11 +44,10 @@ void doEncoderA()
    }
 }
 
-
+// Zur Auswertung des Tasters im Encoder
 void doEncoderTast()
 {
-  unsigned long diffEncoderTaster = millis() - alteZeitEncoderTaster;
-  if(diffEncoderTaster > entprellZeitEncoderTaster)
+  if(millis() - alteZeitEncoderTaster > ENTPRELL_ZEIT_ENCODER_TASTER)
   {
     tasterSet = !tasterSet;
     if(tasterSet)
@@ -61,6 +61,7 @@ void doEncoderTast()
   }
 }
 
+// Initialisierung des Encoders
 void initEncoder()
 {
   pinMode (ENCODER_PIN_A, INPUT);
@@ -73,8 +74,10 @@ void initEncoder()
   scom.printDebug("Encoder ist Initialisiert");
 }
 
+// Gibt die aktuelle position des Encoders zurück
 int getEncoderValue()
 {
+  encoderPosChanged = false;
   return encoderPos;
 }
 
@@ -83,4 +86,10 @@ bool wasEncoderButtonPressed()
   bool ret = tasterPressed;
   tasterPressed = false;
   return ret;
+}
+
+bool hasEncoderPosChanged()
+{
+  encoderPosChanged = false;
+  return encoderPosChanged;
 }
