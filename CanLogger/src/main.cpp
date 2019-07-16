@@ -2,7 +2,8 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_ILI9341.h>
 #include "sd/SD.hpp"
-#include "Canmsg.hpp"
+#include "can/CanUtility.hpp"
+#include "can/Canmsg.hpp"
 #include "serial/SerialCommunication.hpp"
 #include "buttons/Encoder.hpp"
 
@@ -19,7 +20,7 @@ void setup() {
   //scom.showDebugMessages(true); // Debugmodus einschalten
   
   //init_SD();
-  CANutil::Init();
+  //CanUtility_Init();
 
   display.begin();
   display.fillScreen(ILI9341_BLACK);
@@ -27,14 +28,11 @@ void setup() {
   display.print("Test eines Textes...");
 
   //scom << "CanLogger is initialised" << endz;
-  delay(2000);
 }
 
 Canmsg msg{};
 
 void loop() {
-  delay(3000);
-  msg.Send();//no real send just yet
   Serial.println(static_cast<String>(msg));
   delay(2000);
 }

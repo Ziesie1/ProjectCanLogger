@@ -12,7 +12,6 @@ Die Zeile muss dann lauten: "#define HAL_CAN_MODULE_ENABLED"
 
 class Canmsg
 {
-    static constexpr byte maxLength = 8;
     char16_t stdIdentifier;	//Standart identifier or MSB of the extended identifier
 	char32_t extIdentifier; //LSBs of the Extended identifier
 	bool isExtIdentifier; //Message has extended identifier
@@ -22,20 +21,27 @@ class Canmsg
 	byte canBytes[maxLength];
 	
 public:
+	static constexpr byte maxLength = 8;
+	
 	Canmsg();
     explicit operator String() const;  //Der compiler erkennt String aus mir unbekannten Gründen nicht
-	//operator= (Canmsg &const other);
-	void Send(void) const;
-	void Recieve(bool const fifo);
+	//operator= (Canmsg &const other);// noch nicht implementiert
+	
+	// Get-Funktionen:
+	char16_t GetStdIdentifier() const;
+	char32_t GetExtIdentifier() const;
+	bool GetIsExtIdentifier() const;
+	bool GetRtr() const;
+	char16_t GetTime() const;
+	byte GetCanLength() const;
+	byte GetCanByte(int const idx) const;
+	
+	// Bus-Funktionen:
+	void Send(void) const;// noch nicht verwendbar
+	void Recieve(bool const fifo);// noch nicht verwendbar
 };
 
-namespace CANutil
-{
-	void Init(void);
-	bool CheckMailbox(bool const fifo);
-	static Canmsg bufferCanRecMessages[CAN_MSG_CAN_BUFFER_REC_SIZE];
-	static int bufferCanRecPointer;
-	void CanCheck(void);
-}
+extern Canmsg Canmsg_bufferCanRecMessages[CAN_MSG_CAN_BUFFER_REC_SIZE];
+extern int Canmsg_bufferCanRecPointer;
 
 #endif //CANMSG
