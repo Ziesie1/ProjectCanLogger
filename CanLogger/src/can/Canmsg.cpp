@@ -119,7 +119,7 @@ void Canmsg::Send(void) const
 		header.DLC = this->canLength;
 		header.TransmitGlobalTime = DISABLE;
 		uint8_t data[8];
-		for(int i=0;i<header.DLC;i++)
+		for(int i=0; i<header.DLC; i++)
 		{
 			data[i] = this->canBytes[i];
 		}

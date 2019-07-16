@@ -12,6 +12,10 @@ Die Zeile muss dann lauten: "#define HAL_CAN_MODULE_ENABLED"
 
 class Canmsg
 {
+public:
+	static constexpr byte maxLength = 8;
+
+private:
     char16_t stdIdentifier;	//Standart identifier or MSB of the extended identifier
 	char32_t extIdentifier; //LSBs of the Extended identifier
 	bool isExtIdentifier; //Message has extended identifier
@@ -20,9 +24,7 @@ class Canmsg
 	byte canLength;
 	byte canBytes[maxLength];
 	
-public:
-	static constexpr byte maxLength = 8;
-	
+public:	
 	Canmsg();
     explicit operator String() const;  //Der compiler erkennt String aus mir unbekannten Gründen nicht
 	//operator= (Canmsg &const other);// noch nicht implementiert

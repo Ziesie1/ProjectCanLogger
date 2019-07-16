@@ -38,7 +38,7 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef *hcan)
 	
 	// RX-Pin:
 	canPin.Pin = GPIO_PIN_8;
-	canPins.Mode = GPIO_MODE_INPUT;
+	canPin.Mode = GPIO_MODE_INPUT;
 	HAL_GPIO_Init(GPIOB, &canPin);	
 	
 	//setup Interrupts:

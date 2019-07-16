@@ -34,6 +34,7 @@ Canmsg msg{};
 
 void loop() {
   Serial.println(static_cast<String>(msg));
+  Serial.println(String(msg.GetStdIdentifier(),HEX));
   delay(2000);
 }
 
