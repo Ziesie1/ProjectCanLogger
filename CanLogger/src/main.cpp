@@ -19,13 +19,16 @@ void setup() {
   scom.showDebugMessages(true); // Debugmodus einschalten
   
   init_SD();
+
   initEncoder();
   initTaster();
+  createNewCanLogFile();
+
 
   display.begin();
   display.fillScreen(ILI9341_BLACK);
-  display.setTextSize(3);
-  display.print("Test eines Textes...");
+  display.setTextSize(2);
+  display.print(getFullLogFilePath());
 
   scom << "CanLogger ist Initialisiert" << endz;
 }
@@ -46,6 +49,7 @@ void serialEvent() {
 
     Canmsg msg{};
     scom << static_cast<String>(msg) << endz;
+    saveNewCanMessage(msg);
   }
   
 }
