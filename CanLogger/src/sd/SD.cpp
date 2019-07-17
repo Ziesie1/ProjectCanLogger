@@ -24,9 +24,11 @@ void init_SD()
     if (!sdKarte.begin(SD_CS, SD_SCK_MHZ(18))) {
         scom.printError("Bei der Initialisierung der SD-Karte trat ein Fehler auf.\nIst die Karte eingesteckt?");
         //sdKarte.initErrorPrint();
+        return;
     }
 
     // Ordner /can_log erstellen
+    String debugInfo = "SD-Karte initialisiert. Info: ";
     if (!sdKarte.exists(DIRECOTRY_CAN)) {
         if (!sdKarte.mkdir(DIRECOTRY_CAN)) {
             String str = "Der Ordner ";
@@ -34,17 +36,17 @@ void init_SD()
             str += " konnte nicht erstellt werden.";
             scom.printError(str);
             //sdKarte.errorPrint();
+            return;
         }else{
-            String str = DIRECOTRY_CAN;
-            str += " wurde erstellt.";
-            scom.printDebug(str);
+            debugInfo += DIRECOTRY_CAN;
+            debugInfo += " wurde erstellt.";
         }
     }else{
-        String str = DIRECOTRY_CAN;
-        str += " existiert bereits.";
-        scom.printDebug(str);
+        debugInfo += DIRECOTRY_CAN;
+        debugInfo += " existierte bereits.";
     }
 
+    scom.printDebug(debugInfo);
 }
 
 void createNewCanLogFile()
@@ -61,7 +63,9 @@ void createNewCanLogFile()
         number++;
     } while (canLogFile.exists());
     
-    scom.printDebug(canLogFile.getFileName());
+    String ausgabe = "Speicherziel: ";
+    ausgabe += canLogFile.getFileName();
+    scom.printDebug(ausgabe);
      
     canLogFile.writeStr("identifier(dez);RTR bit;time stamp(hex);data length(dez);byte 1(hex);byte 2(hex);byte 3(hex);byte 4(hex);byte 5(hex);byte 6(hex);byte 7(hex);byte 8(hex)\n");
 
