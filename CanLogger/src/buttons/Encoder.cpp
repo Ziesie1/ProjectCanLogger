@@ -40,7 +40,7 @@ void doEncoderA()
     }
   
     alteZeitEncoder = millis();
-    scom.println(encoderPos); // später auskommentieren
+    scom << encoderPos << endz; // später auskommentieren
    }
 }
 
@@ -75,7 +75,7 @@ void initEncoder()
 }
 
 // Gibt die aktuelle position des Encoders zurück
-int getEncoderValue()
+int getEncoderPos()
 {
   encoderPosChanged = false;
   return encoderPos;
