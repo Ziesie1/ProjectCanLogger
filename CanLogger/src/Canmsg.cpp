@@ -1,3 +1,6 @@
+
+#define HAL_CAN_MODULE_ENABLED
+
 #include <Arduino.h>
 #include "Canmsg.h"    
 
