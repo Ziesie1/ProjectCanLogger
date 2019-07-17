@@ -19,11 +19,10 @@ void setup() {
   scom.showDebugMessages(true); // Debugmodus einschalten
   
   init_SD();
-
   initEncoder();
   initTaster();
-  createNewCanLogFile();
 
+  createNewCanLogFile();
 
   display.begin();
   display.fillScreen(ILI9341_BLACK);
