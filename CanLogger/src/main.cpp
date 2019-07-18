@@ -28,8 +28,7 @@ void setup() {
   display.setTextSize(3);
   display.print("Test eines Textes...");
 
-  //scom << "CanLogger is initialised" << endz;
-  Serial.println("µC initialisiert");
+  Serial.println("µC initialized");
 }
 
 

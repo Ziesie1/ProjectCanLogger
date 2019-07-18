@@ -2,7 +2,7 @@
 #include "can/CanUtility.hpp"
 #include "can/Canmsg.hpp"
 
-Canmsg Canmsg_bufferCanRecMessages[CAN_MSG_CAN_BUFFER_REC_SIZE];
+Canmsg Canmsg_bufferCanRecMessages[Canmsg_CAN_BUFFER_REC_SIZE];
 int Canmsg_bufferCanRecPointer;
 
 /*
@@ -10,7 +10,7 @@ int Canmsg_bufferCanRecPointer;
     Zu Testzwecken, Standartwerte
 */
 Canmsg::Canmsg()
-    :stdIdentifier{0x100},extIdentifier{0},isExtIdentifier{false},
+    : stdIdentifier{0x100},extIdentifier{0},isExtIdentifier{false},
         rtr{false},time{0x1000},canLength{maxLength}
 {
     for(byte i=0;i<this->maxLength;i++)
@@ -18,6 +18,94 @@ Canmsg::Canmsg()
         canBytes[i]=static_cast<char>(0x01+(0x22*i));
     }
 }
+
+Canmsg::Canmsg(char16_t stdId, char32_t extId, bool isExtId, bool rtr, char16_t time, 
+                uint8_t canLength, uint8_t const * const data)
+    :Canmsg{stdId, extId, isExtId, rtr, time, canLength}
+{
+    if(data != nullptr)
+    {
+        for(uint8_t i=0; i<this->canLength; i++)
+        {
+            this->canBytes[i] = data[i];
+        }
+    }
+    else
+    {
+        this->canLength = 0;
+    }
+    for(uint8_t i=this->canLength; i<maxLength; i++)
+    {
+        this->canBytes[i] = 0x00;
+    }
+}
+
+Canmsg::Canmsg(char16_t stdId, char32_t extId, bool isExtId, bool rtr, char16_t time, 
+			    uint8_t canLength, uint8_t databit0, uint8_t databit1, 
+			    uint8_t databit2, uint8_t databit3, uint8_t databit4, 
+			    uint8_t databit5, uint8_t databit6, uint8_t databit7)
+{
+    if(stdId <= maxStdId)
+    {
+        this->stdIdentifier = stdId;
+    }
+    else
+    {
+        this->stdIdentifier = maxStdId;
+    }
+    if(isExtId)
+    {
+        if(extId <= maxExtId)
+        {
+            this->extIdentifier = extId;
+        }
+        else
+        {
+            this->extIdentifier = maxExtId;
+        }
+    }
+    else
+    {
+        this->extIdentifier = 0;
+    }
+
+    if(canLength<maxLength)
+    {
+        this->canLength = canLength;
+    }
+    else
+    {
+        this->canLength = maxLength;
+    }
+    
+    uint8_t data[8] = {databit0, databit1, databit2, databit3, 
+                        databit4, databit5, databit6, databit7};
+    for(uint8_t i=0; i<this->canLength; i++)
+    {
+        this->canBytes[i] = data[i];
+    }
+}
+	
+
+Canmsg::Canmsg(Canmsg const& other)
+{
+    *this = other;
+}
+
+Canmsg& Canmsg::operator= (Canmsg const& other)
+{
+    this->stdIdentifier = other.stdIdentifier;
+    this->extIdentifier = other.extIdentifier;
+    this->isExtIdentifier = other.isExtIdentifier;
+    this->rtr = other.rtr;
+    this->time = other.time;
+    this->canLength = other.canLength;
+    for(byte i=0; i<maxLength; i++)
+    {
+        this->canBytes[i] = other.canBytes[i];
+    }
+    return *this;
+}	
 
 Canmsg::operator String() const
 {
@@ -34,7 +122,7 @@ Canmsg::operator String() const
     s+=String(this->rtr);
     s+=" Time: ";
     s+=String(this->time,HEX);
-	s+="h Laenge: ";
+	  s+="h Laenge: ";
     s+=String(this->canLength,HEX);
     s+="h Inhalt: ";
     for(byte i=0;i<this->canLength;i++)
@@ -61,28 +149,28 @@ return:	void
 */
 void Canmsg::Recieve(bool const fifo)
 {
-  if(HAL_CAN_GetRxFifoFillLevel(&CanUtility_hcan, fifo) != 0)
-  {
-    CAN_RxHeaderTypeDef header;
-    uint8_t data[8];
-    if(HAL_CAN_GetRxMessage(&CanUtility_hcan, fifo, &header, data) == HAL_OK)
+    if(HAL_CAN_GetRxFifoFillLevel(&CanUtility_hcan, fifo) != 0)
     {
-      this->stdIdentifier = header.StdId;
-      this->extIdentifier = header.ExtId;
-      this->isExtIdentifier = header.IDE;
-      this->rtr = header.RTR;
-      this->time = header.Timestamp;
-      this->canLength = header.DLC;
-      for(int i=0; i<canLength; i++)
-      {
-        this->canBytes[i] = data[i];
-      }
+        CAN_RxHeaderTypeDef header;
+        uint8_t data[8];
+        if(HAL_CAN_GetRxMessage(&CanUtility_hcan, fifo, &header, data) == HAL_OK)
+        {
+            this->stdIdentifier = header.StdId;
+            this->extIdentifier = header.ExtId;
+            this->isExtIdentifier = header.IDE;
+            this->rtr = header.RTR;
+            this->time = header.Timestamp;
+            this->canLength = header.DLC;
+            for(int i=0; i<canLength; i++)
+            {
+            this->canBytes[i] = data[i];
+            }
+        }
+        else
+        {
+          Serial.println("CAN-Nachricht konnte nicht ausgelesen werden");
+        }
     }
-    else
-    {
-      Serial.println("CAN-Nachricht konnte nicht ausgelesen werden");
-    }
-  }
 }
 
 /*

@@ -8,12 +8,12 @@ Die Zeile muss dann lauten: "#define HAL_CAN_MODULE_ENABLED"
 #ifndef CANMSG_HPP
 #define CANMSG_HPP
 
-#define CAN_MSG_CAN_BUFFER_REC_SIZE 50// umändern auf constexpr
-
 class Canmsg
 {
 public:
 	static constexpr byte maxLength = 8;
+	static constexpr char16_t maxStdId = 0x7ff;
+	static constexpr char32_t maxExtId = 0x3ffff;
 
 private:
     char16_t stdIdentifier;	//Standart identifier or MSB of the extended identifier
@@ -28,6 +28,12 @@ public:
 	Canmsg();
     explicit operator String() const;  //Der compiler erkennt String aus mir unbekannten Gründen nicht
 	//operator= (Canmsg &const other);// noch nicht implementiert
+	Canmsg(char16_t stdId, char32_t extId, bool isExtId, bool rtr, char16_t time, 
+			uint8_t canLength, uint8_t databit0 = 0x00, uint8_t databit1 = 0x00, 
+			uint8_t databit2 = 0x00, uint8_t databit3 = 0x00, uint8_t databit4 = 0x00, 
+			uint8_t databit5 = 0x00, uint8_t databit6 = 0x00, uint8_t databit7 = 0x00);  
+	Canmsg& operator= (Canmsg const& other);
+	explicit operator String() const;
 	
 	// Get-Funktionen:
 	char16_t GetStdIdentifier() const;
@@ -43,7 +49,8 @@ public:
 	void Recieve(bool const fifo);// noch nicht verwendbar
 };
 
-extern Canmsg Canmsg_bufferCanRecMessages[CAN_MSG_CAN_BUFFER_REC_SIZE];
+constexpr int Canmsg_CAN_BUFFER_REC_SIZE = 50;
+extern Canmsg Canmsg_bufferCanRecMessages[Canmsg_CAN_BUFFER_REC_SIZE];
 extern int Canmsg_bufferCanRecPointer;
 
 #endif //CANMSG

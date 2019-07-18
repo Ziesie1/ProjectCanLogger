@@ -82,9 +82,9 @@ void CanUtility_Init(void)
 	if(HAL_CAN_Init(&CanUtility_hcan) != HAL_OK)
 	{
 		Serial.print("Fehler während der CAN initialisierung. Status: ");
-		Serial.print(HAL_CAN_GetState(&CanUtility_hcan));
+		Serial.print(HAL_CAN_GetState(&CanUtility_hcan)); 
 		Serial.print(" Fehlercode: 0x");
-		Serial.println(String(HAL_CAN_GetError(&CanUtility_hcan),HEX));
+		Serial.println(String(HAL_CAN_GetError(&CanUtility_hcan),HEX)); 
 		while(1){}
 	}
 	else
@@ -118,10 +118,10 @@ void CanUtility_Init(void)
 	// start CAN-Instance:
 	if(HAL_CAN_Start(&CanUtility_hcan) != HAL_OK)
 	{
-		Serial.print("CAN-Setup konnte nicht erfolgreich beendet werden. CAN-Status: ");
+		Serial.print("CAN-Setup konnte nicht erfolgreich beendet werden. CAN-Status: "); 
 		Serial.print(HAL_CAN_GetState(&CanUtility_hcan));
 		Serial.print(" Fehlercode: 0x");
-		Serial.println(String(HAL_CAN_GetError(&CanUtility_hcan),HEX));
+		Serial.println(String(HAL_CAN_GetError(&CanUtility_hcan),HEX)); 
 		while(1){}
 	}
 	else
@@ -137,7 +137,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 	{		
 		Canmsg recMessage;
 		recMessage.Recieve(0);
-		if(Canmsg_bufferCanRecPointer < CAN_MSG_CAN_BUFFER_REC_SIZE)
+		if(Canmsg_bufferCanRecPointer < Canmsg_CAN_BUFFER_REC_SIZE)
 		{
 			Canmsg_bufferCanRecMessages[Canmsg_bufferCanRecPointer] = recMessage;
 			Canmsg_bufferCanRecPointer++;
@@ -145,6 +145,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 		else
 		{
 			/* Nachricht wird verworfen */
+			Serial.println("Nachricht verworfen");
 		}
 	}
 }
