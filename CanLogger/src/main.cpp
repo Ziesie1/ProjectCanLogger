@@ -6,6 +6,8 @@
 #include "serial/SerialCommunication.hpp"
 #include "buttons/Encoder.hpp"
 #include "buttons/Taster.hpp"
+#include "display/TFT.hpp"
+
 
 Adafruit_ILI9341 display = Adafruit_ILI9341{PC9, PA8, PA10, PB5, PC8}; // use Software Serial
 //Adafruit_ILI9341 display = Adafruit_ILI9341{PC9, PA8, PC8}; // use Hardware Serial
@@ -24,11 +26,8 @@ void setup() {
 
   createNewCanLogFile();
 
-  display.begin();
-  display.fillScreen(ILI9341_BLACK);
-  display.setTextSize(2);
-  display.print(getFullLogFilePath());
-
+	TFT_init();
+  
   scom << "CanLogger ist Initialisiert" << endz;
 }
 
