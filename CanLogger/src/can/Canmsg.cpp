@@ -52,9 +52,6 @@ Canmsg::operator String() const
     s+=" h";
     return s;
 }
- 
-
-
 
 /*
 Liest eine im FIFO liegende Nachricht ein
@@ -64,28 +61,28 @@ return:	void
 */
 void Canmsg::Recieve(bool const fifo)
 {
-    this->stdIdentifier = ((CAN->sFIFOMailBox[fifo].RIR & CAN_RI0R_STID) >> CAN_RI0R_STID_Pos); //stdIdentifier aus dem CAN_RIxR Register
-	this->extIdentifier = ((CAN->sFIFOMailBox[fifo].RIR & CAN_RI0R_EXID) >> CAN_RI0R_EXID_Pos);
-	this->isExtIdentifier = ((CAN->sFIFOMailBox[fifo].RIR & CAN_RI0R_IDE) >> CAN_RI0R_IDE_Pos);
-	this->rtr = ((CAN->sFIFOMailBox[fifo].RIR & CAN_RI0R_RTR) >> CAN_RI0R_RTR_Pos); //Remote transmission Reguest aus dem CAN_RIxR Register
-	this->time = ((CAN->sFIFOMailBox[fifo].RDTR & CAN_RDT0R_TIME) >> CAN_RDT0R_TIME_Pos); //timestamp aus dem CAN_RDTxR Register
-	this->canLength = ((CAN->sFIFOMailBox[fifo].RDTR & CAN_RDT0R_DLC) >> CAN_RDT0R_DLC_Pos); //anzahl der bytes aus dem CAN_RDTxR Register
-	this->canBytes[0] = ((CAN->sFIFOMailBox[fifo].RDLR & CAN_RDL0R_DATA0) >> CAN_RDL0R_DATA0_Pos); //Daten bytes aus dem CAN_RDLxR Register
-	this->canBytes[1] = ((CAN->sFIFOMailBox[fifo].RDLR & CAN_RDL0R_DATA1) >> CAN_RDL0R_DATA1_Pos);
-	this->canBytes[2] = ((CAN->sFIFOMailBox[fifo].RDLR & CAN_RDL0R_DATA2) >> CAN_RDL0R_DATA2_Pos);
-	this->canBytes[3] = ((CAN->sFIFOMailBox[fifo].RDLR & CAN_RDL0R_DATA3) >> CAN_RDL0R_DATA3_Pos);
-	this->canBytes[4] = ((CAN->sFIFOMailBox[fifo].RDHR & CAN_RDH0R_DATA4) >> CAN_RDH0R_DATA4_Pos); //Daten bytes aus dem CAN_RDHxR Register
-	this->canBytes[5] = ((CAN->sFIFOMailBox[fifo].RDHR & CAN_RDH0R_DATA5) >> CAN_RDH0R_DATA5_Pos);
-	this->canBytes[6] = ((CAN->sFIFOMailBox[fifo].RDHR & CAN_RDH0R_DATA6) >> CAN_RDH0R_DATA6_Pos);
-	this->canBytes[7] = ((CAN->sFIFOMailBox[fifo].RDHR & CAN_RDH0R_DATA7) >> CAN_RDH0R_DATA7_Pos);
-	if(!fifo)
-	{
-		CAN->RF0R |= CAN_RF0R_RFOM0; //Empfange Nachricht freigeben im CAN_RF0R Register
-	}
-	else
-	{
-		CAN->RF1R |= CAN_RF1R_RFOM1; //Empfange Nachricht freigeben im CAN_RF1R Register
-	}
+  if(HAL_CAN_GetRxFifoFillLevel(&CanUtility_hcan, fifo) != 0)
+  {
+    CAN_RxHeaderTypeDef header;
+    uint8_t data[8];
+    if(HAL_CAN_GetRxMessage(&CanUtility_hcan, fifo, &header, data) == HAL_OK)
+    {
+      this->stdIdentifier = header.StdId;
+      this->extIdentifier = header.ExtId;
+      this->isExtIdentifier = header.IDE;
+      this->rtr = header.RTR;
+      this->time = header.Timestamp;
+      this->canLength = header.DLC;
+      for(int i=0; i<canLength; i++)
+      {
+        this->canBytes[i] = data[i];
+      }
+    }
+    else
+    {
+      Serial.println("CAN-Nachricht konnte nicht ausgelesen werden");
+    }
+  }
 }
 
 /*
@@ -119,7 +116,7 @@ void Canmsg::Send(void) const
 		header.DLC = this->canLength;
 		header.TransmitGlobalTime = DISABLE;
 		uint8_t data[8];
-		for(int i=0; i<header.DLC; i++)
+		for(uint8_t i=0; i<header.DLC; i++)
 		{
 			data[i] = this->canBytes[i];
 		}
@@ -128,7 +125,7 @@ void Canmsg::Send(void) const
 	}
   else
   {
-    Serial.println("Alle TX Mailboxen belegt");
+    Serial.println("CAN-Nachricht konnte nicht gesendet werden(Alle TX Mailboxen belegt).");
   }
 }
 

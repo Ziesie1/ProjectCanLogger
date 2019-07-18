@@ -14,13 +14,14 @@ using namespace utilities; // für scom
 
 void setup() {
   HAL_Init();
+  //HAL_InitTick(14);
   SystemClock_Config();
   Serial.begin(115200);
   //scom.workWith(Serial); // scom Hardwareserial zuweisen
   //scom.showDebugMessages(true); // Debugmodus einschalten
   
   //init_SD();
-  //CanUtility_Init();
+  CanUtility_Init();
 
   display.begin();
   display.fillScreen(ILI9341_BLACK);
@@ -28,14 +29,20 @@ void setup() {
   display.print("Test eines Textes...");
 
   //scom << "CanLogger is initialised" << endz;
+  Serial.println("µC initialisiert");
 }
 
-Canmsg msg{};
 
 void loop() {
-  Serial.println(static_cast<String>(msg));
-  Serial.println(String(msg.GetStdIdentifier(),HEX));
-  delay(2000);
+  //Serial.println(HAL_CAN_GetRxFifoFillLevel(&CanUtility_hcan, 0));
+  while(Canmsg_bufferCanRecPointer > 0)
+  {
+    Canmsg_bufferCanRecPointer--;
+    Canmsg_bufferCanRecMessages[Canmsg_bufferCanRecPointer].Send();
+    Serial.print("Empfangene Nachricht: ");
+    Serial.println(static_cast<String>(Canmsg_bufferCanRecMessages[Canmsg_bufferCanRecPointer]));
+  }
+  delay(5000);
 }
 
 

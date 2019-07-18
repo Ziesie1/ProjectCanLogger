@@ -21,8 +21,8 @@ private:
 	bool isExtIdentifier; //Message has extended identifier
 	bool rtr;
 	char16_t time;
-	byte canLength;
-	byte canBytes[maxLength];
+	uint8_t canLength;
+	uint8_t canBytes[maxLength];
 	
 public:	
 	Canmsg();
@@ -35,8 +35,8 @@ public:
 	bool GetIsExtIdentifier() const;
 	bool GetRtr() const;
 	char16_t GetTime() const;
-	byte GetCanLength() const;
-	byte GetCanByte(int const idx) const;
+	uint8_t GetCanLength() const;
+	uint8_t GetCanByte(int const idx) const;
 	
 	// Bus-Funktionen:
 	void Send(void) const;// noch nicht verwendbar

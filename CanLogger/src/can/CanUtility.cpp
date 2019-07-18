@@ -38,10 +38,12 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef *hcan)
 	
 	// RX-Pin:
 	canPin.Pin = GPIO_PIN_8;
-	canPin.Mode = GPIO_MODE_INPUT;
 	HAL_GPIO_Init(GPIOB, &canPin);	
-	
-	//setup Interrupts:
+
+	// setup Interrupts:
+	/*HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
+	HAL_NVIC_SetPriority(CAN_RX0_IRQn,15,0U);
+	HAL_NVIC_EnableIRQ(CAN_RX0_IRQn);*/
 }
 
 void FillCAN_Handle(CAN_HandleTypeDef& hcan)
@@ -103,6 +105,16 @@ void CanUtility_Init(void)
 		Serial.println("CAN-Filtersetup erfolgreich beendet");
 	}
 
+	/*if(HAL_CAN_ActivateNotification(&CanUtility_hcan, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK)
+	{
+		Serial.println("CAN-IRQ konnte nicht aktiviert werden");
+		while(1){}
+	}
+	else
+	{
+		Serial.println("CAN-IRQ aktiviert");
+	}*/
+
 	// start CAN-Instance:
 	if(HAL_CAN_Start(&CanUtility_hcan) != HAL_OK)
 	{
@@ -116,51 +128,38 @@ void CanUtility_Init(void)
 	{
 		Serial.println("CAN-Peripherie einsatzbereit");	
 	}
+	Canmsg_bufferCanRecPointer = 0;
 }
 
-
-/*
-Ueberprueft ob in einem CANRX-FIFO eine nicht ausgelesende Nachricht liegt.
-Input: 	fifo         	- welcher FIFO soll ueberprueft werden 
-				          moegliche Werte: 0,1
-return:	0				- im FIFO liegt keine Nachricht
-		1				- im FIFO liegt eine Nachricht
-*/
-bool CanUtility_CheckMailbox(bool const fifo)
+void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
-    if(!fifo)
-	{
-		return CAN->RF0R & CAN_RF0R_FMP0;
-	}
-	else
-	{
-		return CAN->RF1R & CAN_RF1R_FMP1;
+	if(HAL_CAN_GetRxFifoFillLevel(&CanUtility_hcan, 0) != 0)
+	{		
+		Canmsg recMessage;
+		recMessage.Recieve(0);
+		if(Canmsg_bufferCanRecPointer < CAN_MSG_CAN_BUFFER_REC_SIZE)
+		{
+			Canmsg_bufferCanRecMessages[Canmsg_bufferCanRecPointer] = recMessage;
+			Canmsg_bufferCanRecPointer++;
+		}
+		else
+		{
+			/* Nachricht wird verworfen */
+		}
 	}
 }
 
+void HAL_SYSTICK_Callback(void)
+{
+	HAL_CAN_RxFifo0MsgPendingCallback(&CanUtility_hcan);
+}
 
 /*
 Interrupt Handler für CAN-RX0
 Wird aufgerufen, wenn:
 	- neue CAN message in FIFO0 verfügbar
 */ 
-void CAN_RX0_IRQHandler()
+/*void CAN_RX0_IRQHandler()
 {
-	if(CanUtility_CheckMailbox(0))
-	{
-		Canmsg recMessage;
-		recMessage.Recieve(0);
-		
-		if(Canmsg_bufferCanRecPointer < CAN_MSG_CAN_BUFFER_REC_SIZE)
-		{
-			Canmsg_bufferCanRecMessages[Canmsg_bufferCanRecPointer] = recMessage;
-			Canmsg_bufferCanRecPointer++;
-		}else{
-			/* Nachricht wird verworfen */
-		}
-	}
-		
-}
-
-
-
+	HAL_CAN_IRQHandler(&CanUtility_hcan);
+}*/

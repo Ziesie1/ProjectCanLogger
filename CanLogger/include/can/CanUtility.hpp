@@ -11,8 +11,6 @@ Die Zeile muss dann lauten: "#define HAL_CAN_MODULE_ENABLED"
 #include "can/Canmsg.hpp"
 
 void CanUtility_Init(void);
-bool CanUtility_CheckMailbox(bool const fifo);
-void CanUtility_CanCheck(void);
 
 extern CAN_HandleTypeDef CanUtility_hcan;
 
