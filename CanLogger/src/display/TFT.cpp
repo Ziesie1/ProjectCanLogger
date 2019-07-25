@@ -2,7 +2,7 @@
 #include "display/X_Spi9341.hpp"
 #include <Arduino.h>
 
-void TFT_init(void)
+void initTFT(void)
 {
     TFT_gpioInit();
     ILI9341Init();
@@ -11,6 +11,8 @@ void TFT_init(void)
 	ILI9341DrawVerticalLine(60,0,320,SCHWARZ);
 	ILI9341DrawVerticalLine(120,0,320,SCHWARZ);
 	ILI9341DrawVerticalLine(180,0,320,SCHWARZ);
+
+    ILI9341DisplayString32(20,100,"TEST", ROT100, BLAU50);
 }
 
 void TFT_gpioInit(void)

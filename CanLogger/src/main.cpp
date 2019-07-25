@@ -1,6 +1,4 @@
 #include <Arduino.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_ILI9341.h>
 #include "sd/SD.hpp"
 #include "Canmsg.h"
 #include "serial/SerialCommunication.hpp"
@@ -8,12 +6,7 @@
 #include "buttons/Taster.hpp"
 #include "display/TFT.hpp"
 
-
-Adafruit_ILI9341 display = Adafruit_ILI9341{PC9, PA8, PA10, PB5, PC8}; // use Software Serial
-//Adafruit_ILI9341 display = Adafruit_ILI9341{PC9, PA8, PC8}; // use Hardware Serial
-
 using namespace utilities; // für scom
-
 
 void setup() {
   Serial.begin(115200);
@@ -23,11 +16,11 @@ void setup() {
   init_SD();
   initEncoder();
   initTaster();
+  initTFT();
 
   createNewCanLogFile();
 
-	TFT_init();
-  
+	
   scom << "CanLogger ist Initialisiert" << endz;
 }
 

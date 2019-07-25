@@ -35,6 +35,6 @@
 #define RES_TFT_CS_N	 TFT_CS_N_GPIO_Port->BRR = TFT_CS_N_Pin
 
 void TFT_gpioInit(void);
-void TFT_init(void);
+void initTFT(void);
 
 #endif
