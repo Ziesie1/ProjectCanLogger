@@ -4,9 +4,12 @@
 #include "serial/SerialCommunication.hpp"
 #include "buttons/Encoder.hpp"
 #include "buttons/Taster.hpp"
-#include "display/TFT.hpp"
+//#include "display/TFT.hpp"
+#include "display/ILI9341.hpp"
 
 using namespace utilities; // für scom
+
+ILI9341 display {PC9, PC8, PA10, PA8, PB5};
 
 void setup() {
   Serial.begin(115200);
@@ -16,10 +19,37 @@ void setup() {
   init_SD();
   initEncoder();
   initTaster();
-  initTFT();
+  display.init();
+  display.fillScreen(BLAU50);
+  display.drawFillRect2(50,50+80-1,40,50-1,ILI9341::makeColor(100,0,0));
+  display.drawFillRect(50,50,80,80,ILI9341::makeColor(0,100,0));
+  display.drawOnePixel(230,150,GELB100);
+  display.drawHorizontalLine(0,229,150,ROT100);
+  display.drawOnePixel(20,300,GELB100);
+  display.drawVerticalLine(20,0,299,ROT100); 
+  display.printChar8x16(50,200,'X',ROT100, BLAU50);
+  display.printChar32_8x16(50+8+1,200,'X',ROT100, BLAU50);
+  display.printChar32_24_8x16(50+8+32+1,200,'X',ROT100, BLAU50);
+  display.printChar24_8x16(50+8+32+32+1,200,'X',ROT100, BLAU50);
+  display.printString(50,200+32+1,"Dies ist ein Test! 10", ROT100, BLAU50);
 
+  uint16_t const test[100] = 
+  {
+    WEISS,ROT100,ROT100,ROT100,ROT100,ROT100,ROT100,ROT100,ROT100,WEISS,
+    ROT100,WEISS,ROT100,ROT100,ROT100,ROT100,ROT100,ROT100,WEISS,ROT100,
+    ROT100,ROT100,WEISS,ROT100,ROT100,ROT100,ROT100,WEISS,ROT100,ROT100,
+    ROT100,ROT100,ROT100,WEISS,ROT100,ROT100,WEISS,ROT100,ROT100,ROT100,
+    ROT100,ROT100,ROT100,ROT100,WEISS,WEISS,ROT100,ROT100,ROT100,ROT100,
+    ROT100,ROT100,ROT100,ROT100,WEISS,WEISS,ROT100,ROT100,ROT100,ROT100,
+    ROT100,ROT100,ROT100,WEISS,ROT100,ROT100,WEISS,ROT100,ROT100,ROT100,
+    ROT100,ROT100,WEISS,ROT100,ROT100,ROT100,ROT100,WEISS,ROT100,ROT100,
+    ROT100,WEISS,ROT100,ROT100,ROT100,ROT100,ROT100,ROT100,WEISS,ROT100,
+    WEISS,ROT100,ROT100,ROT100,ROT100,ROT100,ROT100,ROT100,ROT100,WEISS
+  };
+  display.drawBmp(150,50,10,10,test);
+
+  //initTFT();
   createNewCanLogFile();
-
 	
   scom << "CanLogger ist Initialisiert" << endz;
 }
