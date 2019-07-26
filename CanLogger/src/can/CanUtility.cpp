@@ -2,8 +2,12 @@
 #include "can/Canmsg.hpp"
 
 CAN_HandleTypeDef CanUtility_hcan;
-bool CanUtility_CanActive = false;
+bool CanUtility_CanRecieveActive = false;
 
+/* 
+	function that initializes the GPIO-Pins for CAN peripherals
+	Input: hcan	- pointer to CAN-handle
+*/
 void HAL_CAN_MspInit(CAN_HandleTypeDef *hcan)
 {
 	/*
@@ -46,6 +50,10 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef *hcan)
 	HAL_NVIC_EnableIRQ(CAN_RX0_IRQn);*/
 }
 
+/* 
+	function that fills a CAN-handle with all the important information for the specific application
+	Input: hcan	- pointer to CAN-handle
+*/
 void FillCAN_Handle(CAN_HandleTypeDef& hcan)
 {
 	hcan.Instance = CAN1;
@@ -62,9 +70,12 @@ void FillCAN_Handle(CAN_HandleTypeDef& hcan)
 	hcan.Init.TransmitFifoPriority = DISABLE;
 }
 
+/* 
+	function that fills a CANFilter-handle with all the important information for the specific application
+*/
 void FillCAN_Filter(CAN_FilterTypeDef& canFilter)
 {
-	canFilter.FilterActivation = CAN_FILTER_ENABLE;
+	canFilter.FilterActivation = CAN_FILTER_DISABLE;
 	canFilter.FilterScale = CAN_FILTERSCALE_32BIT;
 	canFilter.FilterMode = CAN_FILTERMODE_IDMASK;
 	canFilter.FilterBank = 0;
@@ -75,6 +86,13 @@ void FillCAN_Filter(CAN_FilterTypeDef& canFilter)
 	canFilter.FilterMaskIdHigh = 0x0; 
 }
 
+/* 
+	function that initializes the CAN perihpherals, the recieve Buffer
+	and activates the CAN peripherals
+	return:	HAL_OK		- everything is working as it is supposed to be
+			HAL_ERROR	- an error occured while initializing, 
+						  check the serial output for further details
+*/
 HAL_StatusTypeDef CanUtility_Init(void)
 {	
 	//initialize CAN-handler:
@@ -126,13 +144,17 @@ HAL_StatusTypeDef CanUtility_Init(void)
 	}
 	else
 	{
-		CanUtility_CanActive = true;
+		CanUtility_CanRecieveActive = false;
 		Serial.println("CAN-Peripherie einsatzbereit");	
 	}
 	Canmsg_bufferCanRecPointer = 0;
 	return HAL_OK;
 }
 
+/* 
+	interrupt handler that is called when messages are pending in FIFO 0
+	Input: hcan	- pointer to CAN-handle
+*/
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
 	if(HAL_CAN_GetRxFifoFillLevel(&CanUtility_hcan, 0) != 0)
@@ -152,9 +174,13 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 	}
 }
 
+/* 
+	interrupt handler that is called every ms 
+	NOTE: THIS IS JUST A WORKAROUND AND WILL PROBABLY BE CHANGED IN THE FUTURE
+*/
 void HAL_SYSTICK_Callback(void)
 {
-	if(CanUtility_CanActive)
+	if(CanUtility_CanRecieveActive)
 	{
 		HAL_CAN_RxFifo0MsgPendingCallback(&CanUtility_hcan);
 	}
@@ -170,28 +196,48 @@ Wird aufgerufen, wenn:
 	HAL_CAN_IRQHandler(&CanUtility_hcan);
 }*/
 
-HAL_StatusTypeDef CanUtility_ActivateCan(void)
+/* 
+	function that configures the CAN-message-filter to process all incomming messages
+	return:	HAL_OK		- everything is working as it is supposed to be,
+						  the peripherals are activated
+			HAL_ERROR	- an error occured while activating the peripherals, 
+						  check if the Peripherals are allready initialized
+						  or refer to CanUtility_hcan->ErrorCode
+*/
+HAL_StatusTypeDef CanUtility_EnableRecieve(void)
 {
-	if(HAL_CAN_Start(&CanUtility_hcan) != HAL_OK)
+	CAN_FilterTypeDef canFilter;
+	FillCAN_Filter(canFilter);
+	canFilter.FilterActivation = CAN_FILTER_ENABLE;
+	if(HAL_CAN_ConfigFilter(&CanUtility_hcan, &canFilter) != HAL_OK)
 	{
 		return HAL_ERROR;
 	}
 	else
 	{
-		CanUtility_CanActive = true;
+		CanUtility_CanRecieveActive = true;
 		return HAL_OK;
 	}
 }
 
-HAL_StatusTypeDef CanUtility_DeactivateCan(void)
+/* 
+	function that configures the CAN-message-filter to discard all incomming messages
+	return:	HAL_OK		- everything is working as it is supposed to be,
+						  the peripherals are deactivated
+			HAL_ERROR	- an error occured while activating the peripherals,
+						  please refer to CanUtility_hcan->ErrorCode 
+*/
+HAL_StatusTypeDef CanUtility_DissableRecieve(void)
 {
-	if(HAL_CAN_Stop(&CanUtility_hcan) != HAL_OK)
+	CAN_FilterTypeDef canFilter;
+	FillCAN_Filter(canFilter);
+	if(HAL_CAN_ConfigFilter(&CanUtility_hcan, &canFilter) != HAL_OK)
 	{
 		return HAL_ERROR;
 	}
 	else
 	{
-		CanUtility_CanActive = false;
+		CanUtility_CanRecieveActive = false;
 		return HAL_OK;
 	}
 }

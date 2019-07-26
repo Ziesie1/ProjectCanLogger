@@ -12,10 +12,10 @@ Die Zeile muss dann lauten: "#define HAL_CAN_MODULE_ENABLED"
 #include "can/Canmsg.hpp"
 
 HAL_StatusTypeDef CanUtility_Init(void);
-HAL_StatusTypeDef CanUtility_ActivateCan(void);
-HAL_StatusTypeDef CanUtility_DeactivateCan(void);
+HAL_StatusTypeDef CanUtility_EnableRecieve(void);
+HAL_StatusTypeDef CanUtility_DissableRecieve(void);
 
 extern CAN_HandleTypeDef CanUtility_hcan;
-extern bool CanUtility_CanActive;
+extern bool CanUtility_CanRecieveActive;
 
 #endif //CANUTILITY

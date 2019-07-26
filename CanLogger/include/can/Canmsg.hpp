@@ -12,8 +12,10 @@ class Canmsg
 {
 public:
 	static constexpr byte maxLength = 8;
+	static constexpr char16_t maxTime = 0xffff;
 	static constexpr char16_t maxStdId = 0x7ff;
 	static constexpr char32_t maxExtId = 0x3ffff;
+	static constexpr byte maxDataVal = 0xff;
 
 private:
     char16_t stdIdentifier;	//Standart identifier or MSB of the extended identifier
@@ -29,13 +31,15 @@ public:
 	Canmsg(Canmsg const& other);
 	Canmsg(char16_t stdId, char32_t extId, bool isExtId, bool rtr, char16_t time, 
 			uint8_t canLength, uint8_t const * const data);  
-	Canmsg(char16_t stdId, char32_t extId, bool isExtId, bool rtr, char16_t time, 
+	Canmsg(char16_t stdId, char32_t extId, bool isExtId, bool rtr, char16_t time,
 			uint8_t canLength, uint8_t databit0 = 0x00, uint8_t databit1 = 0x00, 
 			uint8_t databit2 = 0x00, uint8_t databit3 = 0x00, uint8_t databit4 = 0x00, 
 			uint8_t databit5 = 0x00, uint8_t databit6 = 0x00, uint8_t databit7 = 0x00);  
 	Canmsg& operator= (Canmsg const& other);
-	explicit operator String() const;
 	
+	explicit operator String() const;
+	uint8_t operator[](int idx) const;
+
 	// Get-Funktionen:
 	char16_t GetStdIdentifier() const;
 	char32_t GetExtIdentifier() const;

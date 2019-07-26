@@ -21,7 +21,8 @@ void setup() {
   //scom.showDebugMessages(true); // Debugmodus einschalten
   
   //init_SD();
-  if(CanUtility_Init() != HAL_OK)
+
+  if((CanUtility_Init() != HAL_OK) || (CanUtility_EnableRecieve() != HAL_OK))
   {
     while(1){}
   }
@@ -30,27 +31,7 @@ void setup() {
   display.fillScreen(ILI9341_BLACK);
   display.setTextSize(3);
   display.print("Test eines Textes...");
-
-  if(CanUtility_DeactivateCan() != HAL_OK)
-  {
-    Serial.println("Fehler deaktivierung");
-    while(1){}
-  }
-  else
-  {
-    Serial.println("deaktivierung erfolgreich");
-  }
   
-  if(CanUtility_ActivateCan() != HAL_OK)
-  {
-    Serial.println("Fehler aktivierung");
-    while(1){}
-  }
-  else
-  {
-    Serial.println("aktivierung erfolgreich");
-  }
-
   Serial.println("µC initialized");
 }
 
