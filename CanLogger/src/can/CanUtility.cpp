@@ -90,6 +90,8 @@ void FillCAN_Filter(CAN_FilterTypeDef& canFilter)
 	function that initializes the CAN perihpherals, the recieve Buffer
 	and activates the CAN peripherals
 	return:	HAL_OK		- everything is working as it is supposed to be
+						  note to recieve messages furthermore the "CanUtility_EnableRecieve()" 
+						  function needs to be called 
 			HAL_ERROR	- an error occured while initializing, 
 						  check the serial output for further details
 */
