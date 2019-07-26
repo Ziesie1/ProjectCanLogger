@@ -26,8 +26,9 @@ private:
 	
 public:	
 	Canmsg();
-    explicit operator String() const;  //Der compiler erkennt String aus mir unbekannten Gründen nicht
-	//operator= (Canmsg &const other);// noch nicht implementiert
+	Canmsg(Canmsg const& other);
+	Canmsg(char16_t stdId, char32_t extId, bool isExtId, bool rtr, char16_t time, 
+			uint8_t canLength, uint8_t const * const data);  
 	Canmsg(char16_t stdId, char32_t extId, bool isExtId, bool rtr, char16_t time, 
 			uint8_t canLength, uint8_t databit0 = 0x00, uint8_t databit1 = 0x00, 
 			uint8_t databit2 = 0x00, uint8_t databit3 = 0x00, uint8_t databit4 = 0x00, 

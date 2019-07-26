@@ -107,30 +107,42 @@ Canmsg& Canmsg::operator= (Canmsg const& other)
     return *this;
 }	
 
+void AddZerosToStringHex(String& s,int const var,int const maxStellen)
+{
+  for(int i=0x10; i<pow(0x10,maxStellen); i*=0x10)
+  {
+    if(var < i)
+    {
+      s+="0";
+    }
+  }
+}
+
 Canmsg::operator String() const
 {
     String s="Identifier: ";
     if(this->isExtIdentifier)
     {
-        s+=String(this->stdIdentifier<<18|this->extIdentifier,HEX);
+      char32_t fullId = this->stdIdentifier<<18|this->extIdentifier;
+      AddZerosToStringHex(s, fullId, 8);
+      s+=String(fullId, HEX);
     }
     else
     {
-        s+=String(this->stdIdentifier,HEX);
+      AddZerosToStringHex(s, this->stdIdentifier, 3);
+      s+=String(this->stdIdentifier,HEX);
     }
     s+="h RTR: ";
     s+=String(this->rtr);
     s+=" Time: ";
+    AddZerosToStringHex(s, this->time, 4);
     s+=String(this->time,HEX);
 	  s+="h Laenge: ";
     s+=String(this->canLength,HEX);
     s+="h Inhalt: ";
     for(byte i=0;i<this->canLength;i++)
     {
-        if(this->canBytes[i]<0x10)
-        {
-            s+="0";
-        }
+        AddZerosToStringHex(s, this->canBytes[i], 2);
         s+=String(this->canBytes[i],HEX);
         if(i<canLength-1)
         {

@@ -1,8 +1,8 @@
-#include <Arduino.h>
 #include "can/CanUtility.hpp"
 #include "can/Canmsg.hpp"
 
 CAN_HandleTypeDef CanUtility_hcan;
+bool CanUtility_CanActive = false;
 
 void HAL_CAN_MspInit(CAN_HandleTypeDef *hcan)
 {
@@ -75,7 +75,7 @@ void FillCAN_Filter(CAN_FilterTypeDef& canFilter)
 	canFilter.FilterMaskIdHigh = 0x0; 
 }
 
-void CanUtility_Init(void)
+HAL_StatusTypeDef CanUtility_Init(void)
 {	
 	//initialize CAN-handler:
 	FillCAN_Handle(CanUtility_hcan);
@@ -85,7 +85,7 @@ void CanUtility_Init(void)
 		Serial.print(HAL_CAN_GetState(&CanUtility_hcan)); 
 		Serial.print(" Fehlercode: 0x");
 		Serial.println(String(HAL_CAN_GetError(&CanUtility_hcan),HEX)); 
-		while(1){}
+		return HAL_ERROR;
 	}
 	else
 	{
@@ -98,7 +98,7 @@ void CanUtility_Init(void)
 	if(HAL_CAN_ConfigFilter(&CanUtility_hcan, &canFilter) != HAL_OK)
 	{
 		Serial.println("Fehler beim CAN-Filtersetup");
-		while(1){}
+		return HAL_ERROR;
 	}
 	else
 	{
@@ -108,7 +108,7 @@ void CanUtility_Init(void)
 	/*if(HAL_CAN_ActivateNotification(&CanUtility_hcan, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK)
 	{
 		Serial.println("CAN-IRQ konnte nicht aktiviert werden");
-		while(1){}
+		return HAL_ERROR;
 	}
 	else
 	{
@@ -122,13 +122,15 @@ void CanUtility_Init(void)
 		Serial.print(HAL_CAN_GetState(&CanUtility_hcan));
 		Serial.print(" Fehlercode: 0x");
 		Serial.println(String(HAL_CAN_GetError(&CanUtility_hcan),HEX)); 
-		while(1){}
+		return HAL_ERROR;
 	}
 	else
 	{
+		CanUtility_CanActive = true;
 		Serial.println("CAN-Peripherie einsatzbereit");	
 	}
 	Canmsg_bufferCanRecPointer = 0;
+	return HAL_OK;
 }
 
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
@@ -152,7 +154,10 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 
 void HAL_SYSTICK_Callback(void)
 {
-	HAL_CAN_RxFifo0MsgPendingCallback(&CanUtility_hcan);
+	if(CanUtility_CanActive)
+	{
+		HAL_CAN_RxFifo0MsgPendingCallback(&CanUtility_hcan);
+	}
 }
 
 /*
@@ -164,3 +169,29 @@ Wird aufgerufen, wenn:
 {
 	HAL_CAN_IRQHandler(&CanUtility_hcan);
 }*/
+
+HAL_StatusTypeDef CanUtility_ActivateCan(void)
+{
+	if(HAL_CAN_Start(&CanUtility_hcan) != HAL_OK)
+	{
+		return HAL_ERROR;
+	}
+	else
+	{
+		CanUtility_CanActive = true;
+		return HAL_OK;
+	}
+}
+
+HAL_StatusTypeDef CanUtility_DeactivateCan(void)
+{
+	if(HAL_CAN_Stop(&CanUtility_hcan) != HAL_OK)
+	{
+		return HAL_ERROR;
+	}
+	else
+	{
+		CanUtility_CanActive = false;
+		return HAL_OK;
+	}
+}
