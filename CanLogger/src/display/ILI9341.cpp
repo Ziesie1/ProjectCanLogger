@@ -5,14 +5,13 @@
 #include "serial/FunctionLifeTime.hpp"
 
 
-#define TFT_ROTATION    //setzen der Rotation
 
 using namespace utilities;
 
-ILI9341::ILI9341(const uint32_t& CS, const uint32_t& RESET,const uint32_t& MOSI, const uint32_t& DC, const uint32_t& SCK)
+ILI9341::ILI9341(const uint32_t& CS, const uint32_t& RESET,const uint32_t& MOSI, const uint32_t& DC, const uint32_t& SCK, bool rotateDisp)
     : PIN_CS{CS}, PIN_RESET{RESET}, PIN_MOSI{MOSI}, PIN_DC{DC}, PIN_SCK{SCK}
 {
-    
+    this->rotateDisplay = rotateDisp;
 }
 
 void ILI9341::init()
@@ -155,12 +154,13 @@ void ILI9341::displayInit()
 	LCD_ILI9341_Parameter(0xa0); // Original-Scanrichtung
 
 	LCD_ILI9341_CMD(ILI9341_FUNCTONCTL_REG);     // 0xB6
-	#ifdef TFT_ROTATION
-	WriteWord(0x0AA2); // Normal, kleines Display
-	#else
-	WriteWord(0x0AC2); // Normal, kleines Display
-	#endif
-	
+	if(this->rotateDisplay)
+	{
+		WriteWord(0x0AA2); // Normal, kleines Display
+	}else{
+		WriteWord(0x0AC2); // Normal, kleines Display
+	}
+
 	LCD_ILI9341_CMD(ILI9341_ENABLE_3G_REG);      // 0xF2
 	LCD_ILI9341_Parameter(0x00);
 	LCD_ILI9341_CMD(ILI9341_GAMMASET_REG);       // 0x26
@@ -463,20 +463,23 @@ void ILI9341::drawFillRect(unsigned long usStartX, unsigned long usStartY,
 	}
 }
 
+
 /*
 	Zeichnet ein Bild an der angegeben Position.
+	Das Bild ist ganzahlig Skallierbar.
+	Kleinste größe mit size = 1;
 */
-void ILI9341::drawBmp(unsigned short usX, unsigned short usY, unsigned short usSizeX, unsigned short usSizeY, uint16_t const *Bmp)
+void ILI9341::drawBmp(unsigned short usX, unsigned short usY, unsigned short usSizeX, unsigned short usSizeY, uint16_t const *Bmp, byte size)
 {
 	unsigned short i,j;
-    
-    this->setCurPos(usX, usX + usSizeX-1, usY, usY + usSizeY-1); 
+
+    this->setCurPos(usX, usX + usSizeX*size-1, usY, usY + usSizeY*size-1); 
 	
-    for( i = usY; i < usY + usSizeY; i++) 
+    for( i = 0; i < usSizeY*size; i++) 
     {
-        for( j = usX ; j < usX + usSizeX; j++)
+        for( j = 0 ; j < usSizeX*size; j++)
         {
-            this->WriteWord(*Bmp++);  
+            this->WriteWord(Bmp[i/size*usSizeX + j/size]);
         }
     }
 }
@@ -485,19 +488,57 @@ void ILI9341::drawBmp(unsigned short usX, unsigned short usY, unsigned short usS
 #include "display/X_Tft_Zeichensatz_8X16_96.hpp"
 
 /*
+	Schreibt ein Zeichen auf das Display.
+	Verwendet wird der Zeichensatz, mit 8x16 Pixel Pro Zeichen. 
+	Die Zeichen können ganzahlig dynamisch skalliert werden.
+	Die kleinste größe ist mit size = 1. 
+*/
+void ILI9341::printChar(unsigned short usX, unsigned short usY, char c, unsigned long fColor, unsigned long bColor, byte size)
+{
+	unsigned int i, j;
+    
+	if ((c >= 0x20) && (c <= 0x7F)) // Zeichen nach ASCII zwischen "Space" und "DEL"
+	{
+		this->setCurPos(usX, usX + 8*size - 1, usY, usY + 16*size - 1);
 
+		for(i = 0; i < 16*size; i++) 
+		{
+			unsigned char m = Font8x16[(c - 0x20) * 16 + i/size]; // Ein Zeichen besteht aus 16 Zeilen mit jeweils 8 Bildpunkten
+			for(j = 0; j < 8; j++) 
+			{
+				for(unsigned int k=0; k < size; k++)
+				{
+					if((m & 0x80) == 0x80) 
+					{
+						this->WriteWord(fColor);
+					}
+					else 
+					{
+						this->WriteWord(bColor);
+					}
+				}
+				
+				m <<= 1;
+			}
+		}
+	}
+}
+
+/*
+	Schreibt ein Zeichen auf das Display.
+	Verwendet wird der Zeichensatz, mit 8x16 Pixel pro Zeichen.
 */
 void ILI9341::printChar8x16(unsigned short usX, unsigned short usY, char c, unsigned long fColor, unsigned long bColor)
 {
 	unsigned int i, j;
     
-	if ((c >= 0x20) && (c <= 0x7F))
+	if ((c >= 0x20) && (c <= 0x7F)) // Zeichen nach ASCII zwischen "Space" und "DEL"
 	{
 		this->setCurPos(usX, usX + 8 - 1, usY, usY + 16 - 1);
 
 		for(i = 0; i < 16; i++) 
 		{
-			unsigned char m = Font8x16[(c - 0x20) * 16 + i];
+			unsigned char m = Font8x16[(c - 0x20) * 16 + i]; // Ein Zeichen besteht aus 16 Zeilen mit jeweils 8 Bildpunkten
 			for(j = 0; j < 8; j++) 
 			{
 				if((m & 0x80) == 0x80) 
@@ -515,9 +556,11 @@ void ILI9341::printChar8x16(unsigned short usX, unsigned short usY, char c, unsi
 }
 
 /*
-
+	Schreibt ein Zeichen auf das Display.
+	Verwendet wird der Zeichensatz, mit 8x16 Pixel pro Zeichen.
+	Die Zeichen werden skalliert auf 16x32 Pixel pro Zeichen.
 */
-void ILI9341::printChar32_8x16(unsigned short usX, unsigned short usY, char c, unsigned long fColor, unsigned long bColor)
+void ILI9341::printChar16x32(unsigned short usX, unsigned short usY, char c, unsigned long fColor, unsigned long bColor)
 {
 	unsigned int i, j;
 
@@ -546,7 +589,12 @@ void ILI9341::printChar32_8x16(unsigned short usX, unsigned short usY, char c, u
 	}
 }
 
-void ILI9341::printChar32_24_8x16(unsigned short usX, unsigned short usY, char c, unsigned long fColor, unsigned long bColor)
+/*
+	Schreibt ein Zeichen auf das Display.
+	Verwendet wird der Zeichensatz, mit 8x16 Pixel pro Zeichen.
+	Die Zeichen werden skalliert auf 16x24 Pixel pro Zeichen.
+*/
+void ILI9341::printChar16x24(unsigned short usX, unsigned short usY, char c, unsigned long fColor, unsigned long bColor)
 {
 	unsigned int i, j;
     
@@ -581,7 +629,12 @@ void ILI9341::printChar32_24_8x16(unsigned short usX, unsigned short usY, char c
 	}	
 }
 
-void ILI9341::printChar24_8x16(unsigned short usX, unsigned short usY, char c, unsigned long fColor, unsigned long bColor)
+/*
+	Schreibt ein Zeichen auf das Display.
+	Verwendet wird der Zeichensatz, mit 8x16 Pixel pro Zeichen.
+	Die Zeichen werden skalliert auf 12x24 Pixel pro Zeichen.
+*/
+void ILI9341::printChar12x24(unsigned short usX, unsigned short usY, char c, unsigned long fColor, unsigned long bColor)
 {
 	unsigned int i;
 
@@ -616,8 +669,35 @@ void ILI9341::printChar24_8x16(unsigned short usX, unsigned short usY, char c, u
 	}
 }
 
+/*
+	Schreibt eine Zeichenkette auf das Display.
+	Verwendet wird der Zeichensatz, mit 8x16 Pixel Pro Zeichen. 
+	Die Zeichen können ganzahlig dynamisch skalliert werden.
+	Die kleinste größe ist mit size = 1. 
+*/
+void ILI9341::printString(unsigned short usX, unsigned short usY, const char* pcString, unsigned long fColor, unsigned long bColor, byte size)
+{
+	unsigned char ucl = 0;
+	
+	while(*pcString) 
+	{
+		if( *pcString < 0xC0) 
+		{
+			this->printChar(usX + ucl*8*size, usY, *pcString, fColor, bColor, size);
+			pcString++; ucl++;
+		}
+		else
+		{
+			pcString++; ucl++;
+		}
+	}
+}
 
-void ILI9341::printString(unsigned short usX, unsigned short usY, const char* pcString, unsigned long fColor, unsigned long bColor)
+/*
+	Schreibt eine Zeichenkette auf das Display.
+	Verwendet wird der Zeichensatz, mit 8x16 Pixel Pro Zeichen. 
+*/
+void ILI9341::printString8x16(unsigned short usX, unsigned short usY, const char* pcString, unsigned long fColor, unsigned long bColor)
 {
 	unsigned char ucl = 0;
 	
@@ -630,10 +710,7 @@ void ILI9341::printString(unsigned short usX, unsigned short usY, const char* pc
 		}
 		else
 		{
-	//           ILI9341PutGB1616(usX + ucl * 8, usY, (unsigned char*)pcString, fColor, bColor);
-	//           pcString += 2; ucl += 2;
-		pcString++; ucl++;
-
+			pcString++; ucl++;
 		}
 	}
 }

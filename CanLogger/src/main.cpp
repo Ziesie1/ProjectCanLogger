@@ -4,12 +4,11 @@
 #include "serial/SerialCommunication.hpp"
 #include "buttons/Encoder.hpp"
 #include "buttons/Taster.hpp"
-//#include "display/TFT.hpp"
 #include "display/ILI9341.hpp"
 
 using namespace utilities; // für scom
 
-ILI9341 display {PC9, PC8, PA10, PA8, PB5};
+ILI9341 display {PC9, PC8, PA10, PA8, PB5, true};
 
 void setup() {
   Serial.begin(115200);
@@ -26,12 +25,13 @@ void setup() {
   display.drawOnePixel(230,150,GELB100);
   display.drawHorizontalLine(0,229,150,ROT100);
   display.drawOnePixel(20,300,GELB100);
-  display.drawVerticalLine(20,0,299,ROT100); 
+  display.drawVerticalLine(20,0,299,ROT100);
+  
   display.printChar8x16(50,200,'X',ROT100, BLAU50);
-  display.printChar32_8x16(50+8+1,200,'X',ROT100, BLAU50);
-  display.printChar32_24_8x16(50+8+32+1,200,'X',ROT100, BLAU50);
-  display.printChar24_8x16(50+8+32+32+1,200,'X',ROT100, BLAU50);
-  display.printString(50,200+32+1,"Dies ist ein Test! 10", ROT100, BLAU50);
+  display.printChar16x32(50+8+1,200,'X',ROT100, BLAU50);
+  display.printChar16x24(50+8+16+1,200,'X',ROT100, BLAU50);
+  display.printChar12x24(50+8+16+16+1,200,'X',ROT100, BLAU50);
+  display.printString(50,200+32+1,"Hallo", ROT100, BLAU50, 3);
 
   uint16_t const test[100] = 
   {
@@ -46,7 +46,7 @@ void setup() {
     ROT100,WEISS,ROT100,ROT100,ROT100,ROT100,ROT100,ROT100,WEISS,ROT100,
     WEISS,ROT100,ROT100,ROT100,ROT100,ROT100,ROT100,ROT100,ROT100,WEISS
   };
-  display.drawBmp(150,50,10,10,test);
+  display.drawBmp(150,50,10,10,test,4);
 
   //initTFT();
   createNewCanLogFile();

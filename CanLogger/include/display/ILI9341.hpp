@@ -46,6 +46,8 @@ class ILI9341
     uint32_t GPIO_PIN_SCK;
     GPIO_TypeDef * GPIO_PORT_SCK;
 
+    bool rotateDisplay;
+
     inline void setPinCS();
     inline void resetPinCS();
     inline void setPinReset();
@@ -70,7 +72,7 @@ class ILI9341
     void setCurPos(unsigned long ulStartX, unsigned long ulEndX, unsigned long ulStartY, unsigned long ulEndY);
 
 public:
-    ILI9341(const uint32_t& CS, const uint32_t& RESET,const uint32_t& MOSI, const uint32_t& DC, const uint32_t& SCK);
+    ILI9341(const uint32_t& CS, const uint32_t& RESET,const uint32_t& MOSI, const uint32_t& DC, const uint32_t& SCK, bool rotateDisp = false);
     void init();
     void setDisplayOn(bool statusOn);
     void enterSleepMode();
@@ -83,13 +85,15 @@ public:
     void drawVerticalLine(unsigned short usX, unsigned short usStartY, unsigned short usEndY, unsigned long ulColor);
     void drawFillRect2(unsigned long usStartX, unsigned long usEndX, unsigned long usStartY, unsigned long usEndY, unsigned long ulColor);
     void drawFillRect(unsigned long usStartX, unsigned long usStartY, unsigned long SizeX, unsigned long SizeY, unsigned long ulColor);
-    void drawBmp(unsigned short usX, unsigned short usY, unsigned short usSizeX, unsigned short usSizeY, uint16_t const *Bmp);    
+    void drawBmp(unsigned short usX, unsigned short usY, unsigned short usSizeX, unsigned short usSizeY, uint16_t const *Bmp, byte size = 1);    
     
+    void printChar(unsigned short usX, unsigned short usY, char c, unsigned long fColor, unsigned long bColor, byte size = 1);
     void printChar8x16(unsigned short usX, unsigned short usY, char c, unsigned long fColor, unsigned long bColor);
-    void printChar32_8x16(unsigned short usX, unsigned short usY, char c, unsigned long fColor, unsigned long bColor);
-    void printChar32_24_8x16(unsigned short usX, unsigned short usY, char c, unsigned long fColor, unsigned long bColor);
-    void printChar24_8x16(unsigned short usX, unsigned short usY, char c, unsigned long fColor, unsigned long bColor);
-    void printString(unsigned short usX, unsigned short usY, const char* pcString, unsigned long fColor, unsigned long bColor);
+    void printChar16x32(unsigned short usX, unsigned short usY, char c, unsigned long fColor, unsigned long bColor);
+    void printChar16x24(unsigned short usX, unsigned short usY, char c, unsigned long fColor, unsigned long bColor);
+    void printChar12x24(unsigned short usX, unsigned short usY, char c, unsigned long fColor, unsigned long bColor);
+    void printString(unsigned short usX, unsigned short usY, const char* pcString, unsigned long fColor, unsigned long bColor, byte size = 1);
+    void printString8x16(unsigned short usX, unsigned short usY, const char* pcString, unsigned long fColor, unsigned long bColor);
 
     static unsigned long makeColor(byte R, byte G, byte B);
 };
