@@ -35,7 +35,9 @@ Programmiert wird in der Entwicklungsumgebung [Microsoft Visual Studio Code](htt
 | RESET     | CN10\|2   | PC8       |
 | CS        | CN10\|1   | PC9       |
 | GND       | GND       | GND       |
-| VCC       | VCC       | VCC       |
+| VCC       | CN7\|5    | VCC       |
+
+*Der LED-Pin des Displays ist über einen 47 Ohm Widerstand mit CN7\|6 verbunden.*
 
 <a name="sdKartenPins"></a>
 ### SD-Karten-Pins
