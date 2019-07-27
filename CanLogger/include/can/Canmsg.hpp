@@ -11,11 +11,11 @@ Die Zeile muss dann lauten: "#define HAL_CAN_MODULE_ENABLED"
 class Canmsg
 {
 public:
-	static constexpr byte maxLength = 8;
+	static constexpr uint8_t maxLength = 8;
 	static constexpr char16_t maxTime = 0xffff;
 	static constexpr char16_t maxStdId = 0x7ff;
 	static constexpr char32_t maxExtId = 0x3ffff;
-	static constexpr byte maxDataVal = 0xff;
+	static constexpr uint8_t maxDataVal = 0xff;
 
 private:
     char16_t stdIdentifier;	//Standart identifier or MSB of the extended identifier
@@ -24,18 +24,24 @@ private:
 	bool rtr;
 	char16_t time;
 	uint8_t canLength;
-	uint8_t canBytes[maxLength];
+	uint8_t* data;
+	void destroy(void);
+	void moveDestroy(void);
 	
 public:	
 	Canmsg();
-	Canmsg(Canmsg const& other);
 	Canmsg(char16_t stdId, char32_t extId, bool isExtId, bool rtr, char16_t time, 
 			uint8_t canLength, uint8_t const * const data);  
 	Canmsg(char16_t stdId, char32_t extId, bool isExtId, bool rtr, char16_t time,
 			uint8_t canLength, uint8_t databit0 = 0x00, uint8_t databit1 = 0x00, 
 			uint8_t databit2 = 0x00, uint8_t databit3 = 0x00, uint8_t databit4 = 0x00, 
 			uint8_t databit5 = 0x00, uint8_t databit6 = 0x00, uint8_t databit7 = 0x00);  
+
+	~Canmsg();
+	Canmsg(Canmsg const& other);
 	Canmsg& operator= (Canmsg const& other);
+	Canmsg(Canmsg && other);
+	Canmsg& operator= (Canmsg && other);
 	
 	explicit operator String() const;
 	uint8_t operator[](int idx) const;
@@ -50,12 +56,12 @@ public:
 	uint8_t GetCanByte(int const idx) const;
 	
 	// Bus-Funktionen:
-	void Send(void) const;// noch nicht verwendbar
+	HAL_StatusTypeDef Send(void) const;// noch nicht verwendbar
 	void Recieve(bool const fifo);// noch nicht verwendbar
 };
 
 constexpr int Canmsg_CAN_BUFFER_REC_SIZE = 50;
-extern Canmsg Canmsg_bufferCanRecMessages[Canmsg_CAN_BUFFER_REC_SIZE];
+extern Canmsg* Canmsg_bufferCanRecMessages;
 extern int Canmsg_bufferCanRecPointer;
 
 #endif //CANMSG

@@ -8,10 +8,10 @@ Die Zeile muss dann lauten: "#define HAL_CAN_MODULE_ENABLED"
 #ifndef CANUTILITY_HPP
 #define CANUTILITY_HPP
 
-#include <Arduino.h>
 #include "can/Canmsg.hpp"
 
 HAL_StatusTypeDef CanUtility_Init(void);
+HAL_StatusTypeDef CanUtility_DeInit(void);
 HAL_StatusTypeDef CanUtility_EnableRecieve(void);
 HAL_StatusTypeDef CanUtility_DissableRecieve(void);
 

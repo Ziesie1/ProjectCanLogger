@@ -2,7 +2,7 @@
 #include "can/CanUtility.hpp"
 #include "can/Canmsg.hpp"
 
-Canmsg Canmsg_bufferCanRecMessages[Canmsg_CAN_BUFFER_REC_SIZE];
+Canmsg* Canmsg_bufferCanRecMessages;
 int Canmsg_bufferCanRecPointer;
 
 /*
@@ -44,7 +44,7 @@ Canmsg::Canmsg(char16_t stdId, char32_t extId, bool isExtId, bool rtr, char16_t 
     {
         for(uint8_t i=0; i<this->canLength; i++)
         {
-            this->canBytes[i] = data[i];
+            this->data[i] = data[i];
         }
     }
     else
@@ -53,7 +53,7 @@ Canmsg::Canmsg(char16_t stdId, char32_t extId, bool isExtId, bool rtr, char16_t 
     }
     for(uint8_t i=this->canLength; i<maxLength; i++)
     {
-        this->canBytes[i] = 0x00;
+        this->data[i] = 0x00;
     }
 }
 
@@ -145,14 +145,42 @@ Canmsg::Canmsg(char16_t stdId, char32_t extId, bool isExtId, bool rtr, char16_t 
         this->canLength = maxLength;
     }
     
+    this->data = new uint8_t[this->maxLength];
+
     uint8_t data[8] = {databit0, databit1, databit2, databit3, 
                         databit4, databit5, databit6, databit7};
     for(uint8_t i=0; i<this->canLength; i++)
     {
-        this->canBytes[i] = data[i];
+        this->data[i] = data[i];
     }
 }
 	
+/* 
+    function which deletes dynamic resources of a CAN-message
+*/
+void Canmsg::destroy(void)
+{
+  delete[] this->data;
+  this->moveDestroy();
+}
+
+/* 
+    function which avoids dynamic resources from beeing deleted
+*/
+void Canmsg::moveDestroy(void)
+{
+  this->data = nullptr;
+  this->canLength = 0;
+}
+
+/* 
+    destructor for CAN-messages
+*/
+Canmsg::~Canmsg()
+{
+  this->destroy();
+}
+
 /* 
     creates a CAN-message equal to the one passed to the constuctor
     Input:  other - a instance of Canmsg whose values will be copied into this instance
@@ -176,10 +204,37 @@ Canmsg& Canmsg::operator= (Canmsg const& other)
     this->canLength = other.canLength;
     for(byte i=0; i<maxLength; i++)
     {
-        this->canBytes[i] = other.canBytes[i];
+        this->data[i] = other.data[i];
     }
     return *this;
 }	
+
+/* 
+    creates a CAN-message equal to the one passed to the constuctor
+    Input:  other - a R-value instance of Canmsg whose values will be copied into this instance
+*/
+Canmsg::Canmsg(Canmsg && other)
+{
+  (*this) = std::move(other);
+}
+
+/*
+    operator to move a message
+    Input:  other - a R-value instance of Canmsg whose values will be copied into this instance
+*/
+Canmsg& Canmsg::operator= (Canmsg && other)
+{
+  this->destroy();
+  this->stdIdentifier = other.stdIdentifier;
+  this->extIdentifier = other.extIdentifier;
+  this->isExtIdentifier = other.isExtIdentifier;
+  this->rtr = other.rtr;
+  this->time = other.time;
+  this->canLength = other.canLength;
+  this->data = other.data;
+  other.moveDestroy();
+  return (*this);
+}
 
 /* 
     function to add zeros to a String that every String will have the same ammount of chars
@@ -226,8 +281,8 @@ Canmsg::operator String() const
     s+="h Inhalt: ";
     for(byte i=0;i<this->canLength;i++)
     {
-        AddZerosToStringHex(s, this->canBytes[i], Canmsg::maxDataVal);
-        s+=String(this->canBytes[i],HEX);
+        AddZerosToStringHex(s, this->data[i], Canmsg::maxDataVal);
+        s+=String(this->data[i],HEX);
         if(i<canLength-1)
         {
             s+=".";
@@ -248,7 +303,7 @@ uint8_t Canmsg::operator[](int idx) const
 {
   if(idx<this->maxLength)
   {
-    return this->canBytes[idx];
+    return this->data[idx];
   }
   else
   {
@@ -277,7 +332,7 @@ void Canmsg::Recieve(bool const fifo)
             this->canLength = header.DLC;
             for(int i=0; i<canLength; i++)
             {
-            this->canBytes[i] = data[i];
+            this->data[i] = data[i];
             }
         }
         else
@@ -289,8 +344,12 @@ void Canmsg::Recieve(bool const fifo)
 
 /*
     sends the message via tx-mailbox 0
+    return: HAL_OK		- everything is working as it is supposed to be
+			      HAL_ERROR	- an error occured while activating the peripherals, 
+						            check if the Peripherals are allready initialized
+						            or refer to CanUtility_hcan->ErrorCode
 */
-void Canmsg::Send(void) const
+HAL_StatusTypeDef Canmsg::Send(void) const
 {
 	if(HAL_CAN_GetTxMailboxesFreeLevel(&CanUtility_hcan) != 0)
 	{
@@ -318,14 +377,15 @@ void Canmsg::Send(void) const
 		uint8_t data[8];
 		for(uint8_t i=0; i<header.DLC; i++)
 		{
-			data[i] = this->canBytes[i];
+			data[i] = this->data[i];
 		}
 		uint32_t mailbox = 0;
-		HAL_CAN_AddTxMessage(&CanUtility_hcan, &header, data, &mailbox);
+		return HAL_CAN_AddTxMessage(&CanUtility_hcan, &header, data, &mailbox);
 	}
   else
   {
     Serial.println("CAN-Nachricht konnte nicht gesendet werden(Alle TX Mailboxen belegt).");
+    return HAL_ERROR;
   }
 }
 

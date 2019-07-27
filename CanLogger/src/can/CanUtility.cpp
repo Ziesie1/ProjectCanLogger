@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include "can/CanUtility.hpp"
 #include "can/Canmsg.hpp"
 
@@ -48,6 +49,21 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef *hcan)
 	/*HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
 	HAL_NVIC_SetPriority(CAN_RX0_IRQn,15,0U);
 	HAL_NVIC_EnableIRQ(CAN_RX0_IRQn);*/
+}
+
+void HAL_CAN_MspDeInit(CAN_HandleTypeDef *hcan)
+{
+	//resetInterrupts:
+
+	// TX-Pin:
+	HAL_GPIO_DeInit(GPIOB, GPIO_PIN_9);
+	
+	// RX-Pin:
+	HAL_GPIO_DeInit(GPIOB, GPIO_PIN_8);	
+
+	__HAL_RCC_CAN1_CLK_DISABLE();
+	while(__HAL_RCC_CAN1_IS_CLK_ENABLED())
+	{}
 }
 
 /* 
@@ -149,7 +165,35 @@ HAL_StatusTypeDef CanUtility_Init(void)
 		CanUtility_CanRecieveActive = false;
 		Serial.println("CAN-Peripherie einsatzbereit");	
 	}
+	
+	Canmsg_bufferCanRecMessages = new Canmsg[Canmsg_CAN_BUFFER_REC_SIZE];
 	Canmsg_bufferCanRecPointer = 0;
+	
+	return HAL_OK;
+}
+
+/* 
+	function that deinitializes the CAN perihpherals and the recieve Buffer
+	return:	HAL_OK		- everything is working as it is supposed to be
+			HAL_ERROR	- an error occured while deinitializing, 
+						  check the serial output for further details
+*/
+HAL_StatusTypeDef CanUtility_DeInit(void)
+{
+	if(HAL_CAN_DeInit(&CanUtility_hcan)!= HAL_OK)
+	{
+		Serial.print("Fehler während der CAN deinitialisierung. Status: ");
+		Serial.print(HAL_CAN_GetState(&CanUtility_hcan)); 
+		Serial.print(" Fehlercode: 0x");
+		Serial.println(String(HAL_CAN_GetError(&CanUtility_hcan),HEX)); 
+		return HAL_ERROR;
+	}
+	
+	delete[] Canmsg_bufferCanRecMessages;
+	Canmsg_bufferCanRecMessages = nullptr;
+	Canmsg_bufferCanRecPointer = 0;
+	
+	Serial.println("CAN-Baustein deinitialisiert");
 	return HAL_OK;
 }
 
@@ -165,7 +209,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 		recMessage.Recieve(0);
 		if(Canmsg_bufferCanRecPointer < Canmsg_CAN_BUFFER_REC_SIZE)
 		{
-			Canmsg_bufferCanRecMessages[Canmsg_bufferCanRecPointer] = recMessage;
+			Canmsg_bufferCanRecMessages[Canmsg_bufferCanRecPointer] = std::move(recMessage);
 			Canmsg_bufferCanRecPointer++;
 		}
 		else
@@ -199,10 +243,10 @@ Wird aufgerufen, wenn:
 }*/
 
 /* 
-	function that configures the CAN-message-filter to process all incomming messages
+	function that configures the CAN-message filter to process all incomming messages
 	return:	HAL_OK		- everything is working as it is supposed to be,
 						  the peripherals are activated
-			HAL_ERROR	- an error occured while activating the peripherals, 
+			HAL_ERROR	- an error occured while activating the message filter, 
 						  check if the Peripherals are allready initialized
 						  or refer to CanUtility_hcan->ErrorCode
 */
@@ -218,15 +262,16 @@ HAL_StatusTypeDef CanUtility_EnableRecieve(void)
 	else
 	{
 		CanUtility_CanRecieveActive = true;
+		Serial.println("CAN-Nachrichten werden bearbeitet");
 		return HAL_OK;
 	}
 }
 
 /* 
-	function that configures the CAN-message-filter to discard all incomming messages
+	function that configures the CAN-message filter to discard all incomming messages
 	return:	HAL_OK		- everything is working as it is supposed to be,
 						  the peripherals are deactivated
-			HAL_ERROR	- an error occured while activating the peripherals,
+			HAL_ERROR	- an error occured while deactivating the message filter,
 						  please refer to CanUtility_hcan->ErrorCode 
 */
 HAL_StatusTypeDef CanUtility_DissableRecieve(void)
@@ -240,6 +285,7 @@ HAL_StatusTypeDef CanUtility_DissableRecieve(void)
 	else
 	{
 		CanUtility_CanRecieveActive = false;
+		Serial.println("CAN-Nachrichten werden ignoriert");
 		return HAL_OK;
 	}
 }

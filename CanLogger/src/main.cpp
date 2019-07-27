@@ -26,7 +26,7 @@ void setup() {
   {
     while(1){}
   }
-
+  
   display.begin();
   display.fillScreen(ILI9341_BLACK);
   display.setTextSize(3);
@@ -45,7 +45,7 @@ void loop() {
     Serial.print("Empfangene Nachricht: ");
     Serial.println(static_cast<String>(Canmsg_bufferCanRecMessages[Canmsg_bufferCanRecPointer]));
   }
-  delay(5000);
+  delay(500);
 }
 
 
