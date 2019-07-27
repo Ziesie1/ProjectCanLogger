@@ -22,6 +22,8 @@ void setup() {
   display.fillScreen(BLAU50);
   display.drawFillRect2(50,50+80-1,40,50-1,ILI9341::makeColor(100,0,0));
   display.drawFillRect(50,50,80,80,ILI9341::makeColor(0,100,0));
+  display.drawEmptyRect(50-2,40-2,80+4,80+10+4,ILI9341::makeColor(160,0,255),2);
+
   display.drawOnePixel(230,150,GELB100);
   display.drawHorizontalLine(0,229,150,ROT100);
   display.drawOnePixel(20,300,GELB100);
@@ -32,6 +34,15 @@ void setup() {
   display.printChar16x24(50+8+16+1,200,'X',ROT100, BLAU50);
   display.printChar12x24(50+8+16+16+1,200,'X',ROT100, BLAU50);
   display.printString(50,200+32+1,"Hallo", ROT100, BLAU50, 3);
+
+  delay(3000);
+  display.rotateDisplay(false);
+  delay(3000);
+  display.rotateDisplay(true);
+
+
+  display.drawEmptyRect2(50,200,154,190,SCHWARZ,2);
+  display.printString8x16(50+4,154+2+1,"Test",ROT100, BLAU50);
 
   uint16_t const test[100] = 
   {
@@ -48,7 +59,6 @@ void setup() {
   };
   display.drawBmp(150,50,10,10,test,4);
 
-  //initTFT();
   createNewCanLogFile();
 	
   scom << "CanLogger ist Initialisiert" << endz;

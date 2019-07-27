@@ -11,7 +11,11 @@ using namespace utilities;
 ILI9341::ILI9341(const uint32_t& CS, const uint32_t& RESET,const uint32_t& MOSI, const uint32_t& DC, const uint32_t& SCK, bool rotateDisp)
     : PIN_CS{CS}, PIN_RESET{RESET}, PIN_MOSI{MOSI}, PIN_DC{DC}, PIN_SCK{SCK}
 {
-    this->rotateDisplay = rotateDisp;
+    if(rotateDisp)
+	{
+		this->displayFunctionControlREG |= 0x20; // SS-Bit setzen
+		this->displayFunctionControlREG &= ~0x40; // GS-Bit rücksetzen
+	}
 }
 
 void ILI9341::init()
@@ -55,7 +59,7 @@ void ILI9341::init()
     this->gpioInit();
     this->displayInit();
 
-	scom.printDebug("Display ist Initialisiert.");
+	scom.printDebug("Display ist Initialisiert");
 }
 
 void ILI9341::gpioInit()
@@ -154,12 +158,7 @@ void ILI9341::displayInit()
 	LCD_ILI9341_Parameter(0xa0); // Original-Scanrichtung
 
 	LCD_ILI9341_CMD(ILI9341_FUNCTONCTL_REG);     // 0xB6
-	if(this->rotateDisplay)
-	{
-		WriteWord(0x0AA2); // Normal, kleines Display
-	}else{
-		WriteWord(0x0AC2); // Normal, kleines Display
-	}
+	WriteWord(this->displayFunctionControlREG);
 
 	LCD_ILI9341_CMD(ILI9341_ENABLE_3G_REG);      // 0xF2
 	LCD_ILI9341_Parameter(0x00);
@@ -324,7 +323,7 @@ void ILI9341::enterSleepMode()
 */
 void ILI9341::exitSleepMode()
 {
-	LCD_ILI9341_CMD(ILI9341_SLEEP_OUT_REG);		
+	this->LCD_ILI9341_CMD(ILI9341_SLEEP_OUT_REG);		
     delay(500); 
 }
 
@@ -339,6 +338,24 @@ void ILI9341::invertDisplay(bool inverse)
 	}else{
 		this->LCD_ILI9341_CMD(ILI9341_INVERSIONOFF_REG);
 	}
+}
+
+/*
+	Setzt die Rotation des Display.
+	Diese kann um 180° gedreht werden.
+*/
+void ILI9341::rotateDisplay(bool rotateDisp)
+{
+	if(rotateDisp)
+	{
+		this->displayFunctionControlREG |= 0x0020; // SS-Bit setzen
+		this->displayFunctionControlREG &= ~0x0040; // GS-Bit rücksetzen
+	}else{
+		this->displayFunctionControlREG &= ~0x0020; // SS-Bit rücksetzen
+		this->displayFunctionControlREG |= 0x0040; // GS-Bit setzen
+	}
+	this->LCD_ILI9341_CMD(ILI9341_FUNCTONCTL_REG);     // 0xB6
+	this->WriteWord(this->displayFunctionControlREG);
 }
 
 /*
@@ -409,6 +426,37 @@ void ILI9341::drawVerticalLine(unsigned short usX, unsigned short usStartY, unsi
 	}
 }
 
+/*
+	Zeichnet einen rechteckigen Rahmen.
+	Die Rahmendicke ist variable und wächst mit größerer Dicke nach innen an.
+*/
+void ILI9341::drawEmptyRect(unsigned long usStartX, unsigned long usStartY, unsigned long sizeX, unsigned long sizeY, unsigned long ulColor, byte frameSize)
+{
+	// oberen Rahmen
+	this->drawFillRect(usStartX, usStartY, sizeX, frameSize, ulColor);
+	// linken Rahmen
+	this->drawFillRect(usStartX, usStartY, frameSize, sizeY, ulColor);
+	// rechten Rahmen
+	this->drawFillRect(usStartX+sizeX-frameSize, usStartY, frameSize, sizeY, ulColor);
+	// unteren Rahmen
+	this->drawFillRect(usStartX, usStartY+sizeY-frameSize, sizeX, frameSize, ulColor);
+}
+
+/*
+	Zeichnet einen rechteckigen Rahmen.
+	Die Rahmendicke ist variable und wächst mit größerer Dicke nach innen an.
+*/
+void ILI9341::drawEmptyRect2(unsigned long usStartX, unsigned long usEndX, unsigned long usStartY, unsigned long usEndY, unsigned long ulColor, byte frameSize)
+{
+	// oberen Rahmen
+	this->drawFillRect2(usStartX, usEndX, usStartY, usStartY+frameSize, ulColor);
+	// linken Rahmen
+	this->drawFillRect2(usStartX, usStartX+frameSize, usStartY, usEndY, ulColor);
+	// rechten Rahmen
+	this->drawFillRect2(usEndX-frameSize, usEndX, usStartY, usEndY, ulColor);
+	// unteren Rahmen
+	this->drawFillRect2(usStartX, usEndX, usEndY-frameSize, usEndY, ulColor);
+}
 
 /*
 	Zeichnet ein gefülltes Rechteck auf das Display.
@@ -671,7 +719,7 @@ void ILI9341::printChar12x24(unsigned short usX, unsigned short usY, char c, uns
 
 /*
 	Schreibt eine Zeichenkette auf das Display.
-	Verwendet wird der Zeichensatz, mit 8x16 Pixel Pro Zeichen. 
+	Verwendet wird der Zeichensatz, mit 8x16 Pixel pro Zeichen. 
 	Die Zeichen können ganzahlig dynamisch skalliert werden.
 	Die kleinste größe ist mit size = 1. 
 */
@@ -695,7 +743,7 @@ void ILI9341::printString(unsigned short usX, unsigned short usY, const char* pc
 
 /*
 	Schreibt eine Zeichenkette auf das Display.
-	Verwendet wird der Zeichensatz, mit 8x16 Pixel Pro Zeichen. 
+	Verwendet wird der Zeichensatz, mit 8x16 Pixel pro Zeichen. 
 */
 void ILI9341::printString8x16(unsigned short usX, unsigned short usY, const char* pcString, unsigned long fColor, unsigned long bColor)
 {
@@ -713,6 +761,69 @@ void ILI9341::printString8x16(unsigned short usX, unsigned short usY, const char
 			pcString++; ucl++;
 		}
 	}
+}
+
+/*
+	Schreibt eine Zeichenkette auf das Display.
+	Verwendet wird der Zeichensatz, mit 16x32 Pixel pro Zeichen. 
+*/
+void ILI9341::printString16x32(unsigned short usX, unsigned short usY, const char* pcString, unsigned long fColor, unsigned long bColor)
+{
+	unsigned char ucl = 0;
+    while(*pcString) 
+    {
+        if( *pcString < 0xC0)
+        {
+            this->printChar16x32(usX + ucl * 2 * 8, usY, *pcString, fColor, bColor);
+            pcString++; ucl++;
+        }
+        else
+        {
+            pcString++; ucl++;		
+        }	
+    }
+}
+
+/*
+	Schreibt eine Zeichenkette auf das Display.
+	Verwendet wird der Zeichensatz, mit 16x24 Pixel Pro Zeichen. 
+*/
+void ILI9341::printString16x24(unsigned short usX, unsigned short usY, const char* pcString, unsigned long fColor, unsigned long bColor)
+{
+	unsigned char ucl = 0;
+    while(*pcString) 
+    {
+        if( *pcString < 0xC0)
+        {
+            this->printChar16x24(usX + ucl * 2 * 8, usY, *pcString, fColor, bColor);
+            pcString++; ucl++;
+        }
+        else
+        {
+            pcString++; ucl++;		
+        }	
+    }
+}
+
+/*
+	Schreibt eine Zeichenkette auf das Display.
+	Verwendet wird der Zeichensatz, mit 12x24 Pixel Pro Zeichen. 
+*/
+void ILI9341::printString12x24(unsigned short usX, unsigned short usY, const char* pcString, unsigned long fColor, unsigned long bColor)
+{
+	unsigned char ucl = 0;
+    while(*pcString) 
+    {
+        if( *pcString < 0xC0)
+        {
+            this->printChar12x24(usX + ucl * 12, usY, *pcString, fColor, bColor);
+            pcString++; ucl++;
+        }
+        else
+        {
+            pcString++; ucl++;		
+        }	
+    }
 }
 
 // ########################################################################
