@@ -12,27 +12,28 @@ class Canmsg
 {
 public:
 	static constexpr uint8_t maxLength = 8;
-	static constexpr char16_t maxTime = 0xffff;
-	static constexpr char16_t maxStdId = 0x7ff;
-	static constexpr char32_t maxExtId = 0x3ffff;
+	static constexpr uint16_t maxTime = 0xffff;
+	static constexpr uint16_t maxStdId = 0x7ff;
+	static constexpr uint32_t maxExtId = 0x3ffff;
 	static constexpr uint8_t maxDataVal = 0xff;
 
 private:
-    char16_t stdIdentifier;	//Standart identifier or MSB of the extended identifier
-	char32_t extIdentifier; //LSBs of the Extended identifier
+    uint32_t stdIdentifier;	//Standart identifier or MSB of the extended identifier
+	uint32_t extIdentifier; //LSBs of the Extended identifier
 	bool isExtIdentifier; //Message has extended identifier
 	bool rtr;
-	char16_t time;
+	uint16_t time;
 	uint8_t canLength;
 	uint8_t* data;
+	
 	void destroy(void);
 	void moveDestroy(void);
 	
 public:	
 	Canmsg();
-	Canmsg(char16_t stdId, char32_t extId, bool isExtId, bool rtr, char16_t time, 
+	Canmsg(uint16_t stdId, uint32_t extId, bool isExtId, bool rtr, uint16_t time, 
 			uint8_t canLength, uint8_t const * const data);  
-	Canmsg(char16_t stdId, char32_t extId, bool isExtId, bool rtr, char16_t time,
+	Canmsg(uint16_t stdId, uint32_t extId, bool isExtId, bool rtr, uint16_t time,
 			uint8_t canLength, uint8_t databit0 = 0x00, uint8_t databit1 = 0x00, 
 			uint8_t databit2 = 0x00, uint8_t databit3 = 0x00, uint8_t databit4 = 0x00, 
 			uint8_t databit5 = 0x00, uint8_t databit6 = 0x00, uint8_t databit7 = 0x00);  
@@ -47,11 +48,11 @@ public:
 	uint8_t operator[](int idx) const;
 
 	// Get-Funktionen:
-	char16_t GetStdIdentifier() const;
-	char32_t GetExtIdentifier() const;
+	uint16_t GetStdIdentifier() const;
+	uint32_t GetExtIdentifier() const;
 	bool GetIsExtIdentifier() const;
 	bool GetRtr() const;
-	char16_t GetTime() const;
+	uint16_t GetTime() const;
 	uint8_t GetCanLength() const;
 	uint8_t GetCanByte(int const idx) const;
 	

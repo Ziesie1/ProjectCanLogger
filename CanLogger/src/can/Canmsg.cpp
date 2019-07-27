@@ -36,7 +36,7 @@ Canmsg::Canmsg()
                         the constructor will only copy the ammount of values specifies in canLength
                         possible values of the single databits: 0 - 0xff
 */
-Canmsg::Canmsg(char16_t stdId, char32_t extId, bool isExtId, bool rtr, char16_t time, 
+Canmsg::Canmsg(uint16_t stdId, uint32_t extId, bool isExtId, bool rtr, uint16_t time, 
                 uint8_t canLength, uint8_t const * const data)
     :Canmsg{stdId, extId, isExtId, rtr, time, canLength}
 {
@@ -107,10 +107,11 @@ Canmsg::Canmsg(char16_t stdId, char32_t extId, bool isExtId, bool rtr, char16_t 
                         note that even if there are more databitx values surpassed, 
                         the constructor will only copy the ammount of values specifies in canLength
 */
-Canmsg::Canmsg(char16_t stdId, char32_t extId, bool isExtId, bool rtr, char16_t time, 
+Canmsg::Canmsg(uint16_t stdId, uint32_t extId, bool isExtId, bool rtr, uint16_t time, 
 			    uint8_t canLength, uint8_t databit0, uint8_t databit1, 
 			    uint8_t databit2, uint8_t databit3, uint8_t databit4, 
 			    uint8_t databit5, uint8_t databit6, uint8_t databit7)
+  :isExtIdentifier{isExtId}, rtr{rtr}, time{time}
 {
     if(stdId <= maxStdId)
     {
@@ -186,6 +187,7 @@ Canmsg::~Canmsg()
     Input:  other - a instance of Canmsg whose values will be copied into this instance
 */
 Canmsg::Canmsg(Canmsg const& other)
+  :Canmsg{}
 {
     *this = other;
 }
@@ -214,6 +216,7 @@ Canmsg& Canmsg::operator= (Canmsg const& other)
     Input:  other - a R-value instance of Canmsg whose values will be copied into this instance
 */
 Canmsg::Canmsg(Canmsg && other)
+  :Canmsg{}
 {
   (*this) = std::move(other);
 }
@@ -238,13 +241,14 @@ Canmsg& Canmsg::operator= (Canmsg && other)
 
 /* 
     function to add zeros to a String that every String will have the same ammount of chars
-    Input:  s       - reference to the String that should be modified
-            val     - value that will be inserted into the String s after this function is called
-            maxVal  - maximum possible value the type of val can reach
+    Input:  s         - reference to the String that should be modified
+            val       - value that will be inserted into the String s after this function is called
+            maxVal    - maximum possible value the type of val can reach
+            numberSys - number System in which the value should be displayed (e.g. 10(dec), 16(hex))
 */
-void AddZerosToStringHex(String& s,int const val,int const maxVal)
+void AddZerosToString(String& s,uint64_t const val,uint64_t const maxVal, uint8_t const numberSys)
 {
-  for(int i=0x10; i<=maxVal; i*=0x10)
+  for(uint64_t i=numberSys; i<=maxVal; i*=numberSys)
   {
     if(val < i)
     {
@@ -262,26 +266,26 @@ Canmsg::operator String() const
     String s="Identifier: ";
     if(this->isExtIdentifier)
     {
-      char32_t fullId = this->stdIdentifier<<18|this->extIdentifier;
-      AddZerosToStringHex(s, fullId, Canmsg::maxStdId+Canmsg::maxExtId);
+      char32_t fullId = (this->stdIdentifier<<18)|this->extIdentifier;
+      AddZerosToString(s, fullId, Canmsg::maxStdId<<18|Canmsg::maxExtId, HEX);
       s+=String(fullId, HEX);
     }
     else
     {
-      AddZerosToStringHex(s, this->stdIdentifier, Canmsg::maxStdId);
+      AddZerosToString(s, this->stdIdentifier, Canmsg::maxStdId, HEX);
       s+=String(this->stdIdentifier,HEX);
     }
     s+="h RTR: ";
     s+=String(this->rtr);
     s+=" Time: ";
-    AddZerosToStringHex(s, this->time, Canmsg::maxTime);
+    AddZerosToString(s, this->time, Canmsg::maxTime, HEX);
     s+=String(this->time,HEX);
 	  s+="h Laenge: ";
     s+=String(this->canLength,HEX);
     s+="h Inhalt: ";
     for(byte i=0;i<this->canLength;i++)
     {
-        AddZerosToStringHex(s, this->data[i], Canmsg::maxDataVal);
+        AddZerosToString(s, this->data[i], Canmsg::maxDataVal, HEX);
         s+=String(this->data[i],HEX);
         if(i<canLength-1)
         {
@@ -363,7 +367,7 @@ HAL_StatusTypeDef Canmsg::Send(void) const
       header.IDE = CAN_ID_EXT;
     }
     header.StdId = this->stdIdentifier;
-    header.ExtId = this->extIdentifier;
+    header.ExtId = (this->stdIdentifier<<18)|this->extIdentifier;
     if(!this->rtr)
     {
       header.RTR = CAN_RTR_DATA;
@@ -393,7 +397,7 @@ HAL_StatusTypeDef Canmsg::Send(void) const
     function to get the standard Identifier of the CAN-message
     return: value of the standard Identifier of the message
 */
-char16_t Canmsg::GetStdIdentifier() const
+uint16_t Canmsg::GetStdIdentifier() const
 {
   return this->stdIdentifier;
 }
@@ -402,7 +406,7 @@ char16_t Canmsg::GetStdIdentifier() const
     function to get the extended Identifier of the CAN-message
     return: value of the extended Identifier of the message
 */
-char32_t Canmsg::GetExtIdentifier() const
+uint32_t Canmsg::GetExtIdentifier() const
 {
   return this->extIdentifier;  
 }
@@ -431,7 +435,7 @@ bool Canmsg::GetRtr() const
     function to get the timestamp of the CAN-message
     return: value of the timestamp of the message
 */
-char16_t Canmsg::GetTime() const
+uint16_t Canmsg::GetTime() const
 {
   return this->time;
 }
