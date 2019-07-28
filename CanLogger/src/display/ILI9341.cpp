@@ -394,12 +394,7 @@ void ILI9341::setCurPos(unsigned long ulStartX, unsigned long ulEndX, unsigned l
 */
 void ILI9341::fillScreen(int color)
 {
-    unsigned long ulCount;
-    LCD_ILI9341_CMD(ILI9341_MEMORYWRITE_REG);    // 0x2C
-    for(ulCount = 0; ulCount < (ILI9341::HORIZONTAL_MAX * ILI9341::VERTICAL_MAX); ulCount++)
-    {
-        WriteWord(color);
-    }
+	this->drawFillRect(0,0,ILI9341::HORIZONTAL_MAX, ILI9341::VERTICAL_MAX, color);
 }
 
 /*

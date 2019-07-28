@@ -1,6 +1,8 @@
 #ifndef ILI9341_HPP
 #define ILI9341_HPP
 
+#include <Arduino.h>
+
 // Die Farbe wird im 16 Bit Mode übertragen
 // Blau (5 Bit) , Grün (6 Bit), Rot (5 Bit) (LSB)
 enum Color {
@@ -27,9 +29,6 @@ enum Color {
 
 class ILI9341
 {
-    static constexpr uint16_t HORIZONTAL_MAX = 240;
-    static constexpr uint16_t VERTICAL_MAX = 320;
-
     const uint32_t PIN_CS;
     const uint32_t PIN_RESET;
     const uint32_t PIN_MOSI; // MOSI or SDI
@@ -101,6 +100,9 @@ public:
     void printString16x24(unsigned short usX, unsigned short usY, const char* pcString, unsigned long fColor, unsigned long bColor);
     void printString12x24(unsigned short usX, unsigned short usY, const char* pcString, unsigned long fColor, unsigned long bColor);
 
+    // Statische Deklarationen und Definitionen
+    static constexpr uint16_t HORIZONTAL_MAX = 240;
+    static constexpr uint16_t VERTICAL_MAX = 320;
     static unsigned long makeColor(byte R, byte G, byte B);
 };
 
