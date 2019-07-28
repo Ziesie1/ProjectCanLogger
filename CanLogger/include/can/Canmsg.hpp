@@ -23,8 +23,8 @@ private:
 	bool isExtIdentifier; //Message has extended identifier
 	bool rtr;
 	uint16_t time;
-	uint8_t canLength;
-	uint8_t* data;
+	uint8_t canLength = 0;
+	uint8_t* data = nullptr;
 	
 	void destroy(void);
 	void moveDestroy(void);
@@ -46,6 +46,8 @@ public:
 	
 	explicit operator String() const;
 	uint8_t operator[](int idx) const;
+	bool operator==(Canmsg const& other) const;
+	bool operator!=(Canmsg const& other) const;
 
 	// Get-Funktionen:
 	uint16_t GetStdIdentifier() const;

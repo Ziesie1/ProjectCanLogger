@@ -161,12 +161,15 @@ Canmsg::Canmsg(uint16_t stdId, uint32_t extId, bool isExtId, bool rtr, uint16_t 
 */
 void Canmsg::destroy(void)
 {
-  delete[] this->data;
+  if(this->data)
+  {
+    delete[] this->data;
+  }
   this->moveDestroy();
 }
 
 /* 
-    function which avoids dynamic resources from beeing deleted
+    function which sets dynamic resources as deleted
 */
 void Canmsg::moveDestroy(void)
 {
@@ -184,31 +187,34 @@ Canmsg::~Canmsg()
 
 /* 
     creates a CAN-message equal to the one passed to the constuctor
-    Input:  other - a instance of Canmsg whose values will be copied into this instance
+    Input:  other - areference to a instance of Canmsg, 
+                    whose values will be copied into this instance
 */
 Canmsg::Canmsg(Canmsg const& other)
-  :Canmsg{}
 {
     *this = other;
 }
 
 /* 
     operator to copy a message
-    Input:  other - a instance of Canmsg whose values will be copied into this instance
+    Input:  other - a reference to a instance of Canmsg, 
+                    whose values will be copied into this instance
 */
 Canmsg& Canmsg::operator= (Canmsg const& other)
 {
-    this->stdIdentifier = other.stdIdentifier;
-    this->extIdentifier = other.extIdentifier;
-    this->isExtIdentifier = other.isExtIdentifier;
-    this->rtr = other.rtr;
-    this->time = other.time;
-    this->canLength = other.canLength;
-    for(byte i=0; i<maxLength; i++)
-    {
-        this->data[i] = other.data[i];
-    }
-    return *this;
+  this->destroy();
+  this->stdIdentifier = other.stdIdentifier;
+  this->extIdentifier = other.extIdentifier;
+  this->isExtIdentifier = other.isExtIdentifier;
+  this->rtr = other.rtr;
+  this->time = other.time;
+  this->canLength = other.canLength;
+  this->data = new uint8_t[this->maxLength];
+  for(byte i=0; i<maxLength; i++)
+  {
+    this->data[i] = other.data[i];
+  }
+  return *this;
 }	
 
 /* 
@@ -216,7 +222,6 @@ Canmsg& Canmsg::operator= (Canmsg const& other)
     Input:  other - a R-value instance of Canmsg whose values will be copied into this instance
 */
 Canmsg::Canmsg(Canmsg && other)
-  :Canmsg{}
 {
   (*this) = std::move(other);
 }
@@ -313,6 +318,55 @@ uint8_t Canmsg::operator[](int idx) const
   {
     return 0;
   }
+}
+
+/*
+    operator which checks if to CAN-messages are congruent
+    Input:  other - a reference to a CAN-message that will be compared with this CAN-message
+    return: true  - messages are congruent
+            false - messages are not congruent
+*/
+bool Canmsg::operator==(Canmsg const& other) const
+{
+  if(this->isExtIdentifier!=other.isExtIdentifier)
+  {
+    return false;
+  }
+  if(this->stdIdentifier!=other.stdIdentifier)
+  {
+    return false;
+  }
+  if(this->isExtIdentifier && (this->extIdentifier!=other.extIdentifier))
+  {
+    return false;
+  }
+  if(this->rtr!=other.rtr)
+  {
+    return false;
+  }
+  if(this->canLength!=other.canLength)
+  {
+    return false;
+  }
+  for(int i=0; i<this->canLength; i++)
+  {
+    if(this->data[i]!=other.data[i])
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
+/*
+    operator which checks if to CAN-messages are congruent
+    Input:  other - a reference to a CAN-message that will be compared with this CAN-message
+    return: false  - messages are congruent
+            true   - messages are not congruent
+*/
+bool Canmsg::operator!=(Canmsg const& other) const
+{
+  return !(*this==other);
 }
 
 /*

@@ -12,13 +12,17 @@ Adafruit_ILI9341 display = Adafruit_ILI9341{PC9, PA8, PA10, PB5, PC8}; // use So
 
 using namespace utilities; // für scom
 
+//start Definitionen fuer Displaybuffer
 void printScreenBufferSerial(void);
 void processCanMessage(void);
-void insertMessageHere(Canmsg& msg, int pos);
+void insertMessageHere(Canmsg const& msg, int pos);
+void makeBufferVisible(void);
 constexpr int SCREEN_BUFFER_SIZE = 10;
 static int screenBufferFillLevel = 0;
+static int screenBufferUserViewFillLevel = 0;
 static Canmsg* screenBuffer = nullptr;
 static Canmsg* screenBufferUserView = nullptr;
+//end Definitionen fuer Displaybuffer
 
 void setup() {
   HAL_Init();
@@ -37,6 +41,7 @@ void setup() {
   screenBuffer = new Canmsg[SCREEN_BUFFER_SIZE];
   screenBufferUserView = new Canmsg[SCREEN_BUFFER_SIZE];
   screenBufferFillLevel = 0;
+  screenBufferUserViewFillLevel = 0;
   
   display.begin();
   display.fillScreen(ILI9341_BLACK);
@@ -53,6 +58,7 @@ void loop() {
   {
     processCanMessage();
   }
+  makeBufferVisible();
   printScreenBufferSerial();
   delay(5000);
 }
@@ -63,10 +69,10 @@ void loop() {
 void printScreenBufferSerial(void)
 {
   Serial.print("Ausgabebuffer Fuellstand: ");
-  Serial.print(screenBufferFillLevel);
+  Serial.print(screenBufferUserViewFillLevel);
   Serial.print("/");
   Serial.println(SCREEN_BUFFER_SIZE);
-  for(int i=0; i<screenBufferFillLevel; i++)
+  for(int i=0; i<screenBufferUserViewFillLevel; i++)
   {
     Serial.print("Nachricht ");
     if((i+1)<10)
@@ -75,9 +81,9 @@ void printScreenBufferSerial(void)
     }
     Serial.print(i+1);
     Serial.print("/");
-    Serial.print(screenBufferFillLevel);
+    Serial.print(screenBufferUserViewFillLevel);
     Serial.print(": ");
-    Serial.println(static_cast<String>(screenBuffer[i]));
+    Serial.println(static_cast<String>(screenBufferUserView[i]));
   }
   Serial.println("\r\n");
 }
@@ -89,7 +95,7 @@ void printScreenBufferSerial(void)
                   note that if the buffer is allready filled, the last message will be discarded
                   possible values: 0 - screenBufferFillLevel
 */
-void insertMessageHere(Canmsg& msg, int pos)
+void insertMessageHere(Canmsg const& msg, int pos)
 {
   if((pos < SCREEN_BUFFER_SIZE) && (pos <= screenBufferFillLevel))
   {
@@ -187,6 +193,21 @@ void processCanMessage(void)
   Serial.print("Empfangene Nachricht: ");
   Serial.println(static_cast<String>(Canmsg_bufferCanRecMessages[Canmsg_bufferCanRecPointer]));
   */
+}
+
+/* 
+    copies the messages from the Backendbuffer to the Frontendbuffer
+*/
+void makeBufferVisible(void)
+{
+  for(int i=0; i<screenBufferFillLevel; i++)
+  {
+    if(screenBufferUserView[i] != screenBuffer[i])
+    {
+      screenBufferUserView[i] = screenBuffer[i];
+    }
+  }
+  screenBufferUserViewFillLevel = screenBufferFillLevel;
 }
 
 void serialEvent() {
