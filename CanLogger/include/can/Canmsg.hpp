@@ -8,6 +8,8 @@ Die Zeile muss dann lauten: "#define HAL_CAN_MODULE_ENABLED"
 #ifndef CANMSG_HPP
 #define CANMSG_HPP
 
+#include <Arduino.h>
+
 class Canmsg
 {
 public:
