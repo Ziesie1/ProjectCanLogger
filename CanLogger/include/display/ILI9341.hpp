@@ -2,33 +2,34 @@
 #define ILI9341_HPP
 
 // Die Farbe wird im 16 Bit Mode übertragen
-// (MSB) 4 Zero Bits, Blau (5 Bit) , Grün (6 Bit), Rot (5 Bit) (LSB)
-#define ROT100 		0x0000001FUL
-#define GRUEN100 	0x000007E0UL
-#define GRUEN50 	0x000003E0UL
-#define GRUEN25 	0x000001E0UL
-#define BLAU100 	0x0000F800UL
-#define BLAU50 	    0x00007800UL
-#define WEISS 		0x0000FFFFUL
-#define SCHWARZ 	0x00000000UL
-#define GELB100 	0x000007FFUL
-#define GRAU 		0x00002A69UL
-#define GELB50  	0x000003eFUL
-#define GELB25  	0x000001CFUL
-#define GRAU50      0x00007BEFUL
-#define GRAU25      0x00003AE7UL
-#define MAGENTA100  0x0000F81FUL
-#define CYAN100     0x0000FFE0UL
-#define GRAUBRAUN   0x00001965UL
-#define GRUENBLAU   0x00003BE0UL
-#define ORANGE      0x0000013DUL
-
-
-#define LCD_HORIZONTAL_MAX 					240
-#define LCD_VERTICAL_MAX 					320
+// Blau (5 Bit) , Grün (6 Bit), Rot (5 Bit) (LSB)
+enum Color {
+    RED100 =        0x001FUL,
+    GREEN100 =      0x07E0UL,
+    GREEN50 =       0x03E0UL,
+    GREEN25 =       0x01E0UL,
+    BLUE100 =       0xF800UL,
+    BLUE50 =        0x7800UL,
+    WHITE =         0xFFFFUL,
+    BLACK =         0x0000UL,
+    YELLOW100 =     0x07FFUL,
+    YELLOW50 =      0x01CFUL,
+    YELLOW25 =      0x01CFUL,
+    GREY100 =       0x2A69UL,
+    GREY50 =        0x7BEFUL,
+    GREY25 =        0x3AE7UL,
+    MAGENTA100 =    0xF81FUL,
+    CYAN100 =       0xFFE0UL,
+    GREYBROWN =     0x1965UL,
+    GREENBROWN =    0x3BE0UL,
+    ORANGE =        0x013DUL
+};
 
 class ILI9341
 {
+    static constexpr uint16_t HORIZONTAL_MAX = 240;
+    static constexpr uint16_t VERTICAL_MAX = 320;
+
     const uint32_t PIN_CS;
     const uint32_t PIN_RESET;
     const uint32_t PIN_MOSI; // MOSI or SDI
@@ -46,7 +47,7 @@ class ILI9341
     uint32_t GPIO_PIN_SCK;
     GPIO_TypeDef * GPIO_PORT_SCK;
 
-    uint16_t displayFunctionControlREG = 0x0AC2; // Keine Rotation und Schwarz bei ausgeschaltetem Display.
+    uint16_t displayFunctionControlREG = 0x0AC2; // default: Keine Rotation und Schwarz bei ausgeschaltetem Display.
 
     inline void setPinCS();
     inline void resetPinCS();
@@ -87,7 +88,7 @@ public:
     void drawEmptyRect2(unsigned long usStartX, unsigned long usEndX, unsigned long usStartY, unsigned long usEndY, unsigned long ulColor, byte frameSize = 1);
     void drawFillRect(unsigned long usStartX, unsigned long usStartY, unsigned long SizeX, unsigned long SizeY, unsigned long ulColor);
     void drawFillRect2(unsigned long usStartX, unsigned long usEndX, unsigned long usStartY, unsigned long usEndY, unsigned long ulColor);
-    void drawBmp(unsigned short usX, unsigned short usY, unsigned short usSizeX, unsigned short usSizeY, uint16_t const *Bmp, byte size = 1);    
+    void drawBmp(unsigned short usX, unsigned short usY, unsigned short usSizeX, unsigned short usSizeY, uint16_t const *Bmp, byte size = 1);   
     
     void printChar(unsigned short usX, unsigned short usY, char c, unsigned long fColor, unsigned long bColor, byte size = 1);
     void printChar8x16(unsigned short usX, unsigned short usY, char c, unsigned long fColor, unsigned long bColor);

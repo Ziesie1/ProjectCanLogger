@@ -5,7 +5,6 @@
 #include "serial/FunctionLifeTime.hpp"
 
 
-
 using namespace utilities;
 
 ILI9341::ILI9341(const uint32_t& CS, const uint32_t& RESET,const uint32_t& MOSI, const uint32_t& DC, const uint32_t& SCK, bool rotateDisp)
@@ -18,6 +17,10 @@ ILI9341::ILI9341(const uint32_t& CS, const uint32_t& RESET,const uint32_t& MOSI,
 	}
 }
 
+/*
+	Initialisiert das Display.
+	GPIO-Pins und Konfigurierung des Displays.
+*/
 void ILI9341::init()
 {
     PinName p = NC;
@@ -62,6 +65,9 @@ void ILI9341::init()
 	scom.printDebug("Display ist Initialisiert");
 }
 
+/*
+	Initialisert die GPIO-Pins.
+*/
 void ILI9341::gpioInit()
 {
     GPIO_InitTypeDef displayPins;
@@ -87,6 +93,9 @@ void ILI9341::gpioInit()
 
 }
 
+/*
+	Konfiguriert das Display.
+*/
 void ILI9341::displayInit()
 {
 	// Version f�r TFT_PROTO auf dem Laboraufbau F303. 
@@ -207,10 +216,10 @@ void ILI9341::displayInit()
     //
     LCD_ILI9341_CMD(ILI9341_COLADDRSET_REG);     // 0x2A
     WriteWord(0);
-    WriteWord(LCD_HORIZONTAL_MAX - 1);
+    WriteWord(ILI9341::HORIZONTAL_MAX - 1);
     LCD_ILI9341_CMD(ILI9341_PAGEADDRSET_REG);    // 0x2B
     WriteWord(0);
-    WriteWord(LCD_VERTICAL_MAX - 1);
+    WriteWord(ILI9341::VERTICAL_MAX - 1);
 }
 
 
@@ -387,7 +396,7 @@ void ILI9341::fillScreen(int color)
 {
     unsigned long ulCount;
     LCD_ILI9341_CMD(ILI9341_MEMORYWRITE_REG);    // 0x2C
-    for(ulCount = 0; ulCount < (LCD_HORIZONTAL_MAX * LCD_VERTICAL_MAX); ulCount++)
+    for(ulCount = 0; ulCount < (ILI9341::HORIZONTAL_MAX * ILI9341::VERTICAL_MAX); ulCount++)
     {
         WriteWord(color);
     }
@@ -513,9 +522,8 @@ void ILI9341::drawFillRect(unsigned long usStartX, unsigned long usStartY,
 
 
 /*
-	Zeichnet ein Bild an der angegeben Position.
-	Das Bild ist ganzahlig Skallierbar.
-	Kleinste größe mit size = 1;
+	Zeichnet ein Bild an die angegeben Position.
+	Das Bild ist ganzahlig Skallierbar (default: size = 1).
 */
 void ILI9341::drawBmp(unsigned short usX, unsigned short usY, unsigned short usSizeX, unsigned short usSizeY, uint16_t const *Bmp, byte size)
 {
@@ -534,7 +542,6 @@ void ILI9341::drawBmp(unsigned short usX, unsigned short usY, unsigned short usS
 
 
 #include "display/X_Tft_Zeichensatz_8X16_96.hpp"
-
 /*
 	Schreibt ein Zeichen auf das Display.
 	Verwendet wird der Zeichensatz, mit 8x16 Pixel Pro Zeichen. 

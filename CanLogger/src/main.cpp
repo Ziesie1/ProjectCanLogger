@@ -5,6 +5,7 @@
 #include "buttons/Encoder.hpp"
 #include "buttons/Taster.hpp"
 #include "display/ILI9341.hpp"
+#include "display/DisplayImages.hpp"
 
 using namespace utilities; // für scom
 
@@ -19,21 +20,22 @@ void setup() {
   initEncoder();
   initTaster();
   display.init();
-  display.fillScreen(BLAU50);
+  display.fillScreen(BLUE100);
+  
   display.drawFillRect2(50,50+80-1,40,50-1,ILI9341::makeColor(100,0,0));
   display.drawFillRect(50,50,80,80,ILI9341::makeColor(0,100,0));
   display.drawEmptyRect(50-2,40-2,80+4,80+10+4,ILI9341::makeColor(160,0,255),2);
 
-  display.drawOnePixel(230,150,GELB100);
-  display.drawHorizontalLine(0,229,150,ROT100);
-  display.drawOnePixel(20,300,GELB100);
-  display.drawVerticalLine(20,0,299,ROT100);
+  display.drawOnePixel(230,150,YELLOW100);
+  display.drawHorizontalLine(0,229,150, RED100);
+  display.drawOnePixel(20,300,YELLOW100);
+  display.drawVerticalLine(20,0,299, RED100);
   
-  display.printChar8x16(50,200,'X',ROT100, BLAU50);
-  display.printChar16x32(50+8+1,200,'X',ROT100, BLAU50);
-  display.printChar16x24(50+8+16+1,200,'X',ROT100, BLAU50);
-  display.printChar12x24(50+8+16+16+1,200,'X',ROT100, BLAU50);
-  display.printString(50,200+32+1,"Hallo", ROT100, BLAU50, 3);
+  display.printChar8x16(50,200,'X', RED100, BLUE100);
+  display.printChar16x32(50+8+1,200,'X',RED100, BLUE100);
+  display.printChar16x24(50+8+16+1,200,'X',RED100, BLUE100);
+  display.printChar12x24(50+8+16+16+1,200,'X',RED100, BLUE100);
+  display.printString(50,200+32+1,"Hallo", RED100, BLUE100, 3);
 
   delay(3000);
   display.rotateDisplay(false);
@@ -41,24 +43,28 @@ void setup() {
   display.rotateDisplay(true);
 
 
-  display.drawEmptyRect2(50,200,154,190,SCHWARZ,2);
-  display.printString8x16(50+4,154+2+1,"Test",ROT100, BLAU50);
+  display.drawEmptyRect2(50,200,154,190,BLACK,2);
+  display.printString8x16(50+4,154+2+1,"Test", RED100, BLUE100);
 
+  Color cross = WHITE;
+  Color backround = RED100;
   uint16_t const test[100] = 
   {
-    WEISS,ROT100,ROT100,ROT100,ROT100,ROT100,ROT100,ROT100,ROT100,WEISS,
-    ROT100,WEISS,ROT100,ROT100,ROT100,ROT100,ROT100,ROT100,WEISS,ROT100,
-    ROT100,ROT100,WEISS,ROT100,ROT100,ROT100,ROT100,WEISS,ROT100,ROT100,
-    ROT100,ROT100,ROT100,WEISS,ROT100,ROT100,WEISS,ROT100,ROT100,ROT100,
-    ROT100,ROT100,ROT100,ROT100,WEISS,WEISS,ROT100,ROT100,ROT100,ROT100,
-    ROT100,ROT100,ROT100,ROT100,WEISS,WEISS,ROT100,ROT100,ROT100,ROT100,
-    ROT100,ROT100,ROT100,WEISS,ROT100,ROT100,WEISS,ROT100,ROT100,ROT100,
-    ROT100,ROT100,WEISS,ROT100,ROT100,ROT100,ROT100,WEISS,ROT100,ROT100,
-    ROT100,WEISS,ROT100,ROT100,ROT100,ROT100,ROT100,ROT100,WEISS,ROT100,
-    WEISS,ROT100,ROT100,ROT100,ROT100,ROT100,ROT100,ROT100,ROT100,WEISS
+    cross,backround,backround,backround,backround,backround,backround,backround,backround,cross,
+    backround,cross,backround,backround,backround,backround,backround,backround,cross,backround,
+    backround,backround,cross,backround,backround,backround,backround,cross,backround,backround,
+    backround,backround,backround,cross,backround,backround,cross,backround,backround,backround,
+    backround,backround,backround,backround,cross,cross,backround,backround,backround,backround,
+    backround,backround,backround,backround,cross,cross,backround,backround,backround,backround,
+    backround,backround,backround,cross,backround,backround,cross,backround,backround,backround,
+    backround,backround,cross,backround,backround,backround,backround,cross,backround,backround,
+    backround,cross,backround,backround,backround,backround,backround,backround,cross,backround,
+    cross,backround,backround,backround,backround,backround,backround,backround,backround,cross
   };
   display.drawBmp(150,50,10,10,test,4);
 
+  display.drawBmp(0, 0, 80, 80, image_data_Ostfalia_logo_80x80,1);
+  
   createNewCanLogFile();
 	
   scom << "CanLogger ist Initialisiert" << endz;
