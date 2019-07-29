@@ -1,12 +1,16 @@
 #include <Arduino.h>
 #include "sd/SD.hpp"
-#include "Canmsg.h"
+#include "can/Canmsg.hpp"
+#include "can/CanUtility.hpp"
 #include "serial/SerialCommunication.hpp"
 #include "buttons/Encoder.hpp"
 #include "buttons/Taster.hpp"
 #include "display/ILI9341.hpp"
 #include "display/DisplayPageManager.hpp"
 #include "display/pages/HomePage.hpp"
+#include "display/screenBuffer.hpp"
+#include "utilities.hpp"
+
 
 using namespace utilities; // für scom
 
@@ -19,9 +23,17 @@ void setup() {
   scom.showDebugMessages(true); // Debugmodus einschalten
   
   init_SD();
+  HAL_Init();
+  SystemClock_Config();
   initEncoder();
   initTaster();
+  screenBufferInit();
   display.init();
+
+  if((CanUtility_Init() != HAL_OK) || (CanUtility_EnableRecieve() != HAL_OK))
+  {
+    while(1){}
+  }
  
   pageManager.openNewPage(new HomePage{display}); // Startseite setzen
 
@@ -30,12 +42,12 @@ void setup() {
   scom << "CanLogger ist Initialisiert" << endz;
 }
 
+
 void loop() {
   loopTaster();
   pageManager.loop();
   
 }
-
 
 void serialEvent() {
   while (Serial.available()) {
@@ -43,7 +55,7 @@ void serialEvent() {
     /*
       Eine Ausgabe nicht beim Interrupt erlaubt, hier nur Testweise. // Bis das gesamt Konzept feststeht.
     */
-    scom << "Zeichen empfangen:" << inChar << endz;
+    scom << "Charakter recieved:" << inChar << endz;
 
     Canmsg msg{};
     scom << static_cast<String>(msg) << endz;
