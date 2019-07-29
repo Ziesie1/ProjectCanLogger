@@ -16,7 +16,7 @@ namespace singleTaster{
 
 using namespace singleTaster;
 
-//Initialisierung des Tasters
+// Initialisierung des Tasters
 void initTaster()
 {
     pinMode(TASTER_PIN, INPUT);
@@ -37,7 +37,7 @@ void loopTaster()
             {
                 tasterPressed = true;
             }
-            scom << "Zustand Taster2: " << pinStatus << endz; // später auskommentieren
+            //scom << "Zustand Taster2: " << pinStatus << endz; // später auskommentieren
         }
     }
 }

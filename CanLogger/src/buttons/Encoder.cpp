@@ -23,8 +23,8 @@ namespace encoder{
 
 using namespace encoder;
 
-//Interrupt Service Routinen
-//Um ein Prellen zu verhindern wird die Aufrufzeit des Interrupts verwendet
+// Interrupt Service Routinen
+// Um ein Prellen zu verhindern wird die Aufrufzeit des Interrupts verwendet
 void doEncoderA()
 {
   if (millis() - alteZeitEncoder > ENTRPRELL_ZEIT_ENCODER)
@@ -40,7 +40,7 @@ void doEncoderA()
     }
   
     alteZeitEncoder = millis();
-    scom << encoderPos << endz; // später auskommentieren
+    //scom << encoderPos << endz; // später auskommentieren
    }
 }
 
@@ -56,8 +56,8 @@ void doEncoderTast()
     }
     alteZeitEncoderTaster = millis();
 
-    scom<<"Interrupt ausgelöst"<<endz; // später auskommentieren
-    scom<<tasterSet<<endz; // später auskommentieren
+    //scom<<"Interrupt ausgelöst"<<endz; // später auskommentieren
+    //scom<<tasterSet<<endz; // später auskommentieren
   }
 }
 
@@ -68,7 +68,7 @@ void initEncoder()
   pinMode (ENCODER_PIN_B, INPUT);
   pinMode (ENCODER_PIN_TASTER, INPUT);
 
-  attachInterrupt(digitalPinToInterrupt(ENCODER_PIN_A),doEncoderA,FALLING);//Auswertung von PinB ist beim verbauten Encoder aufgrund der Rastpunkte nicht sinnvoll
+  attachInterrupt(digitalPinToInterrupt(ENCODER_PIN_A),doEncoderA,FALLING);
   attachInterrupt(digitalPinToInterrupt(ENCODER_PIN_TASTER),doEncoderTast,CHANGE);
   
   scom.printDebug("Encoder ist Initialisiert");
