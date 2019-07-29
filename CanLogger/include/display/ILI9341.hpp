@@ -3,8 +3,8 @@
 
 #include <Arduino.h>
 
-// Die Farbe wird im 16 Bit Mode übertragen
-// Blau (5 Bit) , Grün (6 Bit), Rot (5 Bit) (LSB)
+// 16 Bit RGB Colors
+// Blue (5 Bit) , Green (6 Bit), Red (5 Bit) (LSB)
 enum Color {
     RED100 =        0x001FUL,
     GREEN100 =      0x07E0UL,
@@ -46,7 +46,7 @@ class ILI9341
     uint32_t GPIO_PIN_SCK;
     GPIO_TypeDef * GPIO_PORT_SCK;
 
-    uint16_t displayFunctionControlREG = 0x0AC2; // default: Keine Rotation und Schwarz bei ausgeschaltetem Display.
+    uint16_t displayFunctionControlREG = 0x0AC2; // default: No rotation and black display when powered off.
 
     inline void setPinCS();
     inline void resetPinCS();

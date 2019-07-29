@@ -12,6 +12,8 @@ class DisplayPageManager
 public:
     DisplayPageManager();
     ~DisplayPageManager();
+    DisplayPageManager(DisplayPageManager const& pageManager) = delete;
+    void operator=(DisplayPageManager const& pageManager) = delete;
     void loop();
     void openNewPage(DisplayPage* page);
     bool deleteOpenPage();
