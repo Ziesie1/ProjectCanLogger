@@ -1,17 +1,17 @@
 #include <Arduino.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_ILI9341.h>
 #include "sd/SD.hpp"
 #include "Canmsg.h"
 #include "serial/SerialCommunication.hpp"
 #include "buttons/Encoder.hpp"
 #include "buttons/Taster.hpp"
-
-Adafruit_ILI9341 display = Adafruit_ILI9341{PC9, PA8, PA10, PB5, PC8}; // use Software Serial
-//Adafruit_ILI9341 display = Adafruit_ILI9341{PC9, PA8, PC8}; // use Hardware Serial
+#include "display/ILI9341.hpp"
+#include "display/DisplayPageManager.hpp"
+#include "display/pages/HomePage.hpp"
 
 using namespace utilities; // für scom
 
+ILI9341 display {PC9, PC8, PA10, PA8, PB5, true};
+DisplayPageManager pageManager {};
 
 void setup() {
   Serial.begin(115200);
@@ -21,19 +21,18 @@ void setup() {
   init_SD();
   initEncoder();
   initTaster();
+  display.init();
+ 
+  pageManager.openNewPage(new HomePage{display}); // Startseite setzen
 
   createNewCanLogFile();
-
-  display.begin();
-  display.fillScreen(ILI9341_BLACK);
-  display.setTextSize(2);
-  display.print(getFullLogFilePath());
-
+	
   scom << "CanLogger ist Initialisiert" << endz;
 }
 
 void loop() {
   loopTaster();
+  pageManager.loop();
   
 }
 
