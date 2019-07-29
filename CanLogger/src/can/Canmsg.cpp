@@ -1,6 +1,5 @@
-#include <Arduino.h>
-#include "can/CanUtility.hpp"
 #include "can/Canmsg.hpp"
+#include "can/CanUtility.hpp"
 #include "utilities.hpp"
 
 Canmsg* Canmsg_bufferCanRecMessages;

@@ -1,4 +1,3 @@
-#include <Arduino.h>
 #include "can/CanUtility.hpp"
 #include "can/Canmsg.hpp"
 
@@ -127,7 +126,7 @@ HAL_StatusTypeDef CanUtility_Init(void)
 	{
 		Serial.println("CAN MCR und BTR erfolgreich initialisiert");
 	}
-		
+	
 	//initialize CAN-Filter 0:
 	CAN_FilterTypeDef canFilter;
 	FillCAN_Filter(canFilter);
