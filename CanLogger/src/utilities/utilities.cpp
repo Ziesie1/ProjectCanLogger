@@ -1,31 +1,5 @@
 #include "display/screenBuffer.hpp"
-#include "can/Canmsg.hpp"
 #include <Arduino.h>
-
-/* 
-    function that processes the last message of the "Canmsg_bufferCanRecMessages"
-*/
-void processCanMessage(void)
-{
-  Canmsg_bufferCanRecPointer--;
-  Canmsg curMsg = std::move(Canmsg_bufferCanRecMessages[Canmsg_bufferCanRecPointer]);
-  
-  //screenBuffer:
-  sortCanMessageIntoBuffer(curMsg);
-
-  //SD-Card:
-
-  //loopback:
-  /*
-  Canmsg_bufferCanRecMessages[Canmsg_bufferCanRecPointer].Send();
-  */
-
-  //Serial:
-  /*
-  Serial.print("Empfangene Nachricht: ");
-  Serial.println(static_cast<String>(Canmsg_bufferCanRecMessages[Canmsg_bufferCanRecPointer]));
-  */
-}
 
 /* 
     function to add zeros to a String that every String will have the same ammount of chars

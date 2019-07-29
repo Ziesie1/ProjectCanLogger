@@ -2,11 +2,17 @@
 #include "can/Canmsg.hpp"
 #include "can/CanUtility.hpp"
 #include <Arduino.h>
+#include "utilities/SerialCommunication.hpp"
 
+//extern:
 int screenBufferFillLevel = 0;
 int screenBufferUserViewFillLevel = 0;
 Canmsg* screenBuffer = nullptr;
 Canmsg* screenBufferUserView = nullptr;
+bool updateUserView = false;
+
+//intern:
+bool CanUtility_CanRecieveActive_lastStatus = false;
 
 /* 
     sets up the front- and the backendbuffer
@@ -35,7 +41,7 @@ void screenBufferDeinit(void)
 /* 
     erases the content of the front- and backendbuffer
 */
-void clearBuffers(void)
+void clearScreenBuffers(void)
 {
   screenBufferDeinit();
   screenBufferInit();
@@ -46,24 +52,26 @@ void clearBuffers(void)
 */
 void printScreenBufferSerial(void)
 {
-  Serial.print("Ausgabebuffer Fuellstand: ");
-  Serial.print(screenBufferFillLevel);
-  Serial.print("/");
-  Serial.println(SCREEN_BUFFER_SIZE);
+  String s = "Backendbuffer Fuellstand: ";
+  s += String(screenBufferFillLevel, DEC);
+  s += "/";
+  s += String(SCREEN_BUFFER_SIZE, DEC);
+  utilities::scom.printDebug(s);
   for(int i=0; i<screenBufferFillLevel; i++)
   {
-    Serial.print("Nachricht ");
+    s = "Nachricht ";
     if((i+1)<10)
     {
-      Serial.print(" ");
+      s += " ";
     }
-    Serial.print(i+1);
-    Serial.print("/");
-    Serial.print(screenBufferFillLevel);
-    Serial.print(": ");
-    Serial.println(static_cast<String>(screenBuffer[i]));
+    s += String(i+1, DEC);
+    s += "/";
+    s += String(screenBufferFillLevel, DEC);
+    s += ": ";
+    s += static_cast<String>(screenBuffer[i]);
+    utilities::scom.printDebug(s);
   }
-  Serial.println("\r\n");
+  utilities::scom.printDebug("");
 }
 
 /* 
@@ -71,24 +79,26 @@ void printScreenBufferSerial(void)
 */
 void printScreenBufferUserViewSerial(void)
 {
-  Serial.print("Ausgabebuffer Fuellstand: ");
-  Serial.print(screenBufferUserViewFillLevel);
-  Serial.print("/");
-  Serial.println(SCREEN_BUFFER_SIZE);
+  String s = "Ausgabebuffer Fuellstand: ";
+  s += String(screenBufferUserViewFillLevel, DEC);
+  s += "/";
+  s += String(SCREEN_BUFFER_SIZE, DEC);
+  utilities::scom.printDebug(s);
   for(int i=0; i<screenBufferUserViewFillLevel; i++)
   {
-    Serial.print("Nachricht ");
+    s = "Nachricht ";
     if((i+1)<10)
     {
-      Serial.print(" ");
+      s += " ";
     }
-    Serial.print(i+1);
-    Serial.print("/");
-    Serial.print(screenBufferUserViewFillLevel);
-    Serial.print(": ");
-    Serial.println(static_cast<String>(screenBufferUserView[i]));
+    s += String(i+1, DEC);
+    s += "/";
+    s += String(screenBufferUserViewFillLevel, DEC);
+    s += ": ";
+    s += static_cast<String>(screenBufferUserView[i]);
+    utilities::scom.printDebug(s);
   }
-  Serial.println("\r\n");
+  utilities::scom.printDebug("");
 }
 
 /* 
@@ -195,3 +205,55 @@ void makeBufferVisible(void)
   }
   screenBufferUserViewFillLevel = screenBufferFillLevel;
 }
+
+/* 
+    function that processes the last message of the "Canmsg_bufferCanRecMessages"
+*/
+void loopScreenBuffer(void)
+{
+  if(CanUtility_CanRecieveActive)
+  {
+    CanUtility_CanRecieveActive_lastStatus = true;
+
+    while(Canmsg_bufferCanRecPointer > 0)
+    {
+      Canmsg_bufferCanRecPointer--;
+
+      // um die Nachrichten in der Reihenfolge abzuarbeiten, in der sie empfangen wurden
+      Canmsg curMsg = std::move(Canmsg_bufferCanRecMessages[0]);
+      for(int i=0; i<Canmsg_bufferCanRecPointer; i++)
+      {
+        Canmsg_bufferCanRecMessages[i] = std::move(Canmsg_bufferCanRecMessages[i+1]);
+      }
+  
+      //screenBuffer:
+      sortCanMessageIntoBuffer(curMsg);
+
+      //SD-Card:
+
+
+
+      //loopback:
+      /*
+      curMsg.Send();
+      */
+
+      //Serial:
+
+      String s = "Empfangene Nachricht: ";
+      s += static_cast<String>(curMsg);
+      utilities::scom.printDebug(s);
+    }
+  }
+  else if(CanUtility_CanRecieveActive_lastStatus)
+  {
+    CanUtility_CanRecieveActive_lastStatus = false;
+    clearScreenBuffers();
+  }
+
+  if(updateUserView)
+  {
+    makeBufferVisible();
+  }
+}
+

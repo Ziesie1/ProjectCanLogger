@@ -30,7 +30,7 @@ void setup() {
   screenBufferInit();
   display.init();
 
-  if((CanUtility_Init() != HAL_OK) || (CanUtility_EnableRecieve() != HAL_OK))
+  if((CanUtility_Init(CAN_500_KBIT) != HAL_OK) || (CanUtility_EnableRecieve() != HAL_OK))
   {
     while(1){}
   }
@@ -46,7 +46,7 @@ void setup() {
 void loop() {
   loopTaster();
   pageManager.loop();
-  
+  loopScreenBuffer();
 }
 
 void serialEvent() {
