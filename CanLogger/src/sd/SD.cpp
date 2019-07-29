@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <SdFat.h>
 #include "sd/SD.hpp"
-#include "serial/SerialCommunication.hpp"
+#include "utilities/SerialCommunication.hpp"
 #include "sd/XFile.hpp"
 
 using namespace utilities;

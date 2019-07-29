@@ -2,14 +2,14 @@
 #include "sd/SD.hpp"
 #include "can/Canmsg.hpp"
 #include "can/CanUtility.hpp"
-#include "serial/SerialCommunication.hpp"
+#include "utilities/SerialCommunication.hpp"
 #include "buttons/Encoder.hpp"
 #include "buttons/Taster.hpp"
 #include "display/ILI9341.hpp"
 #include "display/DisplayPageManager.hpp"
 #include "display/pages/HomePage.hpp"
 #include "display/screenBuffer.hpp"
-#include "utilities.hpp"
+#include "utilities/utilities.hpp"
 
 
 using namespace utilities; // für scom

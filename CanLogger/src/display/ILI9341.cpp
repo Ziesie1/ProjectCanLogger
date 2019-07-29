@@ -1,8 +1,8 @@
 #include <Arduino.h>
 #include "display/ILI9341.hpp"
 #include "display/ILI9341_Definitions.hpp"
-#include "serial/SerialCommunication.hpp"
-#include "serial/FunctionLifeTime.hpp"
+#include "utilities/SerialCommunication.hpp"
+#include "utilities/FunctionLifeTime.hpp"
 
 
 using namespace utilities;

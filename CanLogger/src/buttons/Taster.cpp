@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include "buttons/Taster.hpp"
-#include "serial/SerialCommunication.hpp"
+#include "utilities/SerialCommunication.hpp"
 
 using namespace utilities;
 

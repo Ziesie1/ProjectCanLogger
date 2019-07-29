@@ -1,6 +1,6 @@
 #include "can/Canmsg.hpp"
 #include "can/CanUtility.hpp"
-#include "utilities.hpp"
+#include "utilities/utilities.hpp"
 
 Canmsg* Canmsg_bufferCanRecMessages;
 int Canmsg_bufferCanRecPointer;

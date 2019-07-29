@@ -1,6 +1,6 @@
 #include <Arduino.h>
-#include "serial/FunctionLifeTime.hpp"
-#include "serial/SerialCommunication.hpp"
+#include "utilities/FunctionLifeTime.hpp"
+#include "utilities/SerialCommunication.hpp"
 
 using namespace utilities;
 
