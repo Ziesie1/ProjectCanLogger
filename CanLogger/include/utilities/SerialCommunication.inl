@@ -1,4 +1,4 @@
-#include "serial/SerialCommunication.hpp"
+#include "utilities/SerialCommunication.hpp"
 
 template<typename T>
 void SerialCommunication::print(T const& message) const

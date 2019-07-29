@@ -1,6 +1,6 @@
 #include "sd/XFile.hpp"
-#include "serial/SerialCommunication.hpp"
-#include "serial/FunctionLifeTime.hpp"
+#include "utilities/SerialCommunication.hpp"
+#include "utilities/FunctionLifeTime.hpp"
 
 using namespace utilities;
 

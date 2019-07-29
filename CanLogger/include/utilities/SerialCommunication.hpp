@@ -36,11 +36,11 @@ public:
 
 namespace utilities
 {
-    constexpr char endz = '\n';
+    extern const String endz;
     extern SerialCommunication scom;
 }
 
-#include "serial/SerialCommunication.inl"
+#include "utilities/SerialCommunication.inl"
 
 
 #endif

@@ -1,5 +1,6 @@
-#include "serial/SerialCommunication.hpp"
+#include "utilities/SerialCommunication.hpp"
 
+const String utilities::endz = "\n\r"; // Zeilenumbruch mit CR
 SerialCommunication utilities::scom {}; // Dient zur geordneten seriellen Kommunikation im Projekt
 
 SerialCommunication::SerialCommunication()

@@ -1,10 +1,9 @@
 #ifndef ENCODER_HPP
 #define ENCODER_HPP
 
-#include <string.h>
-
 void initEncoder();
-void loopEncoder();
-
+bool hasEncoderPosChanged();
+int getEncoderPos();
+bool wasEncoderButtonPressed();
 
 #endif

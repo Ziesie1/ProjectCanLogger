@@ -1,7 +1,7 @@
 #ifndef SD_HPP
 #define SD_HPP
 
-#include "Canmsg.h"
+#include "can/Canmsg.hpp"
 
 // SD-Karte wird initialisiert und eine Ordnerstuktur angelegt
 // Muss immer nach dem erneuten Einstecken der SD-Karte aufgerufen werden
