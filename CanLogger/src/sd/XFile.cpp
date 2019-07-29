@@ -4,12 +4,13 @@
 
 using namespace utilities;
 
+const String XFile::LINE_FEED = "\n\r";
 
 XFile::XFile(SdFat& sdCard)
     :sdCard{sdCard}
 { }
 
-
+// override file with string
 bool XFile::writeStr(String const& text)
 {
     //FUNCTION_TIME_X("bool XFile::writeStr(String const& text)")
@@ -25,6 +26,14 @@ bool XFile::writeStr(String const& text)
     return status;
 }
 
+// override fFile with string, with CR&LF
+bool XFile::writeStrLn(String const& text)
+{
+    String text_LF = text + XFile::LINE_FEED;
+    return this->writeStr(text_LF);
+}
+
+// append string on current file
 bool XFile::appendStr(String const& text)
 {
     //FUNCTION_TIME_X("XFile::appendStr(String const& text)")
@@ -41,16 +50,26 @@ bool XFile::appendStr(String const& text)
     return status;
 }
 
+// append string on current file, with CR&LF
+bool XFile::appendStrLn(String const& text)
+{
+    String text_LF = text + XFile::LINE_FEED;
+    return this->appendStr(text_LF);
+}
+
+// set filepath of the current file
 void XFile::setFilePath(String const& filePath)
 {
     this->filePath = filePath;
 }
 
+// set the filename
 void XFile::setFileName(String const& fileName)
 {
     this->fileName = fileName;
 }
 
+// check if the current file with filepath exists
 bool XFile::exists()
 {
     bool ret = this->sdCard.chdir(this->filePath.c_str()); // Workingdirectory setzen
@@ -65,16 +84,19 @@ bool XFile::exists()
     return this->sdCard.exists(this->getFileName().c_str());
 }
 
+// return the current filepath
 String const& XFile::getFilePath() const
 {
     return this->filePath;
 }
 
+// return the current filename
 String const& XFile::getFileName() const
 {
     return this->fileName;
 }
 
+// return the current total filepath
 String XFile::getTotalFilePath() const
 {
     return this->filePath + "/" +this->fileName;

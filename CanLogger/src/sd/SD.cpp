@@ -1,8 +1,9 @@
 #include <Arduino.h>
 #include <SdFat.h>
 #include "sd/SD.hpp"
-#include "utilities/SerialCommunication.hpp"
 #include "sd/XFile.hpp"
+#include "utilities/SerialCommunication.hpp"
+
 
 using namespace utilities;
 
@@ -18,6 +19,10 @@ constexpr char FILE_TYPE_CAN[] = ".txt";
 SdFat sdKarte {};
 XFile canLogFile {sdKarte};
 
+/*
+    Initialized the SD-Card and create default folder.
+    Must recalled after reinserting the SD-Card.
+*/
 void init_SD()
 {
     // SD-Karte Initialisiern
@@ -49,6 +54,9 @@ void init_SD()
     scom.printDebug(debugInfo);
 }
 
+/*
+    Create a new Canlog file in the default folder.
+*/
 void createNewCanLogFile()
 {
     canLogFile.setFilePath(DIRECOTRY_CAN);
@@ -63,23 +71,35 @@ void createNewCanLogFile()
         number++;
     } while (canLogFile.exists());
     
-    String ausgabe = "Speicherziel: ";
+    String ausgabe = "Neues Speicherziel: ";
     ausgabe += canLogFile.getFileName();
     scom.printDebug(ausgabe);
      
     canLogFile.writeStr("identifier(dez);RTR bit;time stamp(hex);data length(dez);byte 1(hex);byte 2(hex);byte 3(hex);byte 4(hex);byte 5(hex);byte 6(hex);byte 7(hex);byte 8(hex)\n");
-
 }
 
+/*
+    Returns the full filepath of the current Canlog file.
+*/
 String getFullLogFilePath()
 {
     return canLogFile.getTotalFilePath();
 }
 
-
+/*
+    Save the Canmessage in the current Canlog file.
+*/
 void saveNewCanMessage(Canmsg const& msg)
 {
-    bool result = canLogFile.appendStr(static_cast<String>(msg)+'\n');
+    String output = String(msg.GetStdIdentifier()) + ";";
+    output += String(msg.GetRtr()) + ";";
+    output += String(msg.GetTime(),HEX) + ";";
+    output += String(msg.GetCanLength()) + ";";
+    for(int i = 0; i < 8; i++)
+        output += String(msg.GetCanByte(i),HEX) + ";";
+    output.remove(output.length()-1); // letztes Semikolon entfernen
+
+    bool result = canLogFile.appendStrLn(output);
     if(result == false)
     {
         String str = "Die folgende Can-Nachricht konnte nicht gespeichert werden:\n";
