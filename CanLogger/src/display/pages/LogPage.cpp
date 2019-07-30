@@ -2,7 +2,7 @@
 #include "display/pages/LogPage.hpp"
 #include "buttons/Encoder.hpp"
 #include "display/DisplayPageManager.hpp"
-
+#include "display/Button.hpp"
 
 extern DisplayPageManager pageManager; // verweißt auf das Objekt in Main
 

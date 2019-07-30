@@ -3,7 +3,7 @@
 
 #include "display/ILI9341.hpp"
 #include "display/pages/DisplayPage.hpp"
-
+#include "display/Button.hpp"
 class HomePage : public DisplayPage
 {
 
@@ -18,10 +18,15 @@ protected:
     const uint16_t IMAGE_DST_Y = 15;
 
     ILI9341& display;
+   
+   Button* buttonNichtSpeichern;
+   Button* buttonSpeichern;
+   
 public:
     HomePage(ILI9341& display);
     void loop() override;
     void startView() override;
+    ~HomePage();
 };
 
 

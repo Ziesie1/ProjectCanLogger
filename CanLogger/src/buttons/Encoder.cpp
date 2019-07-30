@@ -81,6 +81,11 @@ int getEncoderPos()
   return encoderPos;
 }
 
+void setEncoderPos(int pos)
+{
+  encoderPos = pos;
+}
+
 bool wasEncoderButtonPressed()
 {
   bool ret = tasterPressed;
