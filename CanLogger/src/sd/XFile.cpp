@@ -4,7 +4,7 @@
 
 using namespace utilities;
 
-const String XFile::LINE_FEED = "\n\r";
+const String XFile::LINE_FEED = "\r\n";
 
 XFile::XFile(SdFat& sdCard)
     :sdCard{sdCard}

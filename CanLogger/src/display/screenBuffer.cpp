@@ -3,6 +3,8 @@
 #include "can/CanUtility.hpp"
 #include <Arduino.h>
 #include "utilities/SerialCommunication.hpp"
+#include "sd/SD.hpp"
+#include "utilities/FunctionLifeTime.hpp"
 
 //extern:
 int screenBufferFillLevel = 0;
@@ -211,6 +213,8 @@ void makeBufferVisible(void)
 */
 void loopScreenBuffer(void)
 {
+  // Bei zu vielen eingehenden Nachrichten bleibt er in der while() schleife gefangen
+  //FUNCTION_TIME_X("loopScreenBuffer(void)") //-> für eine Nachricht 47 ms, ohne Serial 43 ms
   if(CanUtility_CanRecieveActive)
   {
     CanUtility_CanRecieveActive_lastStatus = true;
@@ -230,7 +234,7 @@ void loopScreenBuffer(void)
       sortCanMessageIntoBuffer(curMsg);
 
       //SD-Card:
-
+      saveNewCanMessage(curMsg);
 
 
       //loopback:

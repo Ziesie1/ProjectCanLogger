@@ -3,22 +3,25 @@
 #include "sd/SD.hpp"
 #include "sd/XFile.hpp"
 #include "utilities/SerialCommunication.hpp"
+#include "utilities/utilities.hpp"
 
-
-using namespace utilities;
-
-#define errorExit(msg) errorHalt(F(msg))
-#define initError(msg) initErrorHalt(F(msg))
+//#define errorExit(msg) errorHalt(F(msg))
+//#define initError(msg) initErrorHalt(F(msg))
 
 //Definitionen
-constexpr byte SD_CS = PB6;
-constexpr char DIRECOTRY_CAN[] = "/can_log";
-constexpr char FILE_NAME_CAN[] = "log_";
-constexpr char FILE_TYPE_CAN[] = ".txt";
+namespace SD_Card{
+    constexpr byte SD_CS = PB6;
+    constexpr char DIRECOTRY_CAN[] = "/can_log";
+    constexpr char FILE_NAME_CAN[] = "log_";
+    constexpr char FILE_TYPE_CAN[] = ".txt";
 
-SdFat sdKarte {};
-XFile canLogFile {sdKarte};
+    bool sdCardInitialized = false;
+    SdFat sdKarte {};
+    XFile canLogFile {sdKarte};
+}
 
+using namespace SD_Card;
+using namespace utilities;
 /*
     Initialized the SD-Card and create default folder.
     Must recalled after reinserting the SD-Card.
@@ -31,6 +34,7 @@ void init_SD()
         //sdKarte.initErrorPrint();
         return;
     }
+    sdCardInitialized = true;
 
     // Ordner /can_log erstellen
     String debugInfo = "SD-Karte initialisiert. Info: ";
@@ -59,23 +63,26 @@ void init_SD()
 */
 void createNewCanLogFile()
 {
-    canLogFile.setFilePath(DIRECOTRY_CAN);
-
-    int number = 0;
-    do  // freie log_X.txt Datei finden
+    if(sdCardInitialized)
     {
-        String str = FILE_NAME_CAN;
-        str += number;
-        str += FILE_TYPE_CAN;
-        canLogFile.setFileName(str);
-        number++;
-    } while (canLogFile.exists());
-    
-    String ausgabe = "Neues Speicherziel: ";
-    ausgabe += canLogFile.getFileName();
-    scom.printDebug(ausgabe);
-     
-    canLogFile.writeStr("identifier(dez);RTR bit;time stamp(hex);data length(dez);byte 1(hex);byte 2(hex);byte 3(hex);byte 4(hex);byte 5(hex);byte 6(hex);byte 7(hex);byte 8(hex)\n");
+        canLogFile.setFilePath(DIRECOTRY_CAN);
+
+        int number = 0;
+        do  // freie log_X.txt Datei finden
+        {
+            String str = FILE_NAME_CAN;
+            str += number;
+            str += FILE_TYPE_CAN;
+            canLogFile.setFileName(str);
+            number++;
+        } while (canLogFile.exists());
+        
+        String ausgabe = "Neues Speicherziel: ";
+        ausgabe += canLogFile.getFileName();
+        scom.printDebug(ausgabe);
+        
+        canLogFile.writeStrLn("identifier(dez);RTR bit;time stamp(hex);data length(dez);byte 1(hex);byte 2(hex);byte 3(hex);byte 4(hex);byte 5(hex);byte 6(hex);byte 7(hex);byte 8(hex)");
+    }
 }
 
 /*
@@ -91,20 +98,34 @@ String getFullLogFilePath()
 */
 void saveNewCanMessage(Canmsg const& msg)
 {
-    String output = String(msg.GetStdIdentifier()) + ";";
-    output += String(msg.GetRtr()) + ";";
-    output += String(msg.GetTime(),HEX) + ";";
-    output += String(msg.GetCanLength()) + ";";
-    for(int i = 0; i < 8; i++)
-        output += String(msg.GetCanByte(i),HEX) + ";";
-    output.remove(output.length()-1); // letztes Semikolon entfernen
-
-    bool result = canLogFile.appendStrLn(output);
-    if(result == false)
+    if(sdCardInitialized)
     {
-        String str = "Die folgende Can-Nachricht konnte nicht gespeichert werden:\n";
-        str += static_cast<String>(msg);
-        str += "\nIst die Speicherkarte noch eingesteckt?";
-        scom.printError(str);
+        String output = String(msg.GetFullId()) + ";";
+        output += String(msg.GetRtr()) + ";";
+
+        AddZerosToString(output,msg.GetTime(),msg.maxTime,HEX);
+        output += String(msg.GetTime(),HEX) + ";";
+        output += String(msg.GetCanLength()) + ";";
+        for(int i = 0; i < 8; i++)
+        {
+            if(i < msg.GetCanLength())
+            {
+                AddZerosToString(output,msg.GetCanByte(i),msg.maxDataVal,HEX);
+                output += String(msg.GetCanByte(i),HEX);
+            }else{
+                AddZerosToString(output,0,msg.maxDataVal,HEX);
+            }
+            if(i < 8-1)
+                output += ";";
+        }
+
+        bool result = canLogFile.appendStrLn(output);
+        if(result == false)
+        {
+            String str = "Die folgende Can-Nachricht konnte nicht gespeichert werden:\n";
+            str += static_cast<String>(msg);
+            str += "\nIst die Speicherkarte noch eingesteckt?";
+            scom.printError(str);
+        }
     }
 }

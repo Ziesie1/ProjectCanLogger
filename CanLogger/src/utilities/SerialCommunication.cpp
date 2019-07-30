@@ -1,6 +1,6 @@
 #include "utilities/SerialCommunication.hpp"
 
-const String utilities::endz = "\n\r"; // LF & CR
+const String utilities::endz = "\r\n"; // LF & CR
 SerialCommunication utilities::scom {}; // be of use for the projekt to manage the seriel communikation
 
 SerialCommunication::SerialCommunication()
@@ -38,8 +38,7 @@ void SerialCommunication::printError(String const& message) const
             this->serial->print("#-> ");
         }
     }
-    this->serial->println('\n');
-    
+    this->serial->println();
 }
 
 /*

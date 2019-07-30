@@ -10,7 +10,7 @@
 #include "display/pages/HomePage.hpp"
 #include "display/screenBuffer.hpp"
 #include "utilities/utilities.hpp"
-
+#include "utilities/FunctionLifeTime.hpp"
 
 using namespace utilities; // für scom
 
@@ -38,6 +38,8 @@ void setup() {
   pageManager.openNewPage(new HomePage{display}); // Startseite setzen
 
   createNewCanLogFile();
+
+  CanUtility_EnableRecieve(); // Vorrübergehende aktivierung
 	
   scom << "CanLogger ist Initialisiert" << endz;
 }
@@ -47,6 +49,7 @@ void loop() {
   loopTaster();
   pageManager.loop();
   loopScreenBuffer();
+
 }
 
 void serialEvent() {
@@ -57,9 +60,6 @@ void serialEvent() {
     */
     scom << "Charakter recieved:" << inChar << endz;
 
-    Canmsg msg{};
-    scom << static_cast<String>(msg) << endz;
-    saveNewCanMessage(msg);
   }
   
 }
