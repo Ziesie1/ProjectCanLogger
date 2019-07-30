@@ -1,5 +1,6 @@
 #include "can/CanUtility.hpp"
 #include "can/Canmsg.hpp"
+#include "utilities/SerialCommunication.hpp"
 
 CAN_HandleTypeDef CanUtility_hcan;
 bool CanUtility_CanRecieveActive = false;
@@ -67,12 +68,13 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef *hcan)
 
 /* 
 	function that fills a CAN-handle with all the important information for the specific application
-	Input: hcan	- pointer to CAN-handle
+	Input: 	hcan	- pointer to CAN-handle
+			speed	- transmission speed of the CAN-bus
 */
-void FillCAN_Handle(CAN_HandleTypeDef& hcan)
+void FillCAN_Handle(CAN_HandleTypeDef& hcan, CAN_SpeedTypedef speed)
 {
 	hcan.Instance = CAN1;
-	hcan.Init.Prescaler = 4; // entspricht 500 kBit/s
+	hcan.Init.Prescaler = speed;
 	hcan.Init.Mode = CAN_MODE_NORMAL;
 	hcan.Init.SyncJumpWidth = CAN_SJW_1TQ;
 	hcan.Init.TimeSeg1 = CAN_BS1_12TQ;
@@ -104,27 +106,29 @@ void FillCAN_Filter(CAN_FilterTypeDef& canFilter)
 /* 
 	function that initializes the CAN perihpherals, the recieve Buffer
 	and activates the CAN peripherals
+	Input:	speed		- transmission speed of the CAN-bus
 	return:	HAL_OK		- everything is working as it is supposed to be
 						  note to recieve messages furthermore the "CanUtility_EnableRecieve()" 
 						  function needs to be called 
 			HAL_ERROR	- an error occured while initializing, 
 						  check the serial output for further details
 */
-HAL_StatusTypeDef CanUtility_Init(void)
+HAL_StatusTypeDef CanUtility_Init(CAN_SpeedTypedef speed)
 {	
 	//initialize CAN-handler:
-	FillCAN_Handle(CanUtility_hcan);
+	FillCAN_Handle(CanUtility_hcan, speed);
 	if(HAL_CAN_Init(&CanUtility_hcan) != HAL_OK)
 	{
-		Serial.print("Fehler während der CAN initialisierung. Status: ");
-		Serial.print(HAL_CAN_GetState(&CanUtility_hcan)); 
-		Serial.print(" Fehlercode: 0x");
-		Serial.println(String(HAL_CAN_GetError(&CanUtility_hcan),HEX)); 
+		String s = "Fehler während der CAN initialisierung. Status: ";
+		s += String(HAL_CAN_GetState(&CanUtility_hcan),HEX); 
+		s += " Fehlercode: 0x";
+		s += String(HAL_CAN_GetError(&CanUtility_hcan),HEX); 
+		utilities::scom.printError(s);
 		return HAL_ERROR;
 	}
 	else
 	{
-		Serial.println("CAN MCR und BTR erfolgreich initialisiert");
+		utilities::scom.printDebug("CAN MCR und BTR erfolgreich initialisiert");
 	}
 	
 	//initialize CAN-Filter 0:
@@ -132,12 +136,12 @@ HAL_StatusTypeDef CanUtility_Init(void)
 	FillCAN_Filter(canFilter);
 	if(HAL_CAN_ConfigFilter(&CanUtility_hcan, &canFilter) != HAL_OK)
 	{
-		Serial.println("Fehler beim CAN-Filtersetup");
+		utilities::scom.printError("Fehler beim CAN-Filtersetup");
 		return HAL_ERROR;
 	}
 	else
 	{
-		Serial.println("CAN-Filtersetup erfolgreich beendet");
+		utilities::scom.printDebug("CAN-Filtersetup erfolgreich beendet");
 	}
 
 	/*if(HAL_CAN_ActivateNotification(&CanUtility_hcan, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK)
@@ -153,16 +157,17 @@ HAL_StatusTypeDef CanUtility_Init(void)
 	// start CAN-Instance:
 	if(HAL_CAN_Start(&CanUtility_hcan) != HAL_OK)
 	{
-		Serial.print("CAN-Setup konnte nicht erfolgreich beendet werden. CAN-Status: "); 
-		Serial.print(HAL_CAN_GetState(&CanUtility_hcan));
-		Serial.print(" Fehlercode: 0x");
-		Serial.println(String(HAL_CAN_GetError(&CanUtility_hcan),HEX)); 
+		String s = "CAN-Setup konnte nicht erfolgreich beendet werden. CAN-Status: "; 
+		s += String(HAL_CAN_GetState(&CanUtility_hcan));
+		s += " Fehlercode: 0x";
+		s += String(HAL_CAN_GetError(&CanUtility_hcan),HEX);
+		utilities::scom.printError(s); 
 		return HAL_ERROR;
 	}
 	else
 	{
 		CanUtility_CanRecieveActive = false;
-		Serial.println("CAN-Peripherie einsatzbereit");	
+		utilities::scom.printDebug("CAN-Peripherie einsatzbereit");	
 	}
 	
 	Canmsg_bufferCanRecMessages = new Canmsg[Canmsg_CAN_BUFFER_REC_SIZE];
@@ -181,10 +186,11 @@ HAL_StatusTypeDef CanUtility_DeInit(void)
 {
 	if(HAL_CAN_DeInit(&CanUtility_hcan)!= HAL_OK)
 	{
-		Serial.print("Fehler während der CAN deinitialisierung. Status: ");
-		Serial.print(HAL_CAN_GetState(&CanUtility_hcan)); 
-		Serial.print(" Fehlercode: 0x");
-		Serial.println(String(HAL_CAN_GetError(&CanUtility_hcan),HEX)); 
+		String s = "Fehler während der CAN deinitialisierung. Status: ";
+		s += String(HAL_CAN_GetState(&CanUtility_hcan),HEX); 
+		s += " Fehlercode: 0x";
+		s += String(HAL_CAN_GetError(&CanUtility_hcan),HEX);
+		utilities::scom.printError(s); 
 		return HAL_ERROR;
 	}
 	
@@ -192,7 +198,7 @@ HAL_StatusTypeDef CanUtility_DeInit(void)
 	Canmsg_bufferCanRecMessages = nullptr;
 	Canmsg_bufferCanRecPointer = 0;
 	
-	Serial.println("CAN-Baustein deinitialisiert");
+	utilities::scom.printDebug("CAN-Baustein deinitialisiert");
 	return HAL_OK;
 }
 
@@ -214,7 +220,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 		else
 		{
 			/* Nachricht wird verworfen */
-			Serial.println("Nachricht verworfen");
+			utilities::scom.printError("Nachricht verworfen");
 		}
 	}
 }
@@ -256,12 +262,13 @@ HAL_StatusTypeDef CanUtility_EnableRecieve(void)
 	canFilter.FilterActivation = CAN_FILTER_ENABLE;
 	if(HAL_CAN_ConfigFilter(&CanUtility_hcan, &canFilter) != HAL_OK)
 	{
+		utilities::scom.printError("Fehler beim aktivieren des CAN Filters");
 		return HAL_ERROR;
 	}
 	else
 	{
 		CanUtility_CanRecieveActive = true;
-		Serial.println("CAN-Nachrichten werden bearbeitet");
+		utilities::scom.printDebug("CAN-Nachrichten werden bearbeitet");
 		return HAL_OK;
 	}
 }
@@ -279,12 +286,13 @@ HAL_StatusTypeDef CanUtility_DissableRecieve(void)
 	FillCAN_Filter(canFilter);
 	if(HAL_CAN_ConfigFilter(&CanUtility_hcan, &canFilter) != HAL_OK)
 	{
+		utilities::scom.printError("Fehler beim deaktivieren des CAN Filters");
 		return HAL_ERROR;
 	}
 	else
 	{
 		CanUtility_CanRecieveActive = false;
-		Serial.println("CAN-Nachrichten werden ignoriert");
+		utilities::scom.printDebug("CAN-Nachrichten werden ignoriert");
 		return HAL_OK;
 	}
 }

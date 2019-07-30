@@ -54,6 +54,7 @@ public:
 	// Get-Funktionen:
 	uint16_t GetStdIdentifier() const;
 	uint32_t GetExtIdentifier() const;
+	uint32_t GetFullId() const;
 	bool GetIsExtIdentifier() const;
 	bool GetRtr() const;
 	uint16_t GetTime() const;

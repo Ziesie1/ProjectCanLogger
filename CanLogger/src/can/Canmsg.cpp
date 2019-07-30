@@ -1,6 +1,7 @@
 #include "can/Canmsg.hpp"
 #include "can/CanUtility.hpp"
 #include "utilities/utilities.hpp"
+#include "utilities/SerialCommunication.hpp"
 
 Canmsg* Canmsg_bufferCanRecMessages;
 int Canmsg_bufferCanRecPointer;
@@ -377,7 +378,7 @@ void Canmsg::Recieve(bool const fifo)
         }
         else
         {
-          Serial.println("CAN-Nachricht konnte nicht ausgelesen werden");
+          utilities::scom.printError("CAN-Nachricht konnte nicht ausgelesen werden");
         }
     }
 }
@@ -424,7 +425,7 @@ HAL_StatusTypeDef Canmsg::Send(void) const
 	}
   else
   {
-    Serial.println("CAN-Nachricht konnte nicht gesendet werden(Alle TX Mailboxen belegt).");
+    utilities::scom.printError("CAN-Nachricht konnte nicht gesendet werden(Alle TX Mailboxen belegt).");
     return HAL_ERROR;
   }
 }
@@ -445,6 +446,23 @@ uint16_t Canmsg::GetStdIdentifier() const
 uint32_t Canmsg::GetExtIdentifier() const
 {
   return this->extIdentifier;  
+}
+
+/* 
+    function to get the full Identifier of the CAN-message,
+    regardless whether it uses the extended identifier or not
+    return: value of the Identifier of the message
+*/
+uint32_t Canmsg::GetFullId() const
+{
+  if(this->isExtIdentifier)
+  {
+    return ((this->stdIdentifier<<18)|this->extIdentifier);
+  }
+  else
+  {
+    return this->stdIdentifier;
+  }
 }
 
 /* 

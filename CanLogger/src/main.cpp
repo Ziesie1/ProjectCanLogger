@@ -20,7 +20,7 @@ DisplayPageManager pageManager {};
 void setup() {
   Serial.begin(115200);
   scom.workWith(Serial); // scom Hardwareserial zuweisen
-  scom.showDebugMessages(true); // Debugmodus einschalten
+  scom.setDebugMode(true); // Debugmodus einschalten
   
   init_SD();
   HAL_Init();
@@ -30,7 +30,7 @@ void setup() {
   screenBufferInit();
   display.init();
 
-  if((CanUtility_Init() != HAL_OK) || (CanUtility_EnableRecieve() != HAL_OK))
+  if((CanUtility_Init(CAN_500_KBIT) != HAL_OK) || (CanUtility_EnableRecieve() != HAL_OK))
   {
     while(1){}
   }
@@ -46,7 +46,7 @@ void setup() {
 void loop() {
   loopTaster();
   pageManager.loop();
-  
+  loopScreenBuffer();
 }
 
 void serialEvent() {
