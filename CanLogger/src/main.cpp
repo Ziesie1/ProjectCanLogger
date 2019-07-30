@@ -20,7 +20,7 @@ DisplayPageManager pageManager {};
 void setup() {
   Serial.begin(115200);
   scom.workWith(Serial); // scom Hardwareserial zuweisen
-  scom.showDebugMessages(true); // Debugmodus einschalten
+  scom.setDebugMode(true); // Debugmodus einschalten
   
   init_SD();
   HAL_Init();
