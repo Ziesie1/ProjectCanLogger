@@ -14,16 +14,16 @@ HomePage::HomePage(ILI9341& display)
     :display{display}
 {
     
-
-   
 }
 
 HomePage::~HomePage()
 {
-    delete[] buttonNichtSpeichern;
-    buttonNichtSpeichern = nullptr;
-    delete[] buttonSpeichern;
-    buttonSpeichern = nullptr;
+    if(this->buttonNichtSpeichern)
+        delete this->buttonNichtSpeichern;
+    this->buttonNichtSpeichern = nullptr;
+    if(this->buttonSpeichern)
+        delete this->buttonSpeichern;
+    this->buttonSpeichern = nullptr;
 }
 
 void HomePage::loop()
@@ -82,8 +82,8 @@ void HomePage::startView()
 
     this->display.drawBmp(xmitte-OSTFALIA_LOGO_SIZE_X/2, IMAGE_DST_Y, OSTFALIA_LOGO_SIZE_X, OSTFALIA_LOGO_SIZE_Y, OSTFALIA_LOGO, 1);
 
-    buttonNichtSpeichern = new Button{xmitte-this->BUTTON_WIDTH/2,ymitte-this->BUTTON_MID_DIST-this->BUTTON_HIGH,this->BUTTON_WIDTH,this->BUTTON_HIGH,this->BUTTON_COLOR_DEFAULT,this->BUTTON_TEXT_DST_X,this->BUTTON_TEXT_DST_Y,"Logging - ohne Speichern",WHITE, display,false};
-    buttonSpeichern = new Button{xmitte-this->BUTTON_WIDTH/2,ymitte+this->BUTTON_MID_DIST,this->BUTTON_WIDTH,this->BUTTON_HIGH,this->BUTTON_COLOR_DEFAULT,this->BUTTON_TEXT_DST_X,this->BUTTON_TEXT_DST_Y,"Logging - mit Speichern",WHITE,display,false};
+    buttonNichtSpeichern = new Button{this->display, xmitte-this->BUTTON_WIDTH/2,ymitte-this->BUTTON_MID_DIST-this->BUTTON_HIGH,this->BUTTON_WIDTH,this->BUTTON_HIGH,this->BUTTON_COLOR_DEFAULT,this->BUTTON_TEXT_DST_X,this->BUTTON_TEXT_DST_Y,"Logging - ohne Speichern",WHITE,false};
+    buttonSpeichern = new Button{this->display, xmitte-this->BUTTON_WIDTH/2,ymitte+this->BUTTON_MID_DIST,this->BUTTON_WIDTH,this->BUTTON_HIGH,this->BUTTON_COLOR_DEFAULT,this->BUTTON_TEXT_DST_X,this->BUTTON_TEXT_DST_Y,"Logging - mit Speichern",WHITE,false};
     
     
     //this->display.fillScreen(WHITE);

@@ -1,10 +1,10 @@
 #include "display/Button.hpp"
 
 
-Button::Button(unsigned long startX, unsigned long startY, unsigned long sizeX, 
-       unsigned long sizeY, unsigned long backColor, byte offsetX, byte offsetY, string text, unsigned long textColor,
-       ILI9341& display, bool isSelected)
-       :startX{startX}, startY{startY}, sizeX{sizeX}, sizeY{sizeY}, backColor{backColor}, offsetX{offsetX}, offsetY{offsetY}, text{text}, textColor{textColor}, display{display}, isSelected{false}
+Button::Button(ILI9341& display, unsigned long startX, unsigned long startY, unsigned long sizeX, 
+        unsigned long sizeY, unsigned long backColor, byte offsetX, byte offsetY, string text, unsigned long textColor,
+        bool isSelected)
+       :display{display}, startX{startX}, startY{startY}, sizeX{sizeX}, sizeY{sizeY}, backColor{backColor}, offsetX{offsetX}, offsetY{offsetY}, text{text}, textColor{textColor}, isSelected{false}
        {
            drawButton();
        }

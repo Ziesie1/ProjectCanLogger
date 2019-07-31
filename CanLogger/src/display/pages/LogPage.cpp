@@ -11,9 +11,11 @@ LogPage::LogPage(ILI9341& display, bool statusSD)
 {
     
 }
+
 LogPage::~LogPage()
 {
-    delete[] this->buttonZurueck;
+    if(this->buttonZurueck)
+        delete this->buttonZurueck;
     this->buttonZurueck = nullptr;
 }
 
@@ -30,11 +32,11 @@ void LogPage::startView()
     if(statusSD)
     {
         this->display.fillScreen(RED100);
-        this->buttonZurueck = new Button{160,10,150,30,BLUE100,5,8,"Zurück",WHITE,this->display,false};
+        this->buttonZurueck = new Button{this->display, 160,10,150,30,BLUE100,5,8,"Zurück",WHITE,false};
     }
     else
     {
         this->display.fillScreen(BLUE50);
-        this->buttonZurueck = new Button{160,10,150,30,BLUE100,5,8,"Zurück",WHITE,this->display,false};
+        this->buttonZurueck = new Button{this->display, 160,10,150,30,BLUE100,5,8,"Zurück",WHITE,false};
     }
 }

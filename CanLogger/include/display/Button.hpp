@@ -6,7 +6,8 @@
 using namespace std;
 class Button
 {
-    protected:
+protected:
+    ILI9341& display;
     unsigned long startX;
     unsigned long startY;
     unsigned long sizeX;
@@ -16,12 +17,11 @@ class Button
     byte offsetY;
     string text;
     unsigned long textColor;
-    ILI9341& display;
     bool isSelected;
 
-    public:
-    Button (unsigned long startX, unsigned long startY, unsigned long sizeX, 
-            unsigned long sizeY, unsigned long backColor,byte offsetX, byte offsetY, string text, unsigned long textColor, ILI9341& display, bool isSelected);
+public:
+    Button (ILI9341& display, unsigned long startX, unsigned long startY, unsigned long sizeX, 
+            unsigned long sizeY, unsigned long backColor,byte offsetX, byte offsetY, string text, unsigned long textColor, bool isSelected);
     bool getStatus();
     void drawButton();
     void setFrame();
