@@ -3,7 +3,7 @@
 
 #include "display/ILI9341.hpp"
 #include "display/pages/DisplayPage.hpp"
-#include "display/Button.hpp"
+#include "display/elements/Button.hpp"
 
 class LogPage : public DisplayPage
 {

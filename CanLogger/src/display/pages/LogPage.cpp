@@ -2,7 +2,8 @@
 #include "display/pages/LogPage.hpp"
 #include "buttons/Encoder.hpp"
 #include "display/DisplayPageManager.hpp"
-#include "display/Button.hpp"
+#include "display/elements/Button.hpp"
+#include "buttons/Taster.hpp"
 
 extern DisplayPageManager pageManager; // verweißt auf das Objekt in Main
 
@@ -15,13 +16,13 @@ LogPage::LogPage(ILI9341& display, bool statusSD)
 LogPage::~LogPage()
 {
     if(this->buttonZurueck)
-        delete this->buttonZurueck;
+    delete this->buttonZurueck;
     this->buttonZurueck = nullptr;
 }
 
 void LogPage::loop()
 {
-    if(wasEncoderButtonPressed())
+    if(wasSingleTasterPressed())
     {
         pageManager.deleteOpenPage();
     }
@@ -31,12 +32,13 @@ void LogPage::startView()
 {
     if(statusSD)
     {
-        this->display.fillScreen(RED100);
-        this->buttonZurueck = new Button{this->display, 160,10,150,30,BLUE100,5,8,"Zurück",WHITE,false};
+        this->display.fillScreen(WHITE);
+        display.printString(50,50,"Logging mit Speichern",BLUE100,WHITE,1);
     }
     else
     {
-        this->display.fillScreen(BLUE50);
-        this->buttonZurueck = new Button{this->display, 160,10,150,30,BLUE100,5,8,"Zurück",WHITE,false};
+        this->display.fillScreen(WHITE);
+        display.printString(50,50,"Logging ohne Speichern",BLUE100,WHITE,1);
+        
     }
 }
