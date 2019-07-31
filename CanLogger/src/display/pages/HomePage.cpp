@@ -23,7 +23,7 @@ HomePage::HomePage(ILI9341& display)
     buttonNichtSpeichern = new Button{xmitte-this->BUTTON_WIDTH/2,ymitte-this->BUTTON_MID_DIST-this->BUTTON_HIGH,this->BUTTON_WIDTH,this->BUTTON_HIGH,this->BUTTON_COLOR_DEFAULT,this->BUTTON_TEXT_DST_X,this->BUTTON_TEXT_DST_Y,"Logging - ohne Speichern",WHITE, display,false};
     buttonSpeichern = new Button{xmitte-this->BUTTON_WIDTH/2,ymitte+this->BUTTON_MID_DIST,this->BUTTON_WIDTH,this->BUTTON_HIGH,this->BUTTON_COLOR_DEFAULT,this->BUTTON_TEXT_DST_X,this->BUTTON_TEXT_DST_Y,"Logging - mit Speichern",WHITE,display,false};
 
-    setEncoderPos(0);
+   
 }
 
 HomePage::~HomePage()
@@ -42,6 +42,12 @@ void HomePage::loop()
     }
     if(hasEncoderPosChanged())
     {
+        
+        if(getEncoderPos() == 0)
+        {
+            this->buttonNichtSpeichern->resetFrame();
+            this->buttonSpeichern->resetFrame();
+        }
         if(getEncoderPos() == 1)
         {
             this->buttonNichtSpeichern->setFrame();
@@ -52,6 +58,16 @@ void HomePage::loop()
             this->buttonNichtSpeichern->resetFrame();
             this->buttonSpeichern->setFrame();
         }
+        if(getEncoderPos() > 2)
+        {
+            setEncoderPos(2);
+        }
+        if(getEncoderPos() < 0)
+        {
+            setEncoderPos(0);
+        }
+        
+        
     }
 }
 
