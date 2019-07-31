@@ -8,10 +8,10 @@ class LogPage : public DisplayPage
 {
 
 protected:
-
+    bool statusSD;
     ILI9341& display;
 public:
-    LogPage(ILI9341& display);
+    LogPage(ILI9341& display, bool statusSD);
     void loop() override;
     void startView() override;
 };

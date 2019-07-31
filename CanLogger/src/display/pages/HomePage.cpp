@@ -36,9 +36,18 @@ HomePage::~HomePage()
 
 void HomePage::loop()
 {
-    if(wasEncoderButtonPressed())
+    if(wasEncoderButtonPressed() && (getEncoderPos() == 1 || getEncoderPos() == 2))
     {
-        pageManager.openNewPage(new LogPage{display});
+        if(this->buttonSpeichern->getStatus())
+        {
+            pageManager.openNewPage(new LogPage{display,true});
+        }
+        else
+        {
+           pageManager.openNewPage(new LogPage{display,false});
+        }
+        
+        
     }
     if(hasEncoderPosChanged())
     {

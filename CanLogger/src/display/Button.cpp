@@ -19,20 +19,13 @@ void Button::drawButton()
 void Button::setFrame()
 {
     this->display.drawEmptyRect(this->startX, this->startY, this->sizeX,this->sizeY,BLACK,2);
-    //this->display.drawHorizontalLine(startX,startX+sizeX,startY,BLACK);
-    //this->display.drawHorizontalLine(startX,startX+sizeX,startY+sizeY,BLACK);
-    //this->display.drawVerticalLine(startX,startY,startY+sizeY,BLACK);
-    //this->display.drawVerticalLine(startX+sizeX,startY,startY+sizeY,BLACK);
-
+    this->isSelected = true;
 }
 
 void Button::resetFrame()
 {
     this->display.drawEmptyRect(this->startX, this->startY, this->sizeX,this->sizeY,BLUE100,2);
-    //this->display.drawHorizontalLine(startX,startX+sizeX,startY,BLUE100);
-    //this->display.drawHorizontalLine(startX,startX+sizeX,startY+sizeY,BLUE100);
-    //this->display.drawVerticalLine(startX,startY,startY+sizeY,BLUE100);
-    //this->display.drawVerticalLine(startX+sizeX,startY,startY+sizeY,BLUE100);
+    this->isSelected = false;
 }
 
 bool Button::getStatus()
