@@ -81,6 +81,7 @@ public:
 
     void fillScreen(int color);
     void drawOnePixel(unsigned long usX, unsigned long usY, unsigned long ulColor);
+    void drawLine(long usP1X, long usP1Y, long usP2X, long usP2Y, unsigned long ulColor);
     void drawHorizontalLine(unsigned short usStartX, unsigned short usEndX, unsigned short usY, unsigned long ulColor);
     void drawVerticalLine(unsigned short usX, unsigned short usStartY, unsigned short usEndY, unsigned long ulColor);
     void drawEmptyRect(unsigned long usStartX, unsigned long usStartY, unsigned long sizeX, unsigned long sizeY, unsigned long ulColor, byte frameSize = 1);

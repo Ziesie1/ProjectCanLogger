@@ -398,6 +398,26 @@ void ILI9341::fillScreen(int color)
 }
 
 /*
+	Draw a direct line from point 1 to point 2.
+*/
+void ILI9341::drawLine(long usP1X, long usP1Y, long usP2X, long usP2Y, unsigned long ulColor)
+{
+	long vecX = usP2X-usP1X;
+	long vecY = usP2Y-usP1Y;
+	long vec_betrag = static_cast<long>(round(sqrt(vecX*vecX+vecY*vecY)));
+
+	this->drawOnePixel(usP1X, usP1Y, ulColor);
+	this->drawOnePixel(usP2X, usP2Y, ulColor);
+
+	for(long pos = 1; pos < vec_betrag; pos++)
+	{
+		long posx = usP1X +  static_cast<long>(round((double)vecX/vec_betrag*pos));
+		long posy = usP1Y +  static_cast<long>(round((double)vecY/vec_betrag*pos));
+		this->drawOnePixel(posx, posy, ulColor);
+	}
+}
+
+/*
 	Zeichnet einen einzelnen Pixel auf dem Display.
 */
 void ILI9341::drawOnePixel(unsigned long usX, unsigned long usY, unsigned long ulColor)
