@@ -535,6 +535,44 @@ void ILI9341::drawFillRect(unsigned long usStartX, unsigned long usStartY,
 	}
 }
 
+/*
+	Draw a quartered filled Circle.
+	@arg quarter, is between 1 - 4 and is based on the cartesian coordinate system
+*/
+void ILI9341::drawFillQuarterCircle(long usPX, long usPY, long radius, byte quarter, unsigned long ulColor)
+{
+	long calcx = 1;
+	long calcy = -1;
+	switch(quarter)
+	{
+		case 1: break;
+		case 2: calcx = -1; break;
+		case 3: calcx = -1; calcy = 1; break;
+		case 4: calcy = 1; break;
+	}
+
+	for(long x = 0; abs(x) <= radius; x+=calcx)
+	{
+		for(long y = 0; abs(y) <= radius; y+=calcy)
+		{
+			long absoulute = static_cast<long>(round(sqrt(x*x+y*y)));
+			if(absoulute > radius)
+				break;
+			this->drawOnePixel(usPX+x,usPY+y,ulColor);
+		}
+	}
+}
+
+/*
+	Draw a filled Circle.
+*/
+void ILI9341::drawFillCircle(long usPX, long usPY, long radius, unsigned long ulColor)
+{
+	this->drawFillQuarterCircle(usPX,usPY,radius,1,ulColor);
+	this->drawFillQuarterCircle(usPX,usPY,radius,2,ulColor);
+	this->drawFillQuarterCircle(usPX,usPY,radius,3,ulColor);
+	this->drawFillQuarterCircle(usPX,usPY,radius,4,ulColor);
+}
 
 /*
 	Zeichnet ein Bild an die angegeben Position.
