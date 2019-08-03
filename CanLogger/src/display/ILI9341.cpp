@@ -575,6 +575,70 @@ void ILI9341::drawFillCircle(long usPX, long usPY, long radius, unsigned long ul
 }
 
 /*
+	Draw an empty Circle.
+*/
+void ILI9341::drawEmptyCircle(long usPX, long usPY, long radius, unsigned long ulColor, byte frameSize)
+{
+	frameSize--; // einen abziehen
+	// I
+	for(long x = 0; abs(x) <= radius; x+=1)
+	{
+		for(long y = -radius; y <= 0; y+=1)
+		{
+			long absoulute = static_cast<long>(round(sqrt(x*x+y*y)));
+			if(absoulute >= radius-frameSize && absoulute <= radius)
+			{
+				this->drawOnePixel(usPX+x,usPY+y,ulColor);
+			}
+			if(absoulute < radius-frameSize)
+				break;
+		}
+	}
+	// II
+	for(long x = 0; abs(x) <= radius; x-=1)
+	{
+		for(long y = -radius; y <= 0; y+=1)
+		{
+			long absoulute = static_cast<long>(round(sqrt(x*x+y*y)));
+			if(absoulute >= radius-frameSize && absoulute <= radius)
+			{
+				this->drawOnePixel(usPX+x,usPY+y,ulColor);
+			}
+			if(absoulute < radius-frameSize)
+				break;
+		}
+	}
+	// III
+	for(long x = 0; abs(x) <= radius; x-=1)
+	{
+		for(long y = radius; y >= 0; y-=1)
+		{
+			long absoulute = static_cast<long>(round(sqrt(x*x+y*y)));
+			if(absoulute >= radius-frameSize && absoulute <= radius)
+			{
+				this->drawOnePixel(usPX+x,usPY+y,ulColor);
+			}
+			if(absoulute < radius-frameSize)
+				break;
+		}
+	}
+	// IV
+	for(long x = 0; abs(x) <= radius; x+=1)
+	{
+		for(long y = radius; y >= 0; y-=1)
+		{
+			long absoulute = static_cast<long>(round(sqrt(x*x+y*y)));
+			if(absoulute >= radius-frameSize && absoulute <= radius)
+			{
+				this->drawOnePixel(usPX+x,usPY+y,ulColor);
+			}
+			if(absoulute < radius-frameSize)
+				break;
+		}
+	}
+}
+
+/*
 	Zeichnet ein Bild an die angegeben Position.
 	Das Bild ist ganzahlig Skallierbar (default: size = 1).
 */

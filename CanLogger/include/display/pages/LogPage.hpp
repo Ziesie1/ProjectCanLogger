@@ -11,7 +11,7 @@ class LogPage : public DisplayPage
 protected:
     ILI9341& display;
     bool statusSD;
-    Button* buttonZurueck;
+    
 public:
     LogPage(ILI9341& display, bool statusSD);
     void loop() override;

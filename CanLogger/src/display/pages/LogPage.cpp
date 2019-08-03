@@ -15,9 +15,7 @@ LogPage::LogPage(ILI9341& display, bool statusSD)
 
 LogPage::~LogPage()
 {
-    if(this->buttonZurueck)
-    delete this->buttonZurueck;
-    this->buttonZurueck = nullptr;
+
 }
 
 void LogPage::loop()
