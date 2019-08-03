@@ -4,6 +4,7 @@
 #include "display/ILI9341.hpp"
 #include "display/pages/DisplayPage.hpp"
 #include "display/elements/Button.hpp"
+#include "display/elements/Table.hpp"
 
 class LogPage : public DisplayPage
 {
@@ -11,6 +12,7 @@ class LogPage : public DisplayPage
 protected:
     ILI9341& display;
     bool statusSD;
+    Table* logTable;
     
 public:
     LogPage(ILI9341& display, bool statusSD);

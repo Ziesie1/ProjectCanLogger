@@ -33,6 +33,8 @@ public:
     void drawButton();
     void selectButton();
     void unselectButton();
+    void drawArrow();
+    void deleteArrow();
 };
 
 

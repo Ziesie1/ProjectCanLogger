@@ -31,25 +31,7 @@ void Button::selectButton()
     this->display.drawEmptyRect(this->startX, this->startY, this->sizeX,this->sizeY,this->COLOR_FRAME_SELECTED,this->FRAME_WIDTH);
     
     //Darstellung des Pfeils
-    int y = this->startY+(this->sizeY/4);
-    for(int x=2;x<this->startX;x++)
-    {
-        this->display.drawOnePixel(x,y,this->COLOR_ARROW_SELECTED);
-        if(x>2 && x%2 == 0)
-        {
-            y++;
-        }
-        
-    }
-    y =this->startY+(this->sizeY)*3/4;
-    for(int x=2;x<this->startX;x++)
-    {
-        this->display.drawOnePixel(x,y,this->COLOR_ARROW_SELECTED);
-        if(x>2 && x%2 == 0)
-        {
-            y--;
-        }
-    }
+    //drawArrow();
     
 }
 void Button::unselectButton()
@@ -58,6 +40,11 @@ void Button::unselectButton()
     this->display.drawEmptyRect(this->startX, this->startY, this->sizeX,this->sizeY,this->COLOR_FRAME_UNSELECTED,this->FRAME_WIDTH);
     
     //Löschen des Pfeils
+    //deleteArrow();
+}
+
+void Button::deleteArrow()
+{
     int y = this->startY+(this->sizeY/4);
     for(int x=2;x<this->startX;x++)
     {
@@ -72,6 +59,28 @@ void Button::unselectButton()
     for(int x=2;x<this->startX;x++)
     {
         this->display.drawOnePixel(x,y,this->COLOR_ARROW_UNSELECTED);
+        if(x>2 && x%2 == 0)
+        {
+            y--;
+        }
+    }
+}
+void Button::drawArrow()
+{
+    int y = this->startY+(this->sizeY/4);
+    for(int x=2;x<this->startX;x++)
+    {
+        this->display.drawOnePixel(x,y,this->COLOR_ARROW_SELECTED);
+        if(x>2 && x%2 == 0)
+        {
+            y++;
+        }
+        
+    }
+    y =this->startY+(this->sizeY)*3/4;
+    for(int x=2;x<this->startX;x++)
+    {
+        this->display.drawOnePixel(x,y,this->COLOR_ARROW_SELECTED);
         if(x>2 && x%2 == 0)
         {
             y--;
