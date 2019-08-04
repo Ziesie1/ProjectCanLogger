@@ -5,8 +5,6 @@
 #include "utilities/SerialCommunication.hpp"
 #include "utilities/utilities.hpp"
 
-//#define errorExit(msg) errorHalt(F(msg))
-//#define initError(msg) initErrorHalt(F(msg))
 
 //Definitionen
 namespace SD_Card{
@@ -22,6 +20,7 @@ namespace SD_Card{
 
 using namespace SD_Card;
 using namespace utilities;
+
 /*
     Initialized the SD-Card and create default folder.
     Must recalled after reinserting the SD-Card.
@@ -81,7 +80,7 @@ void createNewCanLogFile()
         ausgabe += canLogFile.getFileName();
         scom.printDebug(ausgabe);
         
-        canLogFile.writeStrLn("identifier(dez);RTR bit;time stamp(hex);data length(dez);byte 1(hex);byte 2(hex);byte 3(hex);byte 4(hex);byte 5(hex);byte 6(hex);byte 7(hex);byte 8(hex)");
+        canLogFile.writeStrLn("identifier(hex);RTR bit;time stamp(hex);data length(hex);byte 1(hex);byte 2(hex);byte 3(hex);byte 4(hex);byte 5(hex);byte 6(hex);byte 7(hex);byte 8(hex)");
     }
 }
 
@@ -96,16 +95,18 @@ String getFullLogFilePath()
 /*
     Save the Canmessage in the current Canlog file.
 */
-void saveNewCanMessage(Canmsg const& msg)
+bool saveNewCanMessage(Canmsg const& msg)
 {
     if(sdCardInitialized)
     {
-        String output = String(msg.GetFullId()) + ";";
+        String output = "";
+        AddZerosToString(output,msg.GetFullId(),msg.maxExtId,HEX); // nullen hinzufügen
+        output += String(msg.GetFullId(), HEX) + ";";
         output += String(msg.GetRtr()) + ";";
-
-        AddZerosToString(output,msg.GetTime(),msg.maxTime,HEX);
+        
+        AddZerosToString(output,msg.GetTime(),msg.maxTime,HEX); // nullen hinzufügen
         output += String(msg.GetTime(),HEX) + ";";
-        output += String(msg.GetCanLength()) + ";";
+        output += String(msg.GetCanLength(), HEX) + ";"; // nur von 0 - 8
         for(int i = 0; i < 8; i++)
         {
             if(i < msg.GetCanLength())
@@ -127,5 +128,7 @@ void saveNewCanMessage(Canmsg const& msg)
             str += "\nIst die Speicherkarte noch eingesteckt?";
             scom.printError(str);
         }
+        return result;
     }
+    return false;
 }

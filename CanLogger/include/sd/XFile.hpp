@@ -8,6 +8,7 @@ class XFile
 {
 public:
     static const String LINE_FEED;
+    
 protected:
     SdFat& sdCard;
     File orgFile;
