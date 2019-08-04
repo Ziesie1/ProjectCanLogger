@@ -35,6 +35,12 @@ public:
     void unselectButton();
     void drawArrow();
     void deleteArrow();
+    uint16_t getPosX();
+    uint16_t getSizeX();
+    uint16_t getPosY();
+    uint16_t getSizeY();
+    
+
 };
 
 

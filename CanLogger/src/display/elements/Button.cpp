@@ -87,3 +87,19 @@ void Button::drawArrow()
         }
     }
 }
+uint16_t Button::getPosX()
+{
+    return this->startX;
+}
+uint16_t Button::getSizeX()
+{
+    return this->sizeX;
+}
+uint16_t Button::getPosY()
+{
+    return this->startY;
+}
+uint16_t Button::getSizeY()
+{
+    return this->sizeY;
+}
