@@ -13,14 +13,17 @@ class Textzeile
     const Color COLOR_BACKGROUND_SELECTED = RED100;
     const Color COLOR_BACKGROUND_UNSELECTED = WHITE;
     const Color COLOR_FONT = BLACK;
-    const uint8_t ZEILENHOEHE = 20;
-    const uint8_t OFFSETX1 = 5;
-    const uint8_t OFFSETX2 = 31; //OFFSET1+2Zeichen(16Pixel)+Abstand von 10 Pixeln
-    const uint8_t OFFSETX3 = 73; //OFFSEZ2+4Zeichen(32 Pixel)+Abstand von 10 Pixeln
+    uint8_t offsetXSpalte1; 
+    uint8_t offsetXSpalte2;   
+    uint8_t offsetXHeadline1;
+    uint8_t offsetXHeadline2;
+    uint8_t offsetXHeadline3;
+    uint8_t zeilenhoehe;
+
 
 
     public:
-    Textzeile(ILI9341& display, Canmsg msg, bool isSelected);
+    Textzeile(ILI9341& display, Canmsg msg, bool isSelected, uint8_t offsetXSpalte1, uint8_t offsetXSpalte2, uint8_t offsetHeadline1,uint8_t offsetHeadline2,uint8_t offsetHeadline3,uint8_t zeilenhoehe);
     void printImportantContent(uint8_t posY);
     void printWholeContent();
     void selectZeile();

@@ -8,7 +8,7 @@ Table::Table(ILI9341& display, String kopfzeile, Canmsg canMessages[], int anzah
     //Ausgabenachrichten-Array wird erzeugt
     for(int idx = 0;idx<this->anzahlNachrichten;idx++)
     {
-        nachrichten[idx] = new Textzeile(this->display,canMessages[idx],false);
+        nachrichten[idx] = new Textzeile(this->display,canMessages[idx],false,this->OFFSETX_SPALTE1,this->OFFSETX_SPALTE2,this->OFFSETX_HEADLINE1,this->OFFSETX_HEADLINE2,this->OFFSETX_HEADLINE3,this->ZEILENHOEHE);
     }
 
     drawTableLines();
@@ -28,8 +28,8 @@ Table::~Table()
 
 void Table::drawTableLines()
 {
-    this->display.drawVerticalLine(this->OFFSETX_SPALTE1,this->OFFSETY_SPALTENNAMEN,320,this->COLOR_TABLE_LINES);
-    this->display.drawVerticalLine(this->OFFSETX_SPALTE2,this->OFFSETY_SPALTENNAMEN,320,this->COLOR_TABLE_LINES);
+    this->display.drawVerticalLine(this->OFFSETX_SPALTE1,this->OFFSETY_KOPFZEILE,this->DISPLAY_Y,this->COLOR_TABLE_LINES);
+    this->display.drawVerticalLine(this->OFFSETX_SPALTE2,this->OFFSETY_KOPFZEILE,this->DISPLAY_Y,this->COLOR_TABLE_LINES);
     this->display.drawHorizontalLine(0,240,this->OFFSETY_SPALTENNAMEN,this->COLOR_TABLE_LINES);
     
 }
@@ -44,11 +44,11 @@ void Table::printHeadlines(String speicherPfad)
 
 void Table::printMessages()
 {
-    uint8_t posY = this->OFFSETY_SPALTENNAMEN+40;
+    uint8_t posY = this->OFFSETY_SPALTENNAMEN+2;
     for(int idx = 0;idx<this->anzahlNachrichten;idx++)
     {
         this->nachrichten[idx]->printImportantContent(posY);
-        posY = posY+20;
+        posY = posY+this->ZEILENHOEHE;
     }
     
 }
