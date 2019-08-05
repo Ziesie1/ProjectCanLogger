@@ -1,9 +1,12 @@
 #include "can/CanUtility.hpp"
-#include "can/Canmsg.hpp"
 #include "utilities/SerialCommunication.hpp"
 
 CAN_HandleTypeDef CanUtility_hcan;
 bool CanUtility_CanRecieveActive = false;
+
+Canmsg** CanUtility_bufferCanRecMessages;
+int CanUtility_bufferCanRecPointer;
+int CanUtility_discardedMessages = 0;
 
 /* 
 	function that initializes the GPIO-Pins for CAN peripherals
@@ -170,8 +173,13 @@ HAL_StatusTypeDef CanUtility_Init(CAN_SpeedTypedef speed)
 		utilities::scom.printDebug("CAN-Peripherie einsatzbereit");	
 	}
 	
-	Canmsg_bufferCanRecMessages = new Canmsg[Canmsg_CAN_BUFFER_REC_SIZE];
-	Canmsg_bufferCanRecPointer = 0;
+	CanUtility_bufferCanRecMessages = new Canmsg*[CanUtility_CAN_BUFFER_REC_SIZE];
+	for(int i=0; i<CanUtility_CAN_BUFFER_REC_SIZE; i++)
+	{
+		CanUtility_bufferCanRecMessages[i] = nullptr;
+	}
+	CanUtility_bufferCanRecPointer = 0;
+	CanUtility_discardedMessages = 0;
 	
 	return HAL_OK;
 }
@@ -193,10 +201,14 @@ HAL_StatusTypeDef CanUtility_DeInit(void)
 		utilities::scom.printError(s); 
 		return HAL_ERROR;
 	}
-	
-	delete[] Canmsg_bufferCanRecMessages;
-	Canmsg_bufferCanRecMessages = nullptr;
-	Canmsg_bufferCanRecPointer = 0;
+	for(int i=0; i<CanUtility_CAN_BUFFER_REC_SIZE; i++)
+	{
+		delete CanUtility_bufferCanRecMessages[i];
+		CanUtility_bufferCanRecMessages[i] = nullptr;
+	}
+	delete[] CanUtility_bufferCanRecMessages;
+	CanUtility_bufferCanRecMessages = nullptr;
+	CanUtility_bufferCanRecPointer = 0;
 	
 	utilities::scom.printDebug("CAN-Baustein deinitialisiert");
 	return HAL_OK;
@@ -210,17 +222,21 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
 	if(HAL_CAN_GetRxFifoFillLevel(&CanUtility_hcan, 0) != 0)
 	{		
-		Canmsg recMessage;
-		recMessage.Recieve(0);
-		if(Canmsg_bufferCanRecPointer < Canmsg_CAN_BUFFER_REC_SIZE)
+		if(CanUtility_bufferCanRecPointer < CanUtility_CAN_BUFFER_REC_SIZE)
 		{
-			Canmsg_bufferCanRecMessages[Canmsg_bufferCanRecPointer] = std::move(recMessage);
-			Canmsg_bufferCanRecPointer++;
+			if(CanUtility_bufferCanRecMessages[CanUtility_bufferCanRecPointer])
+			{
+				delete CanUtility_bufferCanRecMessages[CanUtility_bufferCanRecPointer];
+			}
+			CanUtility_bufferCanRecMessages[CanUtility_bufferCanRecPointer] = new Canmsg{true};
+			CanUtility_RecieveMessage(0, CanUtility_bufferCanRecMessages[CanUtility_bufferCanRecPointer]);
+			CanUtility_bufferCanRecPointer++;
 		}
 		else
 		{
 			/* Nachricht wird verworfen */
-			utilities::scom.printError("Nachricht verworfen");
+			SET_BIT(hcan->Instance->RF0R, CAN_RF0R_RFOM0);
+    		CanUtility_discardedMessages++;
 		}
 	}
 }
@@ -296,3 +312,86 @@ HAL_StatusTypeDef CanUtility_DissableRecieve(void)
 		return HAL_OK;
 	}
 }
+
+
+/*
+    copies the values of a CAN-message in the recieve FIFO into an instanse of Canmsg
+    releases CAN-message from FIFO after the copy process
+    Input:  fifo  	- specifies the FIFO that the message is pending in 
+			msg		- pointer to a Canmsg object, the message should be stored in
+*/
+HAL_StatusTypeDef CanUtility_RecieveMessage(bool const fifo, Canmsg * msg)
+{
+	if(HAL_CAN_GetRxFifoFillLevel(&CanUtility_hcan, fifo) != 0 && msg)
+    {
+	    CAN_RxHeaderTypeDef header;
+        if(HAL_CAN_GetRxMessage(&CanUtility_hcan, fifo, &header, msg->data) == HAL_OK)
+        {
+            msg->stdIdentifier = header.StdId;
+            msg->extIdentifier = header.ExtId;
+            msg->isExtIdentifier = header.IDE;
+            msg->rtr = header.RTR;
+            msg->time = header.Timestamp;
+            msg->canLength = header.DLC;
+			return HAL_OK;
+		}
+        else
+        {
+			return HAL_ERROR;
+        }
+    }
+	return HAL_ERROR;
+}
+
+/*
+    sends the message via tx-mailbox 0
+    Input:	pointer to the message that is about to be send
+	return: HAL_OK		- everything is working as it is supposed to be
+			      HAL_ERROR	- an error occured while activating the peripherals, 
+						            check if the Peripherals are allready initialized
+						            or refer to CanUtility_hcan->ErrorCode
+*/
+HAL_StatusTypeDef CanUtility_SendMessage(Canmsg *const msg)
+{
+	if(msg)
+	{
+		if(HAL_CAN_GetTxMailboxesFreeLevel(&CanUtility_hcan) != 0)
+		{
+			CAN_TxHeaderTypeDef header;
+			if(!msg->isExtIdentifier)
+    		{
+    		  	header.IDE = CAN_ID_STD;
+    		}
+    		else
+    		{
+      			header.IDE = CAN_ID_EXT;
+    		}
+    		header.StdId = msg->stdIdentifier;
+    		header.ExtId = (msg->stdIdentifier<<18)|msg->extIdentifier;
+    		if(!msg->rtr)
+    		{
+      			header.RTR = CAN_RTR_DATA;
+    		}
+    		else
+    		{
+      			header.RTR = CAN_RTR_REMOTE;
+    		}
+			header.DLC = msg->canLength;
+			header.TransmitGlobalTime = DISABLE;
+			uint8_t data[8];
+			for(uint8_t i=0; i<header.DLC; i++)
+			{
+				data[i] = msg->data[i];
+			}
+			uint32_t mailbox = 0;
+			return HAL_CAN_AddTxMessage(&CanUtility_hcan, &header, data, &mailbox);
+		}
+  		else
+  		{
+    		utilities::scom.printError("CAN-Nachricht konnte nicht gesendet werden(Alle TX Mailboxen belegt).");
+   			return HAL_ERROR;
+  		}
+	}
+	return HAL_ERROR;
+}
+

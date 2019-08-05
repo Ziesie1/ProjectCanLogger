@@ -7,8 +7,8 @@
 //extern:
 int screenBufferFillLevel = 0;
 int screenBufferUserViewFillLevel = 0;
-Canmsg* screenBuffer = nullptr;
-Canmsg* screenBufferUserView = nullptr;
+Canmsg** screenBuffer = nullptr;
+Canmsg** screenBufferUserView = nullptr;
 bool updateUserView = false;
 
 //intern:
@@ -19,10 +19,16 @@ bool CanUtility_CanRecieveActive_lastStatus = false;
 */
 void screenBufferInit(void)
 {
-  screenBuffer = new Canmsg[SCREEN_BUFFER_SIZE];
-  screenBufferUserView = new Canmsg[SCREEN_BUFFER_SIZE];
+  screenBuffer = new Canmsg*[SCREEN_BUFFER_SIZE];
+  screenBufferUserView = new Canmsg*[SCREEN_BUFFER_SIZE];
+  for(int i=0; i<SCREEN_BUFFER_SIZE; i++)
+  {
+    screenBuffer[i] = nullptr;
+    screenBufferUserView[i] = nullptr;
+  }
   screenBufferFillLevel = 0;
   screenBufferUserViewFillLevel = 0;
+  updateUserView = false;
 }
 
 /*
@@ -30,12 +36,35 @@ void screenBufferInit(void)
 */
 void screenBufferDeinit(void)
 {
+  if(screenBuffer)
+  {
+    for(int i=0; i<SCREEN_BUFFER_SIZE; i++)
+    {
+      if(screenBuffer[i])
+      {
+        delete screenBuffer[i];
+      }
+    }
     delete[] screenBuffer;
     screenBuffer = nullptr;
     screenBufferFillLevel = 0;
+  }
+
+  if(screenBufferUserView)
+  {
+    for(int i=0; i<SCREEN_BUFFER_SIZE; i++)
+    {
+      if(screenBufferUserView[i])
+      {
+        delete screenBufferUserView[i];
+      }
+    }
     delete[] screenBufferUserView;
     screenBufferUserView = nullptr;
     screenBufferUserViewFillLevel = 0;
+  }
+
+  updateUserView = false;
 }
 
 /* 
@@ -59,17 +88,20 @@ void printScreenBufferSerial(void)
   utilities::scom.printDebug(s);
   for(int i=0; i<screenBufferFillLevel; i++)
   {
-    s = "Nachricht ";
-    if((i+1)<10)
+    if(screenBuffer[i])
     {
-      s += " ";
+      s = "Nachricht ";
+      if((i+1)<10)
+      {
+        s += " ";
+      }
+      s += String(i+1, DEC);
+      s += "/";
+      s += String(screenBufferFillLevel, DEC);
+      s += ": ";
+      s += static_cast<String>(*screenBuffer[i]);
+      utilities::scom.printDebug(s);
     }
-    s += String(i+1, DEC);
-    s += "/";
-    s += String(screenBufferFillLevel, DEC);
-    s += ": ";
-    s += static_cast<String>(screenBuffer[i]);
-    utilities::scom.printDebug(s);
   }
   utilities::scom.printDebug("");
 }
@@ -86,17 +118,20 @@ void printScreenBufferUserViewSerial(void)
   utilities::scom.printDebug(s);
   for(int i=0; i<screenBufferUserViewFillLevel; i++)
   {
-    s = "Nachricht ";
-    if((i+1)<10)
+    if(screenBufferUserView[i])
     {
-      s += " ";
+      s = "Nachricht ";
+      if((i+1)<10)
+      {
+        s += " ";
+      }
+      s += String(i+1, DEC);
+      s += "/";
+      s += String(screenBufferUserViewFillLevel, DEC);
+      s += ": ";
+      s += static_cast<String>(*screenBufferUserView[i]);
+      utilities::scom.printDebug(s);
     }
-    s += String(i+1, DEC);
-    s += "/";
-    s += String(screenBufferUserViewFillLevel, DEC);
-    s += ": ";
-    s += static_cast<String>(screenBufferUserView[i]);
-    utilities::scom.printDebug(s);
   }
   utilities::scom.printDebug("");
 }
@@ -116,12 +151,17 @@ void insertMessageHere(Canmsg const& msg, int pos)
     {
       screenBufferFillLevel = SCREEN_BUFFER_SIZE-1;
     }
-    screenBuffer[screenBufferFillLevel] = msg;
+    if(screenBuffer[screenBufferFillLevel])
+    {
+      delete screenBuffer[screenBufferFillLevel];
+    }
+    screenBuffer[screenBufferFillLevel] = new Canmsg{msg};
     for(int i=screenBufferFillLevel; i>pos; i--)
     {
-      Canmsg temp = std::move(screenBuffer[i]); 
-      screenBuffer[i] = std::move(screenBuffer[i-1]);
-      screenBuffer[i-1] = std::move(temp);
+      Canmsg* temp = screenBuffer[i]; 
+      screenBuffer[i] = screenBuffer[i-1];
+      screenBuffer[i-1] = temp;
+      temp = nullptr;
     }
     if(screenBufferFillLevel < SCREEN_BUFFER_SIZE)
     {
@@ -140,14 +180,18 @@ void sortCanMessageIntoBuffer(Canmsg const& msg)
   {
     if(!msg.GetIsExtIdentifier())
     {
-      if(!screenBuffer[i].GetIsExtIdentifier())
+      if(!(*screenBuffer[i]).GetIsExtIdentifier())
       {
-        if(msg.GetStdIdentifier() == screenBuffer[i].GetStdIdentifier())
+        if(msg.GetStdIdentifier() == (*screenBuffer[i]).GetStdIdentifier())
         {
-          screenBuffer[i] = msg;
+          if(screenBuffer[i])
+          {
+            delete screenBuffer[i];
+          }
+          screenBuffer[i] = new Canmsg{msg};
           messageInserted = true;
         }
-        else if(msg.GetStdIdentifier() < screenBuffer[i].GetStdIdentifier())
+        else if(msg.GetStdIdentifier() < (*screenBuffer[i]).GetStdIdentifier())
         {
           insertMessageHere(msg, i);
           messageInserted = true;
@@ -161,22 +205,26 @@ void sortCanMessageIntoBuffer(Canmsg const& msg)
     }
     else
     {
-      if(screenBuffer[i].GetIsExtIdentifier())
+      if((*screenBuffer[i]).GetIsExtIdentifier())
       {
-        if(msg.GetStdIdentifier() == screenBuffer[i].GetStdIdentifier())
+        if(msg.GetStdIdentifier() == (*screenBuffer[i]).GetStdIdentifier())
         {
-          if(msg.GetExtIdentifier() == screenBuffer[i].GetExtIdentifier())
+          if(msg.GetExtIdentifier() == (*screenBuffer[i]).GetExtIdentifier())
           {
-            screenBuffer[i] = msg;
+            if(screenBuffer[i])
+            {
+              delete screenBuffer[i];
+            }
+            screenBuffer[i] = new Canmsg{msg};
             messageInserted = true;
           }
-          else if(msg.GetExtIdentifier() < screenBuffer[i].GetExtIdentifier())
+          else if(msg.GetExtIdentifier() < (*screenBuffer[i]).GetExtIdentifier())
           {
             insertMessageHere(msg, i);
             messageInserted = true;
           }
         }
-        else if(msg.GetStdIdentifier() < screenBuffer[i].GetStdIdentifier())
+        else if(msg.GetStdIdentifier() < (*screenBuffer[i]).GetStdIdentifier())
         {
           insertMessageHere(msg, i);
           messageInserted = true;
@@ -186,7 +234,11 @@ void sortCanMessageIntoBuffer(Canmsg const& msg)
   }
   if((screenBufferFillLevel < SCREEN_BUFFER_SIZE) && !messageInserted)
   {
-    screenBuffer[screenBufferFillLevel] = msg;
+    if(screenBuffer[screenBufferFillLevel])
+    {
+      delete screenBuffer[screenBufferFillLevel];
+    }
+    screenBuffer[screenBufferFillLevel] = new Canmsg{msg};
     screenBufferFillLevel++;
   }
 }
@@ -198,9 +250,13 @@ void makeBufferVisible(void)
 {
   for(int i=0; i<screenBufferFillLevel; i++)
   {
-    if(screenBufferUserView[i] != screenBuffer[i])
+    if(!screenBufferUserView[i])
     {
-      screenBufferUserView[i] = screenBuffer[i];
+      screenBufferUserView[i] = new Canmsg{*screenBuffer[i]};
+    }
+    else if(*(screenBufferUserView[i]) != *(screenBuffer[i]))
+    {
+      *(screenBufferUserView[i]) = *(screenBuffer[i]);
     }
   }
   screenBufferUserViewFillLevel = screenBufferFillLevel;
@@ -215,19 +271,20 @@ void loopScreenBuffer(void)
   {
     CanUtility_CanRecieveActive_lastStatus = true;
 
-    while(Canmsg_bufferCanRecPointer > 0)
+    while(CanUtility_bufferCanRecPointer > 0)
     {
-      Canmsg_bufferCanRecPointer--;
+      CanUtility_bufferCanRecPointer--;
 
       // um die Nachrichten in der Reihenfolge abzuarbeiten, in der sie empfangen wurden
-      Canmsg curMsg = std::move(Canmsg_bufferCanRecMessages[0]);
-      for(int i=0; i<Canmsg_bufferCanRecPointer; i++)
+      Canmsg* curMsg = CanUtility_bufferCanRecMessages[0];
+      for(int i=0; i<CanUtility_bufferCanRecPointer; i++)
       {
-        Canmsg_bufferCanRecMessages[i] = std::move(Canmsg_bufferCanRecMessages[i+1]);
+        CanUtility_bufferCanRecMessages[i] = CanUtility_bufferCanRecMessages[i+1];
       }
-  
+      CanUtility_bufferCanRecMessages[CanUtility_bufferCanRecPointer] = nullptr;
+
       //screenBuffer:
-      sortCanMessageIntoBuffer(curMsg);
+      sortCanMessageIntoBuffer(*curMsg);
 
       //SD-Card:
 
@@ -235,13 +292,22 @@ void loopScreenBuffer(void)
 
       //loopback:
       /*
-      curMsg.Send();
+      CanUtility_SendMessage(curMsg);
       */
-
+      
       //Serial:
 
       String s = "Empfangene Nachricht: ";
-      s += static_cast<String>(curMsg);
+      s += static_cast<String>(*curMsg);
+      utilities::scom.printDebug(s);
+      
+      //free space
+      delete curMsg;
+    }
+    if(CanUtility_discardedMessages>0)
+    {
+      String s = "Anzahl verworfener Nachrichten: ";
+      s += String(CanUtility_discardedMessages, DEC);
       utilities::scom.printDebug(s);
     }
   }

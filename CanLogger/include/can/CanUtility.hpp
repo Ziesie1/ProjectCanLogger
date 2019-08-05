@@ -3,6 +3,7 @@
 #define CANUTILITY_HPP
 
 #include <Arduino.h>
+#include "can/Canmsg.hpp"
 
 typedef enum
 {
@@ -19,8 +20,15 @@ HAL_StatusTypeDef CanUtility_Init(CAN_SpeedTypedef speed);
 HAL_StatusTypeDef CanUtility_DeInit(void);
 HAL_StatusTypeDef CanUtility_EnableRecieve(void);
 HAL_StatusTypeDef CanUtility_DissableRecieve(void);
+HAL_StatusTypeDef CanUtility_RecieveMessage(bool const fifo, Canmsg *const msg);
+HAL_StatusTypeDef CanUtility_SendMessage(Canmsg *const msg);
 
 extern CAN_HandleTypeDef CanUtility_hcan;
 extern bool CanUtility_CanRecieveActive;
+
+constexpr int CanUtility_CAN_BUFFER_REC_SIZE = 50;
+extern Canmsg** CanUtility_bufferCanRecMessages;
+extern int CanUtility_bufferCanRecPointer;
+extern int CanUtility_discardedMessages;
 
 #endif //CANUTILITY

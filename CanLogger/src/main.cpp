@@ -28,6 +28,7 @@ void setup() {
   initEncoder();
   initTaster();
   screenBufferInit();
+  updateUserView = true;
   display.init();
 
   if((CanUtility_Init(CAN_500_KBIT) != HAL_OK) || (CanUtility_EnableRecieve() != HAL_OK))

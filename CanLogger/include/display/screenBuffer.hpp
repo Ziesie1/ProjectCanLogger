@@ -24,7 +24,7 @@ void loopScreenBuffer(void);
 constexpr int SCREEN_BUFFER_SIZE = 10;
 extern int screenBufferFillLevel;
 extern int screenBufferUserViewFillLevel;
-extern Canmsg* screenBuffer;
-extern Canmsg* screenBufferUserView;
+extern Canmsg** screenBuffer;
+extern Canmsg** screenBufferUserView;
 
 #endif //SCREENBUFFER_HPP
