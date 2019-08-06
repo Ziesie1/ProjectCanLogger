@@ -12,7 +12,7 @@ class LogPage : public DisplayPage
 protected:
     ILI9341& display;
     bool statusSD;
-    Table* logTable;
+    Table* logTable = nullptr;
     
 public:
     LogPage(ILI9341& display, bool statusSD);

@@ -17,8 +17,8 @@ LogPage::~LogPage()
 {
   if(this->logTable)
   {
-    //delete this->logTable;
-    //this->logTable = nullptr;
+    delete this->logTable;
+    this->logTable = nullptr;
     /*
     Der Destruktor Aufruf muss noch angepasst werden, da dieser im Moment noch dazu führt, dass sich das Programm
     aufhängt

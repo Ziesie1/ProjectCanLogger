@@ -20,7 +20,16 @@ Table::~Table()
 {
     if(this->nachrichten)
     {
-        delete this->nachrichten;
+        for(int idx=0;idx<this->anzahlNachrichten;idx++)
+        {
+            if(this->nachrichten[idx])
+            {
+                delete this->nachrichten[idx];
+                this->nachrichten[idx] = nullptr;
+            }
+            
+        }
+        delete[] this->nachrichten;
         this->nachrichten = nullptr;
     }
     

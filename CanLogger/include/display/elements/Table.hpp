@@ -27,7 +27,7 @@ class Table
     const String HEADLINE_SPALTE3 = "Data";
 
     String kopfzeile;
-    Textzeile** nachrichten;
+    Textzeile** nachrichten = nullptr;
     int anzahlNachrichten;
 
 
