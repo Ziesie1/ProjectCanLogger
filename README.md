@@ -79,10 +79,10 @@ Programmiert wird in der Entwicklungsumgebung [Microsoft Visual Studio Code](htt
 
 |CAN-Controller| Bord-Pin   | Morpho     |
 | :----------- | :--------  | :--------  |
-| TXD          | CN10\|5    | PC9        |
+| TXD          | CN10\|5    | PB9        |
 | GND          | GND        | GND        |
 | VCC          | VCC        | VCC        |
-| RXD          | CN10\|3    | PC8        |
+| RXD          | CN10\|3    | PB8        |
 | RS           | -----------|------------|
 | CANH         |*CAN-SOCKED*|*CAN-SOCKED*|
 | CANL         |*CAN-SOCKED*|*CAN-SOCKED*|
