@@ -17,6 +17,7 @@ public:
 	static constexpr uint16_t maxTime = 0xffff;
 	static constexpr uint16_t maxStdId = 0x7ff;
 	static constexpr uint32_t maxExtId = 0x3ffff;
+	static constexpr uint32_t maxFullId = 0x1fffffff;
 	static constexpr uint8_t maxDataVal = 0xff;
 
 private:

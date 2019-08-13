@@ -3,6 +3,8 @@
 #include "utilities/utilities.hpp"
 #include "utilities/SerialCommunication.hpp"
 
+int messagesWithNew = 0;
+
 /*
     creates a default CAN-message used e.g. in tests 
 */
@@ -19,6 +21,7 @@ Canmsg::Canmsg()
 */
 Canmsg::Canmsg(bool const empty)
 {
+  messagesWithNew++;
   this->data = new uint8_t[this->maxLength];
   this->canLength = 0;
 }
@@ -122,6 +125,7 @@ Canmsg::Canmsg(uint16_t stdId, uint32_t extId, bool isExtId, bool rtr, uint16_t 
 			    uint8_t databit5, uint8_t databit6, uint8_t databit7)
   :isExtIdentifier{isExtId}, rtr{rtr}, time{time}
 {
+    messagesWithNew ++;
     if(stdId <= maxStdId)
     {
         this->stdIdentifier = stdId;
@@ -191,6 +195,7 @@ void Canmsg::moveDestroy(void)
 */
 Canmsg::~Canmsg()
 {
+  messagesWithNew--;
   this->destroy();
 }
 
@@ -201,6 +206,7 @@ Canmsg::~Canmsg()
 */
 Canmsg::Canmsg(Canmsg const& other)
 {
+    messagesWithNew++;
     *this = other;
 }
 
@@ -232,6 +238,7 @@ Canmsg& Canmsg::operator= (Canmsg const& other)
 */
 Canmsg::Canmsg(Canmsg && other)
 {
+  messagesWithNew++;
   (*this) = std::move(other);
 }
 
@@ -332,6 +339,10 @@ bool Canmsg::operator==(Canmsg const& other) const
     return false;
   }
   if(this->rtr!=other.rtr)
+  {
+    return false;
+  }
+  if(this->time!=other.time)
   {
     return false;
   }

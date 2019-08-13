@@ -11,6 +11,9 @@
 #include "display/screenBuffer.hpp"
 #include "utilities/utilities.hpp"
 
+//#define CUSTOMINTERRUPTCHECK
+#include "utilities/interruptcheck.hpp"
+
 
 using namespace utilities; // für scom
 
@@ -28,7 +31,7 @@ void setup() {
   initEncoder();
   initTaster();
   screenBufferInit();
-  updateUserView = true;
+  screenBuffer_enableUpdate();
   display.init();
 
   if((CanUtility_Init(CAN_500_KBIT) != HAL_OK) || (CanUtility_EnableRecieve() != HAL_OK))
@@ -43,11 +46,21 @@ void setup() {
   scom << "CanLogger ist Initialisiert" << endz;
 }
 
-
 void loop() {
   loopTaster();
   pageManager.loop();
   loopScreenBuffer();
+  if(screenBuffer_hasSomethingChanged())
+  {
+    for(int i=0; i<screenBuffer_getFillLevel(); i++)
+    {
+      if(screenBuffer_hasThisMessageChanged(i))
+      {
+        Canmsg const* temp = screenBuffer_getMessageAtPosition(i);
+        utilities::scom.printDebug("                      "+static_cast<String>(*temp));
+      }
+    }
+  }
 }
 
 void serialEvent() {
@@ -64,6 +77,3 @@ void serialEvent() {
   }
   
 }
-
-
-
