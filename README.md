@@ -83,10 +83,10 @@ Programmiert wird in der Entwicklungsumgebung [Microsoft Visual Studio Code](htt
 | GND          | GND        | GND        |
 | VCC          | VCC        | VCC        |
 | RXD          | CN10\|3    | PB8        |
-| RS           | -----------|------------|
+| RS           | NC         | NC         |
 | CANH         |*CAN-SOCKED*|*CAN-SOCKED*|
 | CANL         |*CAN-SOCKED*|*CAN-SOCKED*|
-| Vref         |------------|------------|
+| Vref         | NC         | NC         |
 
 
 <a name="QandH"></a>
