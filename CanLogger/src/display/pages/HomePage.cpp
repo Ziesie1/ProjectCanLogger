@@ -13,7 +13,9 @@ extern DisplayPageManager pageManager; // verweißt auf das Objekt in Main
 HomePage::HomePage(ILI9341& display)
     :display{display}
 {
-    
+    this->buttonColorDefault = this->display.makeColor(1,64,118);
+    this->buttonColorSelected = this->display.makeColor(237,125,49);
+    this->colorArrowSelected = this->display.makeColor(237,125,49);
 }
 
 HomePage::~HomePage()
@@ -53,7 +55,7 @@ void HomePage::loop()
         if(getEncoderPos() == 0)
         {
             this->buttonNichtSpeichern->selectButton();
-            this->pfeilNichtSpeichern->draw(this->COLOR_ARROW_SELECTED);
+            this->pfeilNichtSpeichern->draw(this->colorArrowSelected);
             this->buttonSpeichern->unselectButton();
             this->pfeilSpeichern->draw(this->COLOR_ARROW_UNSELECTED);
         }
@@ -62,7 +64,7 @@ void HomePage::loop()
             this->buttonNichtSpeichern->unselectButton();
             this->pfeilNichtSpeichern->draw(this->COLOR_ARROW_UNSELECTED);
             this->buttonSpeichern->selectButton();
-            this->pfeilSpeichern->draw(this->COLOR_ARROW_SELECTED);
+            this->pfeilSpeichern->draw(this->colorArrowSelected);
         }
         if(getEncoderPos() > 1)
         {
@@ -85,11 +87,11 @@ void HomePage::startView()
     uint16_t ymitte = ILI9341::VERTICAL_MAX/2;
     uint16_t xmitte = ILI9341::HORIZONTAL_MAX/2;
 
-    this->display.drawBmp(xmitte-OSTFALIA_LOGO_SIZE_X/2, IMAGE_DST_Y, OSTFALIA_LOGO_SIZE_X, OSTFALIA_LOGO_SIZE_Y, OSTFALIA_LOGO, 1);
+    this->display.drawBmp(xmitte-OSTFALIA_LOGO_SIZE_X/2, IMAGE_DST_Y+25, OSTFALIA_LOGO_SIZE_X, OSTFALIA_LOGO_SIZE_Y, OSTFALIA_LOGO, 1);
 
-    this->buttonNichtSpeichern = new Button{this->display, xmitte-this->BUTTON_WIDTH/2,ymitte-this->BUTTON_MID_DIST-this->BUTTON_HIGH+this->BUTTON_Y_AXE_OFFSET,this->BUTTON_WIDTH,this->BUTTON_HIGH,this->BUTTON_COLOR_DEFAULT,this->BUTTON_TEXT_DST_X,this->BUTTON_TEXT_DST_Y,"Logging - ohne Speichern",this->BUTTON_COLOR_TEXT,true};
-    this->buttonSpeichern = new Button{this->display, xmitte-this->BUTTON_WIDTH/2,ymitte+this->BUTTON_MID_DIST+this->BUTTON_Y_AXE_OFFSET,this->BUTTON_WIDTH,this->BUTTON_HIGH,this->BUTTON_COLOR_DEFAULT,this->BUTTON_TEXT_DST_X,this->BUTTON_TEXT_DST_Y,"Logging - mit Speichern",this->BUTTON_COLOR_TEXT,false};
-    this->pfeilNichtSpeichern = new Arrow{this->display,this->buttonNichtSpeichern,true};
-    this->pfeilSpeichern = new Arrow{this->display,this->buttonSpeichern,false};
+    this->buttonNichtSpeichern = new Button{this->display, xmitte-this->BUTTON_WIDTH/2,ymitte-this->BUTTON_MID_DIST-this->BUTTON_HIGH+this->BUTTON_Y_AXE_OFFSET,this->BUTTON_WIDTH,this->BUTTON_HIGH,this->buttonColorDefault,this->BUTTON_TEXT_DST_X,this->BUTTON_TEXT_DST_Y,"Logging - ohne Speichern",this->BUTTON_COLOR_TEXT,true};
+    this->buttonSpeichern = new Button{this->display, xmitte-this->BUTTON_WIDTH/2,ymitte+this->BUTTON_MID_DIST+this->BUTTON_Y_AXE_OFFSET,this->BUTTON_WIDTH,this->BUTTON_HIGH,this->buttonColorDefault,this->BUTTON_TEXT_DST_X,this->BUTTON_TEXT_DST_Y,"Logging - mit Speichern",this->BUTTON_COLOR_TEXT,false};
+    this->pfeilNichtSpeichern = new Arrow{this->display,this->buttonNichtSpeichern,this->colorArrowSelected,this->COLOR_ARROW_UNSELECTED,true};
+    this->pfeilSpeichern = new Arrow{this->display,this->buttonSpeichern,this->colorArrowSelected,this->COLOR_ARROW_UNSELECTED,false};
 
 }

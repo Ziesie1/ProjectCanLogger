@@ -15,10 +15,11 @@ protected:
     const uint16_t BUTTON_Y_AXE_OFFSET = 80;
     const uint16_t BUTTON_TEXT_DST_X = 5;
     const uint16_t BUTTON_TEXT_DST_Y = 8;
-    const Color BUTTON_COLOR_DEFAULT = BLUE100;
-    const Color BUTTON_COLOR_TEXT = WHITE;
-    const Color COLOR_ARROW_SELECTED = BLACK;
-    const Color COLOR_ARROW_UNSELECTED = WHITE;
+    unsigned long buttonColorDefault;
+    unsigned long buttonColorSelected;
+    const unsigned long BUTTON_COLOR_TEXT = WHITE;
+    unsigned long colorArrowSelected;
+    const unsigned long COLOR_ARROW_UNSELECTED = WHITE;
     const uint16_t IMAGE_DST_Y = 15;
 
     ILI9341& display;

@@ -1,19 +1,20 @@
 #include "display/elements/Arrow.hpp"
 
-Arrow::Arrow(ILI9341& display, Button* button,bool isSelecetd)
-    :display{display},button{button},isSelected{isSelected}
+Arrow::Arrow(ILI9341& display, Button* button, unsigned long colorSelected, unsigned long colorUnselected,bool isSelecetd)
+    :display{display},button{button},colorArrowSelected{colorSelected},colorArrowUnselected{colorUnselected},isSelected{isSelected}
 {
     setPositions();
     if(isSelecetd)
     {
-        draw(this->COLOR_ARROW_SELECTED);
+        draw(this->colorArrowSelected);
     }
 }
 
-void Arrow::draw(Color Farbe)
+void Arrow::draw(unsigned long Farbe)
 {
-    this->display.drawLine(this->posX1,this->posY1,this->posX3,this->posY3,Farbe);
-    this->display.drawLine(this->posX2,this->posY2,this->posX3,this->posY3,Farbe);
+    //this->display.drawLine(this->posX1,this->posY1,this->posX3,this->posY3,Farbe);
+    //this->display.drawLine(this->posX2,this->posY2,this->posX3,this->posY3,Farbe);
+    this->display.printString(posX1,posX2,">",Farbe,WHITE,1);
 }
 
 void Arrow::setPositions()

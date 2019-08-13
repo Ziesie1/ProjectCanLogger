@@ -16,14 +16,14 @@ class Arrow
     long posX3; //Spitze
     long posY3; //Spitze
     bool isSelected;
-    const Color COLOR_ARROW_SELECTED = BLACK;
-    const Color COLOR_ARROW_UNSELECTED = WHITE;
+    unsigned long colorArrowSelected;
+    unsigned long colorArrowUnselected;
     
 
 
     public:
-    Arrow(ILI9341& display,Button* button,bool isSelected);
-    void draw(Color Farbe);
+    Arrow(ILI9341& display,Button* button, unsigned long colorSelected, unsigned long colorUnselected,bool isSelected);
+    void draw(unsigned long Farbe);
     void setPositions();
 };
 

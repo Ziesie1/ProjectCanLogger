@@ -2,10 +2,13 @@
 
 
 Button::Button(ILI9341& display, uint16_t startX, uint16_t startY, uint16_t sizeX, 
-        uint16_t sizeY, Color backColor, byte offsetX, byte offsetY, string text, Color textColor,
+        uint16_t sizeY, unsigned long backColor, byte offsetX, byte offsetY, string text, unsigned long textColor,
         bool isSelected)
        :display{display}, startX{startX}, startY{startY}, sizeX{sizeX}, sizeY{sizeY}, backColor{backColor}, offsetX{offsetX}, offsetY{offsetY}, text{text}, textColor{textColor}, isSelected{false}
        {
+           this->colorFrameSelected = this->display.makeColor(237,125,49); //orange
+           this->colorFrameUnselected = this->display.makeColor(1,64,118); //blau
+           this->colorArrowSelected = this->display.makeColor(237,125,49); //orange
            drawButton();
            if(isSelected)
            {
@@ -28,7 +31,7 @@ bool Button::getStatus()
 void Button::selectButton()
 {
     this->isSelected = true;
-    this->display.drawEmptyRect(this->startX, this->startY, this->sizeX,this->sizeY,this->COLOR_FRAME_SELECTED,this->FRAME_WIDTH);
+    this->display.drawEmptyRect(this->startX, this->startY, this->sizeX,this->sizeY,this->colorFrameSelected,this->FRAME_WIDTH);
     
     //Darstellung des Pfeils
     //drawArrow();
@@ -37,7 +40,7 @@ void Button::selectButton()
 void Button::unselectButton()
 {
     this->isSelected = false;
-    this->display.drawEmptyRect(this->startX, this->startY, this->sizeX,this->sizeY,this->COLOR_FRAME_UNSELECTED,this->FRAME_WIDTH);
+    this->display.drawEmptyRect(this->startX, this->startY, this->sizeX,this->sizeY,this->colorFrameUnselected,this->FRAME_WIDTH);
     
     //Löschen des Pfeils
     //deleteArrow();
@@ -70,7 +73,7 @@ void Button::drawArrow()
     int y = this->startY+(this->sizeY/4);
     for(int x=2;x<this->startX;x++)
     {
-        this->display.drawOnePixel(x,y,this->COLOR_ARROW_SELECTED);
+        this->display.drawOnePixel(x,y,this->colorArrowSelected);
         if(x>2 && x%2 == 0)
         {
             y++;
@@ -80,7 +83,7 @@ void Button::drawArrow()
     y =this->startY+(this->sizeY)*3/4;
     for(int x=2;x<this->startX;x++)
     {
-        this->display.drawOnePixel(x,y,this->COLOR_ARROW_SELECTED);
+        this->display.drawOnePixel(x,y,this->colorArrowSelected);
         if(x>2 && x%2 == 0)
         {
             y--;
