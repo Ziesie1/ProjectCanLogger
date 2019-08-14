@@ -18,9 +18,9 @@ protected:
     string text;
     unsigned long textColor;
     bool isSelected;
-    unsigned long colorFrameSelected;
-    unsigned long colorFrameUnselected;
-    unsigned long colorArrowSelected;
+    const byte COLOR_FRAME_SELECTED[3] = {237,125,49};
+    const byte COLOR_FRAME_UNSELECTED[3] = {1,64,118};
+    const byte COLOR_ARROW_SELECTED[3] = {237,125,49};
     const unsigned long COLOR_ARROW_UNSELECTED = WHITE;
     const int FRAME_WIDTH = 3;
 

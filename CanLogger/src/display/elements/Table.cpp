@@ -45,10 +45,10 @@ void Table::drawTableLines()
 
 void Table::printHeadlines(String speicherPfad)
 {
-    this->display.printString(this->OFFSETX_HEADLINE_STORAGE,0,speicherPfad.c_str(),this->COLOR_WRITING,this->COLOR_BACKGROUND,1);
-    this->display.printString(this->OFFSETX_HEADLINE1,this->OFFSETY_KOPFZEILE,this->HEADLINE_SPALTE1.c_str(),this->COLOR_WRITING,this->COLOR_BACKGROUND,1);
-    this->display.printString(this->OFFSETX_HEADLINE2,this->OFFSETY_KOPFZEILE,this->HEADLINE_SPALTE2.c_str(),this->COLOR_WRITING,this->COLOR_BACKGROUND,1);
-    this->display.printString(this->OFFSETX_HEADLINE3,this->OFFSETY_KOPFZEILE,this->HEADLINE_SPALTE3.c_str(),this->COLOR_WRITING,this->COLOR_BACKGROUND,1);
+    this->display.printString(this->OFFSETX_HEADLINE_STORAGE,0,speicherPfad.c_str(),this->COLOR_WRITING_HEADER,this->display.makeColor(this->COLOR_BACKGROUND_HEADER[0],this->COLOR_BACKGROUND_HEADER[1],this->COLOR_BACKGROUND_HEADER[2]),1);
+    this->display.printString(this->OFFSETX_HEADLINE1,this->OFFSETY_KOPFZEILE,this->HEADLINE_SPALTE1.c_str(),this->COLOR_WRITING_HEADER,this->display.makeColor(this->COLOR_BACKGROUND_HEADER[0],this->COLOR_BACKGROUND_HEADER[1],this->COLOR_BACKGROUND_HEADER[2]),1);
+    this->display.printString(this->OFFSETX_HEADLINE2,this->OFFSETY_KOPFZEILE,this->HEADLINE_SPALTE2.c_str(),this->COLOR_WRITING_HEADER,this->display.makeColor(this->COLOR_BACKGROUND_HEADER[0],this->COLOR_BACKGROUND_HEADER[1],this->COLOR_BACKGROUND_HEADER[2]),1);
+    this->display.printString(this->OFFSETX_HEADLINE3,this->OFFSETY_KOPFZEILE,this->HEADLINE_SPALTE3.c_str(),this->COLOR_WRITING_HEADER,this->display.makeColor(this->COLOR_BACKGROUND_HEADER[0],this->COLOR_BACKGROUND_HEADER[1],this->COLOR_BACKGROUND_HEADER[2]),1);
 }
 
 void Table::printMessages()

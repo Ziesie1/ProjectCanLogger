@@ -12,22 +12,24 @@ void Textzeile::printImportantContent(uint8_t posY)
     if(this->message)
     {
 
-        //erste Spalte
+        //erste Spalte mit Begrenzung
         String s1 = String(this->message->GetStdIdentifier(),HEX);
         this->display.printString(this->offsetXHeadline1,posY,s1.c_str(),this->COLOR_FONT,this->COLOR_BACKGROUND_UNSELECTED);
+        //hier vertikale Linie zeichnen
 
-        //zweite Spalte
+        //zweite Spalte mit Begrenzung
         s1 = String(this->message->GetTime(),HEX);
         this->display.printString(this->offsetXHeadline2,posY,s1.c_str(),this->COLOR_FONT,this->COLOR_BACKGROUND_UNSELECTED);
+        //hier vertikale Linie zeichnen
 
-        //dritte Spalte
+        //dritte Spalte miz Begrenzung
         s1 = "";
         for(int i=0;i<this->message->GetCanLength();i++)
         {
             s1+=String(this->message->GetCanByte(i),HEX);
         }
         this->display.printString(this->offsetXSpalte2+4,posY,s1.c_str(),this->COLOR_FONT,this->COLOR_BACKGROUND_UNSELECTED);
-
+        //hier vertikale Linie zeichnen
     }
 }
 void Textzeile::printWholeContent()

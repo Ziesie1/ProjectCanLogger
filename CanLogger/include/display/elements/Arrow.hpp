@@ -15,9 +15,10 @@ class Arrow
     long posY2; //Anfang 2
     long posX3; //Spitze
     long posY3; //Spitze
-    bool isSelected;
     unsigned long colorArrowSelected;
     unsigned long colorArrowUnselected;
+    bool isSelected;
+    const uint8_t ARROWWIDTH = 1;
     
 
 

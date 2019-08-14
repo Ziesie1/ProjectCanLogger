@@ -19,9 +19,12 @@ class Table
     const uint8_t ZEILENHOEHE = 20; //Horizontale Linie
     const uint8_t DISPLAY_X = 240;
     const uint16_t DISPLAY_Y = 320;
-    const Color COLOR_TABLE_LINES = BLACK;
-    const Color COLOR_WRITING = BLACK;
-    const Color COLOR_BACKGROUND = WHITE;
+    const unsigned long COLOR_TABLE_LINES = BLACK;
+    const unsigned long COLOR_WRITING_HEADER = WHITE;
+    const unsigned long COLOR_WRITING_BODY_DEFAULT = BLACK;
+    const unsigned long COLOR_BACKGROUND_BODY = WHITE;
+    const byte COLOR_BACKGROUND_HEADER[3] = {1,64,118};
+    const byte COLOR_WRITING_BODY_ISRTR[3] = {237,125,49};
     const String HEADLINE_SPALTE1 = "Idf";
     const String HEADLINE_SPALTE2 = "TimeS";
     const String HEADLINE_SPALTE3 = "Data";
