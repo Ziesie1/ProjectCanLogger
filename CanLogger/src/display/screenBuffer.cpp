@@ -21,23 +21,26 @@ bool screenBufferInitialized = false;
 */
 void screenBufferInit(void)
 {
-  screenBuffer = new Canmsg*[SCREEN_BUFFER_SIZE];
-  screenBufferUserView = new Canmsg*[SCREEN_BUFFER_SIZE];
-  for(int i=0; i<SCREEN_BUFFER_SIZE; i++)
+  if(!screenBufferInitialized)
   {
-    screenBuffer[i] = nullptr;
-    screenBufferUserView[i] = nullptr;
-  }
-  screenBufferFillLevel = 0;
-  screenBufferUserViewFillLevel = 0;
-  updateUserView = false;
-  somethingChanged = false;
-  for(int i=0; i<SCREEN_BUFFER_SIZE; i++)
-  {
-    whatChanged[i] = false;
-  }
+    screenBuffer = new Canmsg*[SCREEN_BUFFER_SIZE];
+    screenBufferUserView = new Canmsg*[SCREEN_BUFFER_SIZE];
+    for(int i=0; i<SCREEN_BUFFER_SIZE; i++)
+    {
+      screenBuffer[i] = nullptr;
+      screenBufferUserView[i] = nullptr;
+    }
+    screenBufferFillLevel = 0;
+    screenBufferUserViewFillLevel = 0;
+    updateUserView = false;
+    somethingChanged = false;
+    for(int i=0; i<SCREEN_BUFFER_SIZE; i++)
+    {
+      whatChanged[i] = false;
+    }
 
-  screenBufferInitialized = true;
+    screenBufferInitialized = true;
+  }
 }
 
 /*
@@ -85,11 +88,14 @@ void screenBufferDeinit(void)
 
 /* 
     erases the content of the front- and backendbuffer
+    return  true  - buffers erased
+            false - error occured
 */
-void screenBuffer_clearScreenBuffer(void)
+bool screenBuffer_clearScreenBuffer(void)
 {
   screenBufferDeinit();
   screenBufferInit();
+  return true;
 }
 
 /* 
@@ -294,6 +300,11 @@ void makeBufferVisible(void)
   }
 }
 
+/*
+		has a message in userView changed since the last check
+		return: true  - something changed (use "screenBuffer_hasThisMessageChanged" to find out what exactly changed)
+			      false - nothing changed
+*/
 bool screenBuffer_hasSomethingChanged(void)
 {
   if(somethingChanged)
@@ -307,6 +318,13 @@ bool screenBuffer_hasSomethingChanged(void)
   }
 }
 
+/*
+		chek if the message at a specified position in userView changed
+		Input:  pos	- position of the message in userView
+				          range: 0-(SCREEN_BUFFER_SIZE-1)
+		return: true  - this message was Updated
+			      false - this message has not been changed
+*/
 bool screenBuffer_hasThisMessageChanged(int pos)
 {
   if((pos >= 0) && (pos<SCREEN_BUFFER_SIZE))
@@ -380,31 +398,67 @@ void loopScreenBuffer(void)
   }
 }
 
-void screenBuffer_enableUpdate(void)
+/*
+		UserView will be updated from now on
+		return: true  - will be updated
+			      false - error occured
+*/
+bool screenBuffer_enableUpdate(void)
 {
   if(screenBufferInitialized)
   {
     updateUserView = true;
+    return true;
   }
+  return false;
 }
 
-void screenBuffer_disableUpdate(void)
+/*
+		UserView will not be updated from now on
+		return: true  - will not be updated
+			      false - error occured
+*/
+bool screenBuffer_disableUpdate(void)
 {
   updateUserView = false;
+  return true;
 }
 
-Canmsg const* screenBuffer_getMessageAtPosition(int pos)
+/*
+    tells if the userView is currently and will be updated
+    return: true  - userView is and will be updated
+            false - userView is and will not be updated
+*/
+bool screenBuffer_updateStatus(void)
+{
+  return updateUserView;
+}
+
+/*
+		returns the message of the UserView at a specified position
+		Input:  msg   - reference the values of the message should be copied
+            pos   - Position of the Message in UserView
+				            range: 0-(Amount of Messages in UserView (use "screenBuffer_getFillLevel"))
+		return: true  - transfer correctly
+			      false -	error occured
+*/
+bool screenBuffer_getMessageAtPosition(Canmsg & msg, int pos)
 {
   if(screenBufferInitialized && (pos >= 0) && (pos < screenBufferUserViewFillLevel))
   {
-    return screenBufferUserView[pos];
+    msg = *(screenBufferUserView[pos]);
+    return true;
   }
   else
   {
-    return nullptr;
+    return false;
   }
 }
 
+/*
+		returns the ammount of messages currently stored in userView
+		return: int -	number of messages stored in userView
+*/
 int screenBuffer_getFillLevel(void)
 {
   return screenBufferUserViewFillLevel;

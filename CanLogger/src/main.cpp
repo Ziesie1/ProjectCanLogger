@@ -50,17 +50,20 @@ void loop() {
   loopTaster();
   pageManager.loop();
   loopScreenBuffer();
+  /*
   if(screenBuffer_hasSomethingChanged())
   {
+    Canmsg temp{};
     for(int i=0; i<screenBuffer_getFillLevel(); i++)
     {
       if(screenBuffer_hasThisMessageChanged(i))
       {
-        Canmsg const* temp = screenBuffer_getMessageAtPosition(i);
-        utilities::scom.printDebug("                      "+static_cast<String>(*temp));
+        screenBuffer_getMessageAtPosition(temp, i);
+        utilities::scom.printDebug("                      "+static_cast<String>(temp));
       }
     }
   }
+  */
 }
 
 void serialEvent() {

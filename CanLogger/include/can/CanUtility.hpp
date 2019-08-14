@@ -18,12 +18,16 @@ typedef enum
 
 HAL_StatusTypeDef CanUtility_Init(CAN_SpeedTypedef speed);
 HAL_StatusTypeDef CanUtility_DeInit(void);
+
 HAL_StatusTypeDef CanUtility_EnableRecieve(void);
 HAL_StatusTypeDef CanUtility_DissableRecieve(void);
 HAL_StatusTypeDef CanUtility_RecieveMessage(bool const fifo, Canmsg *const msg);
 HAL_StatusTypeDef CanUtility_SendMessage(Canmsg *const msg);
+
 Canmsg* CanUtility_readFirstMessageFromBuffer(void);
 int CanUtility_getbufferCanRecMessagesFillLevel(void);
+bool CanUtility_isMessagePending(void);
+
 bool CanUtility_isRecieveActive(void);
 bool CanUtility_hasFiFoOverflowOccured(void);
 bool CanUtility_whereNewMessagesDiscarded(void);

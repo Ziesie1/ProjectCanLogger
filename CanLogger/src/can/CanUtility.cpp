@@ -39,6 +39,10 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 	}
 }
 
+/* 
+	interrupt handler that is called when FIFO 0 is full
+	Input: hcan	- pointer to CAN-handle
+*/
 void HAL_CAN_RxFifo0FullCallback(CAN_HandleTypeDef *hcan)
 {
 		HAL_NVIC_DisableIRQ(CAN_RX0_IRQn);
@@ -178,74 +182,78 @@ void FillCAN_Filter(CAN_FilterTypeDef& canFilter)
 */
 HAL_StatusTypeDef CanUtility_Init(CAN_SpeedTypedef speed)
 {	
-	//initialize CAN-handler:
-	FillCAN_Handle(CanUtility_hcan, speed);
-	if(HAL_CAN_Init(&CanUtility_hcan) != HAL_OK)
+	if(!CanUtility_initialized)
 	{
-		String s = "Fehler während der CAN initialisierung. Status: ";
-		s += String(HAL_CAN_GetState(&CanUtility_hcan),HEX); 
-		s += " Fehlercode: 0x";
-		s += String(HAL_CAN_GetError(&CanUtility_hcan),HEX); 
-		utilities::scom.printError(s);
-		return HAL_ERROR;
-	}
-	else
-	{
-		utilities::scom.printDebug("CAN MCR und BTR erfolgreich initialisiert");
-	}
+		//initialize CAN-handler:
+		FillCAN_Handle(CanUtility_hcan, speed);
+		if(HAL_CAN_Init(&CanUtility_hcan) != HAL_OK)
+		{
+			String s = "Fehler während der CAN initialisierung. Status: ";
+			s += String(HAL_CAN_GetState(&CanUtility_hcan),HEX); 
+			s += " Fehlercode: 0x";
+			s += String(HAL_CAN_GetError(&CanUtility_hcan),HEX); 
+			utilities::scom.printError(s);
+			return HAL_ERROR;
+		}
+		else
+		{
+			utilities::scom.printDebug("CAN MCR und BTR erfolgreich initialisiert");
+		}
+
+		//initialize CAN-Filter 0:
+		CAN_FilterTypeDef canFilter;
+		FillCAN_Filter(canFilter);
+		if(HAL_CAN_ConfigFilter(&CanUtility_hcan, &canFilter) != HAL_OK)
+		{
+			utilities::scom.printError("Fehler beim CAN-Filtersetup");
+			return HAL_ERROR;
+		}
+		else
+		{
+			utilities::scom.printDebug("CAN-Filtersetup erfolgreich beendet");
+		}
+
+		if((HAL_CAN_ActivateNotification(&CanUtility_hcan, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK) ||
+			(HAL_CAN_ActivateNotification(&CanUtility_hcan, CAN_IT_RX_FIFO0_FULL) != HAL_OK))
+		{
+			Serial.println("CAN-IRQ konnte nicht aktiviert werden");
+			return HAL_ERROR;
+		}
+		else
+		{
+			Serial.println("CAN-IRQ aktiviert");
+		}
+
+		// start CAN-Instance:
+		if(HAL_CAN_Start(&CanUtility_hcan) != HAL_OK)
+		{
+			String s = "CAN-Setup konnte nicht erfolgreich beendet werden. CAN-Status: "; 
+			s += String(HAL_CAN_GetState(&CanUtility_hcan));
+			s += " Fehlercode: 0x";
+			s += String(HAL_CAN_GetError(&CanUtility_hcan),HEX);
+			utilities::scom.printError(s); 
+			return HAL_ERROR;
+		}
+		else
+		{
+			CanUtility_CanRecieveActive = false;
+			utilities::scom.printDebug("CAN-Peripherie einsatzbereit");	
+		}
 	
-	//initialize CAN-Filter 0:
-	CAN_FilterTypeDef canFilter;
-	FillCAN_Filter(canFilter);
-	if(HAL_CAN_ConfigFilter(&CanUtility_hcan, &canFilter) != HAL_OK)
-	{
-		utilities::scom.printError("Fehler beim CAN-Filtersetup");
-		return HAL_ERROR;
-	}
-	else
-	{
-		utilities::scom.printDebug("CAN-Filtersetup erfolgreich beendet");
-	}
+		CanUtility_bufferCanRecMessages = new Canmsg*[CanUtility_CAN_BUFFER_REC_SIZE];
+		for(int i=0; i<CanUtility_CAN_BUFFER_REC_SIZE; i++)
+		{
+			CanUtility_bufferCanRecMessages[i] = new Canmsg{true};
+		}
+		CanUtility_bufferCanRecPointer = 0;
+		CanUtility_discardedMessages = 0;
+		CanUtility_discardedMessagesLastState = 0;
+		CanUtility_toManyMsgs = false;
 
-	if((HAL_CAN_ActivateNotification(&CanUtility_hcan, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK) ||
-		(HAL_CAN_ActivateNotification(&CanUtility_hcan, CAN_IT_RX_FIFO0_FULL) != HAL_OK))
-	{
-		Serial.println("CAN-IRQ konnte nicht aktiviert werden");
-		return HAL_ERROR;
+		CanUtility_initialized = true;
+		return HAL_OK;
 	}
-	else
-	{
-		Serial.println("CAN-IRQ aktiviert");
-	}
-
-	// start CAN-Instance:
-	if(HAL_CAN_Start(&CanUtility_hcan) != HAL_OK)
-	{
-		String s = "CAN-Setup konnte nicht erfolgreich beendet werden. CAN-Status: "; 
-		s += String(HAL_CAN_GetState(&CanUtility_hcan));
-		s += " Fehlercode: 0x";
-		s += String(HAL_CAN_GetError(&CanUtility_hcan),HEX);
-		utilities::scom.printError(s); 
-		return HAL_ERROR;
-	}
-	else
-	{
-		CanUtility_CanRecieveActive = false;
-		utilities::scom.printDebug("CAN-Peripherie einsatzbereit");	
-	}
-	
-	CanUtility_bufferCanRecMessages = new Canmsg*[CanUtility_CAN_BUFFER_REC_SIZE];
-	for(int i=0; i<CanUtility_CAN_BUFFER_REC_SIZE; i++)
-	{
-		CanUtility_bufferCanRecMessages[i] = new Canmsg{true};
-	}
-	CanUtility_bufferCanRecPointer = 0;
-	CanUtility_discardedMessages = 0;
-	CanUtility_discardedMessagesLastState = 0;
-	CanUtility_toManyMsgs = false;
-
-	CanUtility_initialized = true;
-	return HAL_OK;
+	return HAL_ERROR;
 }
 
 /* 
@@ -337,6 +345,11 @@ HAL_StatusTypeDef CanUtility_DissableRecieve(void)
 	}
 }
 
+/*
+	returns state of CAN-block
+	return:	true	- CAN-block is currently recieving
+			false	- CAN-block is currently not recieving
+*/
 bool CanUtility_isRecieveActive(void)
 {
 	return CanUtility_CanRecieveActive;
@@ -379,9 +392,9 @@ HAL_StatusTypeDef CanUtility_RecieveMessage(bool const fifo, Canmsg * msg)
     sends the message via tx-mailbox 0
     Input:	pointer to the message that is about to be send
 	return: HAL_OK		- everything is working as it is supposed to be
-			      HAL_ERROR	- an error occured while activating the peripherals, 
-						            check if the Peripherals are allready initialized
-						            or refer to CanUtility_hcan->ErrorCode
+			HAL_ERROR	- an error occured while activating the peripherals, 
+						  check if the Peripherals are allready initialized
+					      or refer to CanUtility_hcan->ErrorCode
 */
 HAL_StatusTypeDef CanUtility_SendMessage(Canmsg *const msg)
 {
@@ -427,6 +440,12 @@ HAL_StatusTypeDef CanUtility_SendMessage(Canmsg *const msg)
 	return HAL_ERROR;
 }
 
+/*
+	function that gives the message from the recieve buffer, that was put in first(timewise)
+	return:	valid pointer	- pointer to the Message 
+							  note message will be deleted from buffer
+			nullptr			- FiFo was empty
+*/
 Canmsg* CanUtility_readFirstMessageFromBuffer(void)
 {
 	HAL_NVIC_DisableIRQ(CAN_RX0_IRQn);
@@ -448,6 +467,10 @@ Canmsg* CanUtility_readFirstMessageFromBuffer(void)
 	return temp;
 }
 
+/*
+	returns the ammount of messages stored in the CAN-recieve buffer
+	return:	int	- number of messages in the recieve buffer
+*/
 int CanUtility_getbufferCanRecMessagesFillLevel(void)
 {
 	HAL_NVIC_DisableIRQ(CAN_RX0_IRQn);
@@ -459,6 +482,21 @@ int CanUtility_getbufferCanRecMessagesFillLevel(void)
 	return temp;
 }
 
+/*
+	tells if any messages are pending in the recieve buffer
+	return:	true	- messages are pending
+			false	- no messages are pending
+*/
+bool CanUtility_isMessagePending(void)
+{
+	return (CanUtility_getbufferCanRecMessagesFillLevel()!=0);	
+}
+
+/*
+	checks if an overrun occured since the last time checked
+	return: true	- overrun has occured
+			false	- overrun has not occured 
+*/
 bool CanUtility_hasFiFoOverflowOccured(void)
 {
 	if(CanUtility_toManyMsgs)
@@ -472,6 +510,11 @@ bool CanUtility_hasFiFoOverflowOccured(void)
 	}
 }
 
+/*
+	checks if any messages were discarded since last checked
+	return:	true	- messages were discarded
+			false	- no messages were discarded 
+*/
 bool CanUtility_whereNewMessagesDiscarded(void)
 {
 	bool temp = CanUtility_discardedMessages != CanUtility_discardedMessagesLastState;
@@ -479,7 +522,12 @@ bool CanUtility_whereNewMessagesDiscarded(void)
 	return temp;
 }
 
+/*
+	returns the ammount of messages that were discarded since the last init of CAN
+	return:	int	- number of messages that were discarded since the last init of CAN
+*/
 int CanUtility_howManyMessagesWhereDiscarded(void)
 {
 	return CanUtility_discardedMessages;
 }
+

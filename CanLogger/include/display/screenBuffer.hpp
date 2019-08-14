@@ -12,9 +12,9 @@ void printScreenBufferUserViewSerial(void);
 //void insertMessageHere(Canmsg const& msg, int pos);
 
 // steuern des frontendbuffer
-void screenBuffer_enableUpdate(void);
-void screenBuffer_disableUpdate(void);
-void screenBuffer_clearScreenBuffer(void);
+bool screenBuffer_enableUpdate(void);
+bool screenBuffer_disableUpdate(void);
+bool screenBuffer_clearScreenBuffer(void);
 
 // initialisierungsfunktionen
 void screenBufferInit(void);
@@ -26,8 +26,9 @@ void loopScreenBuffer(void);
 // request information while running
 bool screenBuffer_hasSomethingChanged(void);
 bool screenBuffer_hasThisMessageChanged(int pos);
-Canmsg const* screenBuffer_getMessageAtPosition(int pos);
+bool screenBuffer_getMessageAtPosition(Canmsg & msg, int pos);
 int screenBuffer_getFillLevel(void);
+bool screenBuffer_updateStatus(void);
 
 constexpr int SCREEN_BUFFER_SIZE = 10;
 //extern int screenBufferFillLevel;
