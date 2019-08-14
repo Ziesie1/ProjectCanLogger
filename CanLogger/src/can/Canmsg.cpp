@@ -3,8 +3,7 @@
 #include "utilities/utilities.hpp"
 #include "utilities/SerialCommunication.hpp"
 
-Canmsg* Canmsg_bufferCanRecMessages;
-int Canmsg_bufferCanRecPointer;
+int messagesWithNew = 0;
 
 /*
     creates a default CAN-message used e.g. in tests 
@@ -13,6 +12,18 @@ Canmsg::Canmsg()
     : Canmsg(0x100, 0x0, false, false, 0x1000, 8, 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef)  
 {
 
+}
+
+/* 
+    creates an empty Message
+    ATTENTION: MESSAGE WON'T FULLFILL THE CAN-STANDARD
+    PLEASE ONLY USE THIS IF YOU KNOW WHAT YOU ARE DOING
+*/
+Canmsg::Canmsg(bool const empty)
+{
+  messagesWithNew++;
+  this->data = new uint8_t[this->maxLength];
+  this->canLength = 0;
 }
 
 /* 
@@ -114,6 +125,7 @@ Canmsg::Canmsg(uint16_t stdId, uint32_t extId, bool isExtId, bool rtr, uint16_t 
 			    uint8_t databit5, uint8_t databit6, uint8_t databit7)
   :isExtIdentifier{isExtId}, rtr{rtr}, time{time}
 {
+    messagesWithNew ++;
     if(stdId <= maxStdId)
     {
         this->stdIdentifier = stdId;
@@ -183,6 +195,7 @@ void Canmsg::moveDestroy(void)
 */
 Canmsg::~Canmsg()
 {
+  messagesWithNew--;
   this->destroy();
 }
 
@@ -193,6 +206,7 @@ Canmsg::~Canmsg()
 */
 Canmsg::Canmsg(Canmsg const& other)
 {
+    messagesWithNew++;
     *this = other;
 }
 
@@ -224,6 +238,7 @@ Canmsg& Canmsg::operator= (Canmsg const& other)
 */
 Canmsg::Canmsg(Canmsg && other)
 {
+  messagesWithNew++;
   (*this) = std::move(other);
 }
 
@@ -327,6 +342,10 @@ bool Canmsg::operator==(Canmsg const& other) const
   {
     return false;
   }
+  if(this->time!=other.time)
+  {
+    return false;
+  }
   if(this->canLength!=other.canLength)
   {
     return false;
@@ -350,84 +369,6 @@ bool Canmsg::operator==(Canmsg const& other) const
 bool Canmsg::operator!=(Canmsg const& other) const
 {
   return !(*this==other);
-}
-
-/*
-    copies the values of a CAN-message in the recieve FIFO into an instanse of Canmsg
-    releases CAN-message from FIFO after the copy process
-    Input:  fifo  - specifies the FIFO that the message is pending in 
-*/
-void Canmsg::Recieve(bool const fifo)
-{
-    if(HAL_CAN_GetRxFifoFillLevel(&CanUtility_hcan, fifo) != 0)
-    {
-        CAN_RxHeaderTypeDef header;
-        uint8_t data[8];
-        if(HAL_CAN_GetRxMessage(&CanUtility_hcan, fifo, &header, data) == HAL_OK)
-        {
-            this->stdIdentifier = header.StdId;
-            this->extIdentifier = header.ExtId;
-            this->isExtIdentifier = header.IDE;
-            this->rtr = header.RTR;
-            this->time = header.Timestamp;
-            this->canLength = header.DLC;
-            for(int i=0; i<canLength; i++)
-            {
-            this->data[i] = data[i];
-            }
-        }
-        else
-        {
-          utilities::scom.printError("CAN-Nachricht konnte nicht ausgelesen werden");
-        }
-    }
-}
-
-/*
-    sends the message via tx-mailbox 0
-    return: HAL_OK		- everything is working as it is supposed to be
-			      HAL_ERROR	- an error occured while activating the peripherals, 
-						            check if the Peripherals are allready initialized
-						            or refer to CanUtility_hcan->ErrorCode
-*/
-HAL_StatusTypeDef Canmsg::Send(void) const
-{
-	if(HAL_CAN_GetTxMailboxesFreeLevel(&CanUtility_hcan) != 0)
-	{
-		CAN_TxHeaderTypeDef header;
-		if(!this->isExtIdentifier)
-    {
-      header.IDE = CAN_ID_STD;
-    }
-    else
-    {
-      header.IDE = CAN_ID_EXT;
-    }
-    header.StdId = this->stdIdentifier;
-    header.ExtId = (this->stdIdentifier<<18)|this->extIdentifier;
-    if(!this->rtr)
-    {
-      header.RTR = CAN_RTR_DATA;
-    }
-    else
-    {
-      header.RTR = CAN_RTR_REMOTE;
-    }
-		header.DLC = this->canLength;
-		header.TransmitGlobalTime = DISABLE;
-		uint8_t data[8];
-		for(uint8_t i=0; i<header.DLC; i++)
-		{
-			data[i] = this->data[i];
-		}
-		uint32_t mailbox = 0;
-		return HAL_CAN_AddTxMessage(&CanUtility_hcan, &header, data, &mailbox);
-	}
-  else
-  {
-    utilities::scom.printError("CAN-Nachricht konnte nicht gesendet werden(Alle TX Mailboxen belegt).");
-    return HAL_ERROR;
-  }
 }
 
 /* 

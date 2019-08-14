@@ -17,6 +17,7 @@ public:
 	static constexpr uint16_t maxTime = 0xffff;
 	static constexpr uint16_t maxStdId = 0x7ff;
 	static constexpr uint32_t maxExtId = 0x3ffff;
+	static constexpr uint32_t maxFullId = 0x1fffffff;
 	static constexpr uint8_t maxDataVal = 0xff;
 
 private:
@@ -33,6 +34,7 @@ private:
 	
 public:	
 	Canmsg();
+	Canmsg(bool const empty);
 	Canmsg(uint16_t stdId, uint32_t extId, bool isExtId, bool rtr, uint16_t time, 
 			uint8_t canLength, uint8_t const * const data);  
 	Canmsg(uint16_t stdId, uint32_t extId, bool isExtId, bool rtr, uint16_t time,
@@ -62,12 +64,8 @@ public:
 	uint8_t GetCanByte(int const idx) const;
 	
 	// Bus-Funktionen:
-	HAL_StatusTypeDef Send(void) const;// noch nicht verwendbar
-	void Recieve(bool const fifo);// noch nicht verwendbar
+	friend HAL_StatusTypeDef CanUtility_RecieveMessage(bool const fifo, Canmsg *const msg);
+	friend HAL_StatusTypeDef CanUtility_SendMessage(Canmsg *const msg);
 };
-
-constexpr int Canmsg_CAN_BUFFER_REC_SIZE = 50;
-extern Canmsg* Canmsg_bufferCanRecMessages;
-extern int Canmsg_bufferCanRecPointer;
 
 #endif //CANMSG

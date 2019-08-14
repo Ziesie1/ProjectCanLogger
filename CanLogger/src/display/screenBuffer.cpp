@@ -9,22 +9,40 @@
 //extern:
 int screenBufferFillLevel = 0;
 int screenBufferUserViewFillLevel = 0;
-Canmsg* screenBuffer = nullptr;
-Canmsg* screenBufferUserView = nullptr;
-bool updateUserView = false;
+Canmsg** screenBuffer = nullptr;
+Canmsg** screenBufferUserView = nullptr;
 
 //intern:
-bool CanUtility_CanRecieveActive_lastStatus = false;
+bool updateUserView = false;
+bool somethingChanged = false;
+bool whatChanged[SCREEN_BUFFER_SIZE];
+bool screenBufferInitialized = false;
 
 /* 
     sets up the front- and the backendbuffer
 */
 void screenBufferInit(void)
 {
-  screenBuffer = new Canmsg[SCREEN_BUFFER_SIZE];
-  screenBufferUserView = new Canmsg[SCREEN_BUFFER_SIZE];
-  screenBufferFillLevel = 0;
-  screenBufferUserViewFillLevel = 0;
+  if(!screenBufferInitialized)
+  {
+    screenBuffer = new Canmsg*[SCREEN_BUFFER_SIZE];
+    screenBufferUserView = new Canmsg*[SCREEN_BUFFER_SIZE];
+    for(int i=0; i<SCREEN_BUFFER_SIZE; i++)
+    {
+      screenBuffer[i] = nullptr;
+      screenBufferUserView[i] = nullptr;
+    }
+    screenBufferFillLevel = 0;
+    screenBufferUserViewFillLevel = 0;
+    updateUserView = false;
+    somethingChanged = false;
+    for(int i=0; i<SCREEN_BUFFER_SIZE; i++)
+    {
+      whatChanged[i] = false;
+    }
+
+    screenBufferInitialized = true;
+  }
 }
 
 /*
@@ -32,21 +50,54 @@ void screenBufferInit(void)
 */
 void screenBufferDeinit(void)
 {
+  if(screenBuffer)
+  {
+    for(int i=0; i<SCREEN_BUFFER_SIZE; i++)
+    {
+      if(screenBuffer[i])
+      {
+        delete screenBuffer[i];
+      }
+    }
     delete[] screenBuffer;
     screenBuffer = nullptr;
     screenBufferFillLevel = 0;
+  }
+
+  if(screenBufferUserView)
+  {
+    for(int i=0; i<SCREEN_BUFFER_SIZE; i++)
+    {
+      if(screenBufferUserView[i])
+      {
+        delete screenBufferUserView[i];
+      }
+    }
     delete[] screenBufferUserView;
     screenBufferUserView = nullptr;
     screenBufferUserViewFillLevel = 0;
+  }
+
+  updateUserView = false;
+  somethingChanged = false;
+  for(int i=0; i<SCREEN_BUFFER_SIZE; i++)
+  {
+    whatChanged[i] = false;
+  }
+
+  screenBufferInitialized = false;
 }
 
 /* 
     erases the content of the front- and backendbuffer
+    return  true  - buffers erased
+            false - error occured
 */
-void clearScreenBuffers(void)
+bool screenBuffer_clearScreenBuffer(void)
 {
   screenBufferDeinit();
   screenBufferInit();
+  return true;
 }
 
 /* 
@@ -54,26 +105,32 @@ void clearScreenBuffers(void)
 */
 void printScreenBufferSerial(void)
 {
-  String s = "Backendbuffer Fuellstand: ";
-  s += String(screenBufferFillLevel, DEC);
-  s += "/";
-  s += String(SCREEN_BUFFER_SIZE, DEC);
-  utilities::scom.printDebug(s);
-  for(int i=0; i<screenBufferFillLevel; i++)
+  if(screenBufferInitialized)
   {
-    s = "Nachricht ";
-    if((i+1)<10)
-    {
-      s += " ";
-    }
-    s += String(i+1, DEC);
-    s += "/";
+    String s = "Backendbuffer Fuellstand: ";
     s += String(screenBufferFillLevel, DEC);
-    s += ": ";
-    s += static_cast<String>(screenBuffer[i]);
+    s += "/";
+    s += String(SCREEN_BUFFER_SIZE, DEC);
     utilities::scom.printDebug(s);
+    for(int i=0; i<screenBufferFillLevel; i++)
+    {
+      if(screenBuffer[i])
+      {
+        s = "Nachricht ";
+        if((i+1)<10)
+        {
+          s += " ";
+        }
+        s += String(i+1, DEC);
+        s += "/";
+        s += String(screenBufferFillLevel, DEC);
+        s += ": ";
+        s += static_cast<String>(*screenBuffer[i]);
+        utilities::scom.printDebug(s);
+      }
+    }
+    utilities::scom.printDebug("");
   }
-  utilities::scom.printDebug("");
 }
 
 /* 
@@ -81,26 +138,32 @@ void printScreenBufferSerial(void)
 */
 void printScreenBufferUserViewSerial(void)
 {
-  String s = "Ausgabebuffer Fuellstand: ";
-  s += String(screenBufferUserViewFillLevel, DEC);
-  s += "/";
-  s += String(SCREEN_BUFFER_SIZE, DEC);
-  utilities::scom.printDebug(s);
-  for(int i=0; i<screenBufferUserViewFillLevel; i++)
+  if(screenBufferInitialized)
   {
-    s = "Nachricht ";
-    if((i+1)<10)
-    {
-      s += " ";
-    }
-    s += String(i+1, DEC);
-    s += "/";
+    String s = "Ausgabebuffer Fuellstand: ";
     s += String(screenBufferUserViewFillLevel, DEC);
-    s += ": ";
-    s += static_cast<String>(screenBufferUserView[i]);
+    s += "/";
+    s += String(SCREEN_BUFFER_SIZE, DEC);
     utilities::scom.printDebug(s);
+    for(int i=0; i<screenBufferUserViewFillLevel; i++)
+    {
+      if(screenBufferUserView[i])
+      {
+        s = "Nachricht ";
+        if((i+1)<10)
+        {
+          s += " ";
+        }
+        s += String(i+1, DEC);
+        s += "/";
+        s += String(screenBufferUserViewFillLevel, DEC);
+        s += ": ";
+        s += static_cast<String>(*screenBufferUserView[i]);
+        utilities::scom.printDebug(s);
+      }
+    }
+    utilities::scom.printDebug("");
   }
-  utilities::scom.printDebug("");
 }
 
 /* 
@@ -112,18 +175,23 @@ void printScreenBufferUserViewSerial(void)
 */
 void insertMessageHere(Canmsg const& msg, int pos)
 {
-  if((pos < SCREEN_BUFFER_SIZE) && (pos <= screenBufferFillLevel))
+  if((pos < SCREEN_BUFFER_SIZE) && (pos <= screenBufferFillLevel) && screenBufferInitialized)
   {
     if(screenBufferFillLevel >= SCREEN_BUFFER_SIZE)
     {
       screenBufferFillLevel = SCREEN_BUFFER_SIZE-1;
     }
-    screenBuffer[screenBufferFillLevel] = msg;
+    if(screenBuffer[screenBufferFillLevel])
+    {
+      delete screenBuffer[screenBufferFillLevel];
+    }
+    screenBuffer[screenBufferFillLevel] = new Canmsg{msg};
     for(int i=screenBufferFillLevel; i>pos; i--)
     {
-      Canmsg temp = std::move(screenBuffer[i]); 
-      screenBuffer[i] = std::move(screenBuffer[i-1]);
-      screenBuffer[i-1] = std::move(temp);
+      Canmsg* temp = screenBuffer[i]; 
+      screenBuffer[i] = screenBuffer[i-1];
+      screenBuffer[i-1] = temp;
+      temp = nullptr;
     }
     if(screenBufferFillLevel < SCREEN_BUFFER_SIZE)
     {
@@ -137,19 +205,31 @@ void insertMessageHere(Canmsg const& msg, int pos)
 */
 void sortCanMessageIntoBuffer(Canmsg const& msg)
 {
-  bool messageInserted = false;
-  for(int i=0; i<screenBufferFillLevel && !messageInserted; i++)
+  if(screenBufferInitialized)
   {
-    if(!msg.GetIsExtIdentifier())
+    bool messageInserted = false;
+    for(int i=0; i<screenBufferFillLevel && !messageInserted; i++)
     {
-      if(!screenBuffer[i].GetIsExtIdentifier())
+      if(!msg.GetIsExtIdentifier())
       {
-        if(msg.GetStdIdentifier() == screenBuffer[i].GetStdIdentifier())
+        if(!(*screenBuffer[i]).GetIsExtIdentifier())
         {
-          screenBuffer[i] = msg;
-          messageInserted = true;
+          if(msg.GetStdIdentifier() == (*screenBuffer[i]).GetStdIdentifier())
+          {
+            if(screenBuffer[i])
+            {
+              delete screenBuffer[i];
+            }
+            screenBuffer[i] = new Canmsg{msg};
+            messageInserted = true;
+          }
+          else if(msg.GetStdIdentifier() < (*screenBuffer[i]).GetStdIdentifier())
+          {
+            insertMessageHere(msg, i);
+            messageInserted = true;
+          }
         }
-        else if(msg.GetStdIdentifier() < screenBuffer[i].GetStdIdentifier())
+        else
         {
           insertMessageHere(msg, i);
           messageInserted = true;
@@ -157,39 +237,42 @@ void sortCanMessageIntoBuffer(Canmsg const& msg)
       }
       else
       {
-        insertMessageHere(msg, i);
-        messageInserted = true;
-      }
-    }
-    else
-    {
-      if(screenBuffer[i].GetIsExtIdentifier())
-      {
-        if(msg.GetStdIdentifier() == screenBuffer[i].GetStdIdentifier())
+        if((*screenBuffer[i]).GetIsExtIdentifier())
         {
-          if(msg.GetExtIdentifier() == screenBuffer[i].GetExtIdentifier())
+          if(msg.GetStdIdentifier() == (*screenBuffer[i]).GetStdIdentifier())
           {
-            screenBuffer[i] = msg;
-            messageInserted = true;
+            if(msg.GetExtIdentifier() == (*screenBuffer[i]).GetExtIdentifier())
+            {
+              if(screenBuffer[i])
+              {
+                delete screenBuffer[i];
+              }
+              screenBuffer[i] = new Canmsg{msg};
+              messageInserted = true;
+            }
+            else if(msg.GetExtIdentifier() < (*screenBuffer[i]).GetExtIdentifier())
+            {
+              insertMessageHere(msg, i);
+              messageInserted = true;
+            }
           }
-          else if(msg.GetExtIdentifier() < screenBuffer[i].GetExtIdentifier())
+          else if(msg.GetStdIdentifier() < (*screenBuffer[i]).GetStdIdentifier())
           {
             insertMessageHere(msg, i);
             messageInserted = true;
           }
         }
-        else if(msg.GetStdIdentifier() < screenBuffer[i].GetStdIdentifier())
-        {
-          insertMessageHere(msg, i);
-          messageInserted = true;
-        }
       }
     }
-  }
-  if((screenBufferFillLevel < SCREEN_BUFFER_SIZE) && !messageInserted)
-  {
-    screenBuffer[screenBufferFillLevel] = msg;
-    screenBufferFillLevel++;
+    if((screenBufferFillLevel < SCREEN_BUFFER_SIZE) && !messageInserted)
+    {
+      if(screenBuffer[screenBufferFillLevel])
+      {
+        delete screenBuffer[screenBufferFillLevel];
+      }
+      screenBuffer[screenBufferFillLevel] = new Canmsg{msg};
+      screenBufferFillLevel++;
+    }
   }
 }
 
@@ -198,14 +281,67 @@ void sortCanMessageIntoBuffer(Canmsg const& msg)
 */
 void makeBufferVisible(void)
 {
-  for(int i=0; i<screenBufferFillLevel; i++)
+  if(screenBufferInitialized)
   {
-    if(screenBufferUserView[i] != screenBuffer[i])
+    for(int i=0; i<screenBufferFillLevel; i++)
     {
-      screenBufferUserView[i] = screenBuffer[i];
+      if(!screenBufferUserView[i])
+      {
+        screenBufferUserView[i] = new Canmsg{*screenBuffer[i]};
+        somethingChanged = true;
+        whatChanged[i] = true;
+      }
+      else if(*(screenBufferUserView[i]) != *(screenBuffer[i]))
+      {
+        *(screenBufferUserView[i]) = *(screenBuffer[i]);
+        somethingChanged = true;
+        whatChanged[i] = true;
+      }
+    }
+    screenBufferUserViewFillLevel = screenBufferFillLevel;
+  }
+}
+
+/*
+		has a message in userView changed since the last check
+		return: true  - something changed (use "screenBuffer_hasThisMessageChanged" to find out what exactly changed)
+			      false - nothing changed
+*/
+bool screenBuffer_hasSomethingChanged(void)
+{
+  if(somethingChanged)
+  {
+    somethingChanged = false;
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+/*
+		chek if the message at a specified position in userView changed
+		Input:  pos	- position of the message in userView
+				          range: 0-(SCREEN_BUFFER_SIZE-1)
+		return: true  - this message was Updated
+			      false - this message has not been changed
+*/
+bool screenBuffer_hasThisMessageChanged(int pos)
+{
+  if((pos >= 0) && (pos<SCREEN_BUFFER_SIZE))
+  {
+    if(whatChanged[pos])
+    {
+      whatChanged[pos] = false;
+      return true;
+    }
+    else
+    {
+      return false;
     }
   }
-  screenBufferUserViewFillLevel = screenBufferFillLevel;
+  return false;
 }
 
 /* 
@@ -215,49 +351,117 @@ void loopScreenBuffer(void)
 {
   // Bei zu vielen eingehenden Nachrichten bleibt er in der while() schleife gefangen
   //FUNCTION_TIME_X("loopScreenBuffer(void)") //-> für eine Nachricht 47 ms, ohne Serial 43 ms
-  if(CanUtility_CanRecieveActive)
+  if(CanUtility_isRecieveActive() && screenBufferInitialized)
   {
-    CanUtility_CanRecieveActive_lastStatus = true;
-
-    while(Canmsg_bufferCanRecPointer > 0)
+    if(CanUtility_getbufferCanRecMessagesFillLevel() > 0)
     {
-      Canmsg_bufferCanRecPointer--;
-
-      // um die Nachrichten in der Reihenfolge abzuarbeiten, in der sie empfangen wurden
-      Canmsg curMsg = std::move(Canmsg_bufferCanRecMessages[0]);
-      for(int i=0; i<Canmsg_bufferCanRecPointer; i++)
+      //get message recieved first
+      Canmsg* curMsg = CanUtility_readFirstMessageFromBuffer();
+      if(curMsg)
       {
-        Canmsg_bufferCanRecMessages[i] = std::move(Canmsg_bufferCanRecMessages[i+1]);
-      }
-  
       //screenBuffer:
-      sortCanMessageIntoBuffer(curMsg);
+      sortCanMessageIntoBuffer(*curMsg);
 
       //SD-Card:
-      saveNewCanMessage(curMsg);
-
+      saveNewCanMessage(*curMsg);
 
       //loopback:
       /*
-      curMsg.Send();
+      CanUtility_SendMessage(curMsg);
       */
-
+    
       //Serial:
-
       String s = "Empfangene Nachricht: ";
-      s += static_cast<String>(curMsg);
+      s += static_cast<String>(*curMsg);
+      utilities::scom.printDebug(s);
+    
+      //free space:
+      delete curMsg;
+      }
+    }
+    
+    if(CanUtility_whereNewMessagesDiscarded())
+    {
+      String s = "Anzahl verworfener Nachrichten: ";
+      s += String(CanUtility_howManyMessagesWhereDiscarded(), DEC);
       utilities::scom.printDebug(s);
     }
-  }
-  else if(CanUtility_CanRecieveActive_lastStatus)
-  {
-    CanUtility_CanRecieveActive_lastStatus = false;
-    clearScreenBuffers();
+    
+    if(CanUtility_hasFiFoOverflowOccured())
+    {
+      utilities::scom.printDebug("FIFO ueberfuellt");
+      HAL_NVIC_EnableIRQ(CAN_RX0_IRQn);
+    }
   }
 
-  if(updateUserView)
+  if(updateUserView && screenBufferInitialized)
   {
     makeBufferVisible();
   }
 }
 
+/*
+		UserView will be updated from now on
+		return: true  - will be updated
+			      false - error occured
+*/
+bool screenBuffer_enableUpdate(void)
+{
+  if(screenBufferInitialized)
+  {
+    updateUserView = true;
+    return true;
+  }
+  return false;
+}
+
+/*
+		UserView will not be updated from now on
+		return: true  - will not be updated
+			      false - error occured
+*/
+bool screenBuffer_disableUpdate(void)
+{
+  updateUserView = false;
+  return true;
+}
+
+/*
+    tells if the userView is currently and will be updated
+    return: true  - userView is and will be updated
+            false - userView is and will not be updated
+*/
+bool screenBuffer_updateStatus(void)
+{
+  return updateUserView;
+}
+
+/*
+		returns the message of the UserView at a specified position
+		Input:  msg   - reference the values of the message should be copied
+            pos   - Position of the Message in UserView
+				            range: 0-(Amount of Messages in UserView (use "screenBuffer_getFillLevel"))
+		return: true  - transfer correctly
+			      false -	error occured
+*/
+bool screenBuffer_getMessageAtPosition(Canmsg & msg, int pos)
+{
+  if(screenBufferInitialized && (pos >= 0) && (pos < screenBufferUserViewFillLevel))
+  {
+    msg = *(screenBufferUserView[pos]);
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+/*
+		returns the ammount of messages currently stored in userView
+		return: int -	number of messages stored in userView
+*/
+int screenBuffer_getFillLevel(void)
+{
+  return screenBufferUserViewFillLevel;
+}

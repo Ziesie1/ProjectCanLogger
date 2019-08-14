@@ -10,7 +10,8 @@
 #include "display/pages/HomePage.hpp"
 #include "display/screenBuffer.hpp"
 #include "utilities/utilities.hpp"
-#include "utilities/FunctionLifeTime.hpp"
+
+
 
 using namespace utilities; // für scom
 
@@ -28,6 +29,7 @@ void setup() {
   initEncoder();
   initTaster();
   screenBufferInit();
+  screenBuffer_enableUpdate();
   display.init();
 
   if((CanUtility_Init(CAN_500_KBIT) != HAL_OK) || (CanUtility_EnableRecieve() != HAL_OK))
@@ -44,12 +46,10 @@ void setup() {
   scom << "CanLogger ist Initialisiert" << endz;
 }
 
-
 void loop() {
   loopTaster();
   pageManager.loop();
   loopScreenBuffer();
-
 }
 
 void serialEvent() {
@@ -63,6 +63,3 @@ void serialEvent() {
   }
   
 }
-
-
-
