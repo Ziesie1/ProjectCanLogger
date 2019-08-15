@@ -15,14 +15,16 @@ protected:
     const uint16_t BUTTON_Y_AXE_OFFSET = 80;
     const uint16_t BUTTON_TEXT_DST_X = 5;
     const uint16_t BUTTON_TEXT_DST_Y = 8;
-    unsigned long buttonColorDefault;
-    unsigned long buttonColorSelected;
-    const unsigned long BUTTON_COLOR_TEXT = WHITE;
-    unsigned long colorArrowSelected;
+    const byte COLOR_BUTTON_DEFAULT[3] = {1,64,118};
+    const unsigned long COLOR_BUTTON_TEXT = WHITE;
+    const byte COLOR_ARROW_SELECTED[3] = {237,125,49};
     const unsigned long COLOR_ARROW_UNSELECTED = WHITE;
     const uint16_t IMAGE_DST_Y = 15;
 
+   
+
     ILI9341& display;
+    bool statusSD;
    
     Button* buttonNichtSpeichern;
     Arrow*  pfeilNichtSpeichern;

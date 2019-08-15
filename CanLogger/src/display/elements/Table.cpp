@@ -11,9 +11,12 @@ Table::Table(ILI9341& display, String kopfzeile, Canmsg canMessages[], int anzah
         nachrichten[idx] = new Textzeile(this->display,canMessages[idx],false,this->OFFSETX_SPALTE1,this->OFFSETX_SPALTE2,this->OFFSETX_HEADLINE1,this->OFFSETX_HEADLINE2,this->OFFSETX_HEADLINE3,this->ZEILENHOEHE);
     }
 
+    
+    setHeadlinePosition();
+    printTable(this->kopfzeile);
     drawTableLines();
-    printHeadlines(this->kopfzeile);
     printMessages();
+    
 }
 
 Table::~Table()
@@ -39,16 +42,23 @@ void Table::drawTableLines()
 {
     this->display.drawVerticalLine(this->OFFSETX_SPALTE1,this->OFFSETY_KOPFZEILE,this->DISPLAY_Y,this->COLOR_TABLE_LINES);
     this->display.drawVerticalLine(this->OFFSETX_SPALTE2,this->OFFSETY_KOPFZEILE,this->DISPLAY_Y,this->COLOR_TABLE_LINES);
-    this->display.drawHorizontalLine(0,240,this->OFFSETY_SPALTENNAMEN,this->COLOR_TABLE_LINES);
+    this->display.drawHorizontalLine(0,this->DISPLAY_X,this->OFFSETY_SPALTENNAMEN,this->COLOR_TABLE_LINES);
+    this->display.drawHorizontalLine(0,this->DISPLAY_X,this->OFFSETY_KOPFZEILE,this->COLOR_TABLE_LINES);
     
 }
 
-void Table::printHeadlines(String speicherPfad)
+void Table::printTable(String speicherPfad)
 {
-    this->display.printString(this->OFFSETX_HEADLINE_STORAGE,0,speicherPfad.c_str(),this->COLOR_WRITING_HEADER,this->display.makeColor(this->COLOR_BACKGROUND_HEADER[0],this->COLOR_BACKGROUND_HEADER[1],this->COLOR_BACKGROUND_HEADER[2]),1);
+    setBackroundHeader();
+
+    this->display.printString(this->offsetXHeadlineStorage,0,speicherPfad.c_str(),this->COLOR_WRITING_HEADER,this->display.makeColor(this->COLOR_BACKGROUND_HEADER[0],this->COLOR_BACKGROUND_HEADER[1],this->COLOR_BACKGROUND_HEADER[2]),1);
     this->display.printString(this->OFFSETX_HEADLINE1,this->OFFSETY_KOPFZEILE,this->HEADLINE_SPALTE1.c_str(),this->COLOR_WRITING_HEADER,this->display.makeColor(this->COLOR_BACKGROUND_HEADER[0],this->COLOR_BACKGROUND_HEADER[1],this->COLOR_BACKGROUND_HEADER[2]),1);
     this->display.printString(this->OFFSETX_HEADLINE2,this->OFFSETY_KOPFZEILE,this->HEADLINE_SPALTE2.c_str(),this->COLOR_WRITING_HEADER,this->display.makeColor(this->COLOR_BACKGROUND_HEADER[0],this->COLOR_BACKGROUND_HEADER[1],this->COLOR_BACKGROUND_HEADER[2]),1);
     this->display.printString(this->OFFSETX_HEADLINE3,this->OFFSETY_KOPFZEILE,this->HEADLINE_SPALTE3.c_str(),this->COLOR_WRITING_HEADER,this->display.makeColor(this->COLOR_BACKGROUND_HEADER[0],this->COLOR_BACKGROUND_HEADER[1],this->COLOR_BACKGROUND_HEADER[2]),1);
+
+    drawTableLines();
+
+
 }
 
 void Table::printMessages()
@@ -56,8 +66,20 @@ void Table::printMessages()
     uint8_t posY = this->OFFSETY_SPALTENNAMEN+2;
     for(int idx = 0;idx<this->anzahlNachrichten;idx++)
     {
-        this->nachrichten[idx]->printImportantContent(posY);
+        this->nachrichten[idx]->printImportantContent(posY,this->COLOR_WRITING_BODY_DEFAULT);
         posY = posY+this->ZEILENHOEHE;
     }
     
+}
+
+void Table::setHeadlinePosition()
+{
+    this->offsetXHeadlineStorage = (this->DISPLAY_X-(this->kopfzeile.length()*8))/2;
+    
+    
+}
+
+void Table::setBackroundHeader()
+{
+    this->display.drawFillRect(0,0,this->DISPLAY_X,this->OFFSETY_SPALTENNAMEN,this->display.makeColor(this->COLOR_BACKGROUND_HEADER[0],this->COLOR_BACKGROUND_HEADER[1],this->COLOR_BACKGROUND_HEADER[2]));
 }

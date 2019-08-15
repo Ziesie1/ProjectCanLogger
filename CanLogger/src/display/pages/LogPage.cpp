@@ -42,7 +42,7 @@ void LogPage::startView()
     if(statusSD)
     {
         this->display.fillScreen(WHITE);
-        this->logTable = new Table(this->display,"Speicherpfad SD",nachrichten,5);
+        this->logTable = new Table(this->display,getFullLogFilePath().c_str(),nachrichten,5);
     }
     else
     {

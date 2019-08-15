@@ -8,15 +8,15 @@ class Table
 {
     protected:
     ILI9341& display;
-    const uint8_t OFFSETX_HEADLINE_STORAGE = 60;
-    const uint8_t OFFSETX_HEADLINE1 = 2;
-    const uint8_t OFFSETX_SPALTE1 = 28; //vertikale Linie 1
-    const uint8_t OFFSETX_HEADLINE2 = 32;
-    const uint8_t OFFSETX_SPALTE2 = 76; //vertikale Linie 2
-    const uint8_t OFFSETX_HEADLINE3 = 140;
-    const uint8_t OFFSETY_KOPFZEILE = 40;    //Ende Kopfzeilenbereich
-    const uint8_t OFFSETY_SPALTENNAMEN = 58;
-    const uint8_t ZEILENHOEHE = 20; //Horizontale Linie
+    uint8_t offsetXHeadlineStorage;
+    const uint8_t OFFSETX_HEADLINE1 = 0;
+    const uint8_t OFFSETX_SPALTE1 = 32; //vertikale Linie 1
+    const uint8_t OFFSETX_HEADLINE2 = 34;
+    const uint8_t OFFSETX_SPALTE2 = 80; //vertikale Linie 2
+    const uint8_t OFFSETX_HEADLINE3 = 82;
+    const uint8_t OFFSETY_KOPFZEILE = 16;    //Ende Kopfzeilenbereich
+    const uint8_t OFFSETY_SPALTENNAMEN = 32; //Horizontale Linie
+    const uint8_t ZEILENHOEHE = 16; 
     const uint8_t DISPLAY_X = 240;
     const uint16_t DISPLAY_Y = 320;
     const unsigned long COLOR_TABLE_LINES = BLACK;
@@ -25,8 +25,8 @@ class Table
     const unsigned long COLOR_BACKGROUND_BODY = WHITE;
     const byte COLOR_BACKGROUND_HEADER[3] = {1,64,118};
     const byte COLOR_WRITING_BODY_ISRTR[3] = {237,125,49};
-    const String HEADLINE_SPALTE1 = "Idf";
-    const String HEADLINE_SPALTE2 = "TimeS";
+    const String HEADLINE_SPALTE1 = "Idf.";
+    const String HEADLINE_SPALTE2 = "TimeS.";
     const String HEADLINE_SPALTE3 = "Data";
 
     String kopfzeile;
@@ -38,8 +38,10 @@ class Table
     Table(ILI9341& display, String kopfzeile, Canmsg canMessages[], int anzahl);
     ~Table();
     void drawTableLines();
-    void printHeadlines(String speicherPfad);
+    void printTable(String speicherPfad);
     void printMessages();
+    void setHeadlinePosition();
+    void setBackroundHeader();
     
 
 };

@@ -7,29 +7,29 @@ Textzeile::Textzeile(ILI9341& display,Canmsg &msg, bool isSelected, uint8_t offs
 
 }
 
-void Textzeile::printImportantContent(uint8_t posY)
+void Textzeile::printImportantContent(uint8_t posY,unsigned long Farbe)
 {
     if(this->message)
     {
 
         //erste Spalte mit Begrenzung
         String s1 = String(this->message->GetStdIdentifier(),HEX);
-        this->display.printString(this->offsetXHeadline1,posY,s1.c_str(),this->COLOR_FONT,this->COLOR_BACKGROUND_UNSELECTED);
-        //hier vertikale Linie zeichnen
+        this->display.printString(this->offsetXHeadline1,posY,s1.c_str(),Farbe,this->COLOR_BACKGROUND_UNSELECTED);
+        this->display.drawVerticalLine(this->offsetXSpalte1,posY,posY+this->zeilenhoehe,this->COLOR_TABLE_LINE);
 
         //zweite Spalte mit Begrenzung
         s1 = String(this->message->GetTime(),HEX);
-        this->display.printString(this->offsetXHeadline2,posY,s1.c_str(),this->COLOR_FONT,this->COLOR_BACKGROUND_UNSELECTED);
-        //hier vertikale Linie zeichnen
+        this->display.printString(this->offsetXHeadline2,posY,s1.c_str(),Farbe,this->COLOR_BACKGROUND_UNSELECTED);
+        this->display.drawVerticalLine(this->offsetXSpalte2,posY,posY+this->zeilenhoehe,this->COLOR_TABLE_LINE);
 
-        //dritte Spalte miz Begrenzung
+        //dritte Spalte 
         s1 = "";
         for(int i=0;i<this->message->GetCanLength();i++)
         {
             s1+=String(this->message->GetCanByte(i),HEX);
         }
-        this->display.printString(this->offsetXSpalte2+4,posY,s1.c_str(),this->COLOR_FONT,this->COLOR_BACKGROUND_UNSELECTED);
-        //hier vertikale Linie zeichnen
+        this->display.printString(this->offsetXSpalte2+4,posY,s1.c_str(),Farbe,this->COLOR_BACKGROUND_UNSELECTED);
+        
     }
 }
 void Textzeile::printWholeContent()
