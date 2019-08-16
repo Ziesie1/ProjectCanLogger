@@ -6,6 +6,10 @@ Button::Button(ILI9341& display, uint16_t startX, uint16_t startY, uint16_t size
         bool isSelected)
        :display{display}, startX{startX}, startY{startY}, sizeX{sizeX}, sizeY{sizeY}, backColor{backColor}, offsetX{offsetX}, offsetY{offsetY}, text{text}, textColor{textColor}, isSelected{false}
        {
+           this->colorFrameSelected = this->display.makeColor(this->COLOR_FRAME_SELECTED[0],this->COLOR_FRAME_SELECTED[1],this->COLOR_FRAME_SELECTED[2]);
+           this->colorFrameUnselected = this->display.makeColor(this->COLOR_FRAME_UNSELECTED[0],this->COLOR_FRAME_UNSELECTED[1],this->COLOR_FRAME_UNSELECTED[2]);
+           this->colorArrowSelected = this->display.makeColor(this->COLOR_ARROW_SELECTED[0],this->COLOR_ARROW_SELECTED[1],this->COLOR_ARROW_SELECTED[2]);
+
            drawButton();
            if(isSelected)
            {
@@ -28,7 +32,7 @@ bool Button::getStatus()
 void Button::selectButton()
 {
     this->isSelected = true;
-    this->display.drawEmptyRect(this->startX, this->startY, this->sizeX,this->sizeY,this->display.makeColor(this->COLOR_FRAME_SELECTED[0],this->COLOR_FRAME_SELECTED[1],this->COLOR_FRAME_SELECTED[2]),this->FRAME_WIDTH);
+    this->display.drawEmptyRect(this->startX, this->startY, this->sizeX,this->sizeY,this->colorFrameSelected,this->FRAME_WIDTH);
     
     
     
@@ -36,7 +40,7 @@ void Button::selectButton()
 void Button::unselectButton()
 {
     this->isSelected = false;
-    this->display.drawEmptyRect(this->startX, this->startY, this->sizeX,this->sizeY,this->display.makeColor(this->COLOR_FRAME_UNSELECTED[0],this->COLOR_FRAME_UNSELECTED[1],this->COLOR_FRAME_UNSELECTED[2]),this->FRAME_WIDTH);
+    this->display.drawEmptyRect(this->startX, this->startY, this->sizeX,this->sizeY,this->colorFrameUnselected,this->FRAME_WIDTH);
     
     //Löschen des Pfeils
     //deleteArrow();

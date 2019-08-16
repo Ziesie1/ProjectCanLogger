@@ -32,8 +32,24 @@ void LogPage::loop()
 {
     if(wasSingleTasterPressed())
     {
-        pageManager.deleteOpenPage();
+        if(this->logTable->getPausingStatus())
+        {
+            this->logTable->setPausingStatus(false);
+            this->logTable->updateHeadlineBackground();
+        }
+        else
+        {
+             pageManager.deleteOpenPage();
+        }
     }
+
+    if(hasEncoderPosChanged())
+    {
+        this->logTable->setPausingStatus(true);
+        this->logTable->updateHeadlineBackground();
+    }
+    
+    
 }
 
 void LogPage::startView()

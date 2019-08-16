@@ -16,8 +16,10 @@ protected:
     const uint16_t BUTTON_TEXT_DST_X = 5;
     const uint16_t BUTTON_TEXT_DST_Y = 8;
     const byte COLOR_BUTTON_DEFAULT[3] = {1,64,118};
+    unsigned long colorButtonDefault;
     const unsigned long COLOR_BUTTON_TEXT = WHITE;
     const byte COLOR_ARROW_SELECTED[3] = {237,125,49};
+    unsigned long colorArrowSelected;
     const unsigned long COLOR_ARROW_UNSELECTED = WHITE;
     const uint16_t IMAGE_DST_Y = 15;
 
