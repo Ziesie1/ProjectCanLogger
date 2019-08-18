@@ -57,9 +57,9 @@ Programmiert wird in der Entwicklungsumgebung [Microsoft Visual Studio Code](htt
 | :-------- | :-------- | :-------- |
 | A         | CN10\|19  | PC7       | 
 | B         | CN10\|4   | PC6       | 
-| C         |           | GND       | 
+| C         | GND       | GND       | 
 | SW        | CN10\|27  | PB4       | 
-| GND       |           | GND       | 
+| GND       | GND       | GND       | 
 
 *SW wird beim Drücken des Drehdrückstellers auf Masse gelegt.*
 
@@ -68,25 +68,25 @@ Programmiert wird in der Entwicklungsumgebung [Microsoft Visual Studio Code](htt
 
 | Taster    | Bord-Pin     | Morpho    | 
 | :-------- | :--------    | :-------- |
-| 1         |              | VCC       | 
+| 1         | VCC          | VCC       | 
 | 2         | CN10\|34     | PC4       | 
-| GND       |              | GND       | 
+| GND       | GND          | GND       | 
 
 *1 und 2 liegen auf dem selben Potenzial. Wird der NO-Taster betätigt werden beide Pins auf Masse gelegt. Dies führt zu einem Spannungsabfall an CN10\|34 PCB.*
 
 <a name="canControllerPins"></a>
 ### CAN-Controller-Pins
 
-|CAN-Controller| Bord-Pin  | Morpho    |
-| :----------- | :-------- | :-------- |
-|              | Inhalt    |           |
-|              | Inhalt    |           |
-|              | Inhalt    |           |
-|              | Inhalt    |           |
-|              | Inhalt    |           |
-|              | Inhalt    |           |
-|              | Inhalt    |           |
-
+|CAN-Controller| Bord-Pin   | Morpho     |
+| :----------- | :--------  | :--------  |
+| TXD          | CN10\|5    | PB9        |
+| GND          | GND        | GND        |
+| VCC          | VCC        | VCC        |
+| RXD          | CN10\|3    | PB8        |
+| RS           | NC         | NC         |
+| CANH         |*CAN-SOCKED*|*CAN-SOCKED*|
+| CANL         |*CAN-SOCKED*|*CAN-SOCKED*|
+| Vref         | NC         | NC         |
 
 
 <a name="QandH"></a>
