@@ -1,8 +1,8 @@
 #include "display/elements/Textzeile.hpp"
 
-Textzeile::Textzeile(ILI9341& display,Canmsg &msg, bool isSelected, uint8_t offsetXSpalte1,
+Textzeile::Textzeile(ILI9341& display,Canmsg* msg, bool isSelected, uint8_t offsetXSpalte1,
                      uint8_t offsetXSpalte2, uint8_t offsetHeadline1,uint8_t offsetHeadline2,uint8_t offsetHeadline3,uint8_t zeilenhoehe)
-        :display{display},message{&msg},isSelected{isSelected},offsetXSpalte1{offsetXSpalte1},offsetXSpalte2{offsetXSpalte2},offsetXHeadline1{offsetHeadline1},offsetXHeadline2{offsetHeadline2},offsetXHeadline3{offsetHeadline3},zeilenhoehe{zeilenhoehe}
+        :display{display},message{msg},isSelected{isSelected},offsetXSpalte1{offsetXSpalte1},offsetXSpalte2{offsetXSpalte2},offsetXHeadline1{offsetHeadline1},offsetXHeadline2{offsetHeadline2},offsetXHeadline3{offsetHeadline3},zeilenhoehe{zeilenhoehe}
 {
 
 }

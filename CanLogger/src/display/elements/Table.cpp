@@ -1,6 +1,6 @@
 #include "display/elements/Table.hpp"
 
-Table::Table(ILI9341& display, String kopfzeile, Canmsg canMessages[], int anzahl, bool status)
+Table::Table(ILI9341& display, String kopfzeile, Canmsg* canMessages, int anzahl, bool status)
     :display{display},kopfzeile{kopfzeile},anzahlNachrichten{anzahl},pausing{status}
 {
     this->nachrichten = new Textzeile*[this->anzahlNachrichten];
@@ -8,7 +8,7 @@ Table::Table(ILI9341& display, String kopfzeile, Canmsg canMessages[], int anzah
     //Ausgabenachrichten-Array wird erzeugt
     for(int idx = 0;idx<this->anzahlNachrichten;idx++)
     {
-        nachrichten[idx] = new Textzeile(this->display,canMessages[idx],false,this->OFFSETX_SPALTE1,this->OFFSETX_SPALTE2,this->OFFSETX_HEADLINE1,this->OFFSETX_HEADLINE2,this->OFFSETX_HEADLINE3,this->ZEILENHOEHE);
+        nachrichten[idx] = new Textzeile(this->display,&canMessages[idx],false,this->OFFSETX_SPALTE1,this->OFFSETX_SPALTE2,this->OFFSETX_HEADLINE1,this->OFFSETX_HEADLINE2,this->OFFSETX_HEADLINE3,this->ZEILENHOEHE);
     }
 
     this->colorBackgroundFreeze = this->display.makeColor(this->COLOR_BACKGROUND_FREEZE[0],this->COLOR_BACKGROUND_FREEZE[1],this->COLOR_BACKGROUND_FREEZE[2]);
@@ -103,11 +103,11 @@ void Table::loop()
 {
     if(pausing)
     {
-
+        screenBuffer_disableUpdate();
     }
     else
     {
-        
+        screenBuffer_enableUpdate();
     }
     
 }

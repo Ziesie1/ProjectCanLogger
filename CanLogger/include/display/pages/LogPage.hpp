@@ -6,6 +6,7 @@
 #include "display/elements/Button.hpp"
 #include "display/elements/Table.hpp"
 #include "sd/SD.hpp"
+#include "display/screenBuffer.hpp"
 
 class LogPage : public DisplayPage
 {

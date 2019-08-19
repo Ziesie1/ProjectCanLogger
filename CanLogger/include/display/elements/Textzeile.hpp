@@ -23,7 +23,7 @@ class Textzeile
 
 
     public:
-    Textzeile(ILI9341& display, Canmsg &msg, bool isSelected, uint8_t offsetXSpalte1, uint8_t offsetXSpalte2, uint8_t offsetHeadline1,uint8_t offsetHeadline2,uint8_t offsetHeadline3,uint8_t zeilenhoehe);
+    Textzeile(ILI9341& display, Canmsg *msg, bool isSelected, uint8_t offsetXSpalte1, uint8_t offsetXSpalte2, uint8_t offsetHeadline1,uint8_t offsetHeadline2,uint8_t offsetHeadline3,uint8_t zeilenhoehe);
     void printImportantContent(uint8_t posY,unsigned long Farbe);
     void printWholeContent();
     void selectZeile();

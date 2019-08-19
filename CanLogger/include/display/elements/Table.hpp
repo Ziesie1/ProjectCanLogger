@@ -1,8 +1,9 @@
 #ifndef TABLE_HPP
 #define TABLE_HPP
 
-#include"display/elements/Textzeile.hpp"
-#include"display/ILI9341.hpp"
+#include "display/elements/Textzeile.hpp"
+#include "display/ILI9341.hpp"
+#include "display/screenBuffer.hpp"
 
 class Table
 {
@@ -43,7 +44,7 @@ class Table
 
 
     public:
-    Table(ILI9341& display, String kopfzeile, Canmsg canMessages[], int anzahl, bool status = false);
+    Table(ILI9341& display, String kopfzeile, Canmsg* canMessages, int anzahl, bool status = false);
     ~Table();
     void drawTableLines();
     void printTable(String speicherPfad);

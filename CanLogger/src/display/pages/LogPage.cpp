@@ -4,6 +4,8 @@
 #include "display/DisplayPageManager.hpp"
 #include "display/elements/Button.hpp"
 #include "buttons/Taster.hpp"
+#include "can/CanUtility.hpp"
+#include "display/screenBuffer.hpp"
 
 extern DisplayPageManager pageManager; // verweißt auf das Objekt in Main
 
@@ -19,10 +21,7 @@ LogPage::~LogPage()
   {
     delete this->logTable;
     this->logTable = nullptr;
-    /*
-    Der Destruktor Aufruf muss noch angepasst werden, da dieser im Moment noch dazu führt, dass sich das Programm
-    aufhängt
-     */
+
   }
     
 
@@ -30,6 +29,8 @@ LogPage::~LogPage()
 
 void LogPage::loop()
 {
+    this->logTable->loop();
+
     if(wasSingleTasterPressed())
     {
         if(this->logTable->getPausingStatus())
@@ -54,16 +55,23 @@ void LogPage::loop()
 
 void LogPage::startView()
 {
-    Canmsg* nachrichten = new Canmsg[5];
+    
+
+    Canmsg* nachrichten = new Canmsg[screenBuffer_getFillLevel()];
+    for(int i=0;i<screenBuffer_getFillLevel();i++)
+    {
+        screenBuffer_getMessageAtPosition(nachrichten[i],i);
+    }
+
     if(statusSD)
     {
         this->display.fillScreen(WHITE);
-        this->logTable = new Table(this->display,getFullLogFilePath().c_str(),nachrichten,5);
+        this->logTable = new Table(this->display,getFullLogFilePath().c_str(),nachrichten,screenBuffer_getFillLevel());
     }
     else
     {
         this->display.fillScreen(WHITE);
-        this->logTable = new Table(this->display,"Ohne Speichern",nachrichten,5);
+        this->logTable = new Table(this->display,"Ohne Speichern",nachrichten,screenBuffer_getFillLevel());
         
     }
 }
