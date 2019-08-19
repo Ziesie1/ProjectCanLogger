@@ -3,6 +3,8 @@
 #include "can/CanUtility.hpp"
 #include <Arduino.h>
 #include "utilities/SerialCommunication.hpp"
+#include "sd/SD.hpp"
+#include "utilities/FunctionLifeTime.hpp"
 
 //extern:
 int screenBufferFillLevel = 0;
@@ -347,34 +349,34 @@ bool screenBuffer_hasThisMessageChanged(int pos)
 */
 void loopScreenBuffer(void)
 {
+  // Bei zu vielen eingehenden Nachrichten bleibt er in der while() schleife gefangen
+  //FUNCTION_TIME_X("loopScreenBuffer(void)") //-> für eine Nachricht 47 ms, ohne Serial 43 ms
   if(CanUtility_isRecieveActive() && screenBufferInitialized)
   {
-    while(CanUtility_getbufferCanRecMessagesFillLevel() > 0)
+    if(CanUtility_getbufferCanRecMessagesFillLevel() > 0)
     {
       //get message recieved first
       Canmsg* curMsg = CanUtility_readFirstMessageFromBuffer();
-      
       if(curMsg)
       {
-        //screenBuffer:  
-        sortCanMessageIntoBuffer(*curMsg);
+      //screenBuffer:
+      sortCanMessageIntoBuffer(*curMsg);
 
-        //SD-Card:
+      //SD-Card:
+      saveNewCanMessage(*curMsg);
 
-
-
-        //loopback:
-        /*
-        CanUtility_SendMessage(curMsg);
-        */
-      
-        //Serial:
-        String s = "Empfangene Nachricht: ";
-        s += static_cast<String>(*curMsg);
-        utilities::scom.printDebug(s);
-      
-        //free space:
-        delete curMsg;
+      //loopback:
+      /*
+      CanUtility_SendMessage(curMsg);
+      */
+    
+      //Serial:
+      String s = "Empfangene Nachricht: ";
+      s += static_cast<String>(*curMsg);
+      utilities::scom.printDebug(s);
+    
+      //free space:
+      delete curMsg;
       }
     }
     

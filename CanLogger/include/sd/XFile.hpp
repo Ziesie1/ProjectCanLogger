@@ -6,6 +6,10 @@
 
 class XFile
 {
+public:
+    static const String LINE_FEED;
+    
+protected:
     SdFat& sdCard;
     File orgFile;
     String filePath = "";
@@ -13,21 +17,16 @@ class XFile
     
 public:
     XFile(SdFat& sdCard);
-    // Datei wird mit Text beschrieben/ueberschrieben
     bool writeStr(String const& text);
-    // Datei wird Text angehängt
+    bool writeStrLn(String const& text);
     bool appendStr(String const& text);
-    // Dateipfad angeben
+    bool appendStrLn(String const& text);
     void setFilePath(String const& filePath);
-    // Dateinamen setzen
     void setFileName(String const& fileName);
-    // Prüft ob die Datei bereits existiert
     bool exists();
-    // Gibt den Dateipfad zurück
+
     String const& getFilePath() const;
-    // Gibt den Dateinamen zurück
     String const& getFileName() const;
-    // Gibt den gesamten Dateipfad zurück
     String getTotalFilePath() const;
     
 };

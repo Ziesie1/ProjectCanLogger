@@ -11,8 +11,6 @@
 #include "display/screenBuffer.hpp"
 #include "utilities/utilities.hpp"
 
-//#define CUSTOMINTERRUPTCHECK
-#include "utilities/interruptcheck.hpp"
 
 
 using namespace utilities; // für scom
@@ -23,7 +21,7 @@ DisplayPageManager pageManager {};
 void setup() {
   Serial.begin(115200);
   scom.workWith(Serial); // scom Hardwareserial zuweisen
-  scom.showDebugMessages(true); // Debugmodus einschalten
+  scom.setDebugMode(true); // Debugmodus einschalten
   
   init_SD();
   HAL_Init();
@@ -42,6 +40,8 @@ void setup() {
   pageManager.openNewPage(new HomePage{display}); // Startseite setzen
 
   createNewCanLogFile();
+
+  CanUtility_EnableRecieve(); // Vorrübergehende aktivierung
 	
   scom << "CanLogger ist Initialisiert" << endz;
 }
@@ -50,20 +50,6 @@ void loop() {
   loopTaster();
   pageManager.loop();
   loopScreenBuffer();
-  /*
-  if(screenBuffer_hasSomethingChanged())
-  {
-    Canmsg temp{};
-    for(int i=0; i<screenBuffer_getFillLevel(); i++)
-    {
-      if(screenBuffer_hasThisMessageChanged(i))
-      {
-        screenBuffer_getMessageAtPosition(temp, i);
-        utilities::scom.printDebug("                      "+static_cast<String>(temp));
-      }
-    }
-  }
-  */
 }
 
 void serialEvent() {
@@ -74,9 +60,6 @@ void serialEvent() {
     */
     scom << "Charakter recieved:" << inChar << endz;
 
-    Canmsg msg{};
-    scom << static_cast<String>(msg) << endz;
-    saveNewCanMessage(msg);
   }
   
 }
