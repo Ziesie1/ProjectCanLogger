@@ -48,11 +48,23 @@ void setup() {
   scom << "CanLogger ist Initialisiert" << endz;
 }
 
+int timeHelper = 0;
+void HAL_SYSTICK_Callback(void)
+{
+  timeHelper++;
+}
+
 void loop() {
   loopTaster();
   pageManager.loop();
   loopScreenBuffer();
-
+  if(timeHelper>3000)
+  {
+    // printScreenBufferUserViewSerial();
+    // timeHelper = 0;
+    closeSD();
+    startSD();
+  }
 }
 
 void serialEvent() {

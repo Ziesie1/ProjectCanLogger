@@ -15,18 +15,6 @@ Canmsg::Canmsg()
 }
 
 /* 
-    creates an empty Message
-    ATTENTION: MESSAGE WON'T FULLFILL THE CAN-STANDARD
-    PLEASE ONLY USE THIS IF YOU KNOW WHAT YOU ARE DOING
-*/
-Canmsg::Canmsg(bool const empty)
-{
-  messagesWithNew++;
-  this->data = new uint8_t[this->maxLength];
-  this->canLength = 0;
-}
-
-/* 
     creates a CAN-message, where the databits are passed via a array
     Input:  stdId     - specifies the standard identifier of the message 
                         possible values: 0 - 0x7ff

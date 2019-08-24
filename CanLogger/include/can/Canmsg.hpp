@@ -34,7 +34,6 @@ private:
 	
 public:	
 	Canmsg();
-	Canmsg(bool const empty);
 	Canmsg(uint16_t stdId, uint32_t extId, bool isExtId, bool rtr, uint16_t time, 
 			uint8_t canLength, uint8_t const * const data);  
 	Canmsg(uint16_t stdId, uint32_t extId, bool isExtId, bool rtr, uint16_t time,
