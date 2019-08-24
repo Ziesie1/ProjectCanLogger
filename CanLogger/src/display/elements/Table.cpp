@@ -1,24 +1,31 @@
 #include "display/elements/Table.hpp"
 
-Table::Table(ILI9341& display, String kopfzeile, Canmsg* canMessages, int anzahl, bool status)
+Table::Table(ILI9341& display, String kopfzeile, int anzahl, bool status)
     :display{display},kopfzeile{kopfzeile},anzahlNachrichten{anzahl},pausing{status}
 {
-    this->nachrichten = new Textzeile*[this->anzahlNachrichten];
+    this->nachrichten = new Textzeile*[SCREEN_BUFFER_SIZE];
 
-    //Ausgabenachrichten-Array wird erzeugt
-    for(int idx = 0;idx<this->anzahlNachrichten;idx++)
+    //Textzeilenarray maximaler Groeße 
+    for(int idx = 0;idx<SCREEN_BUFFER_SIZE;idx++)
+    {    
+        nachrichten[idx] = new Textzeile(this->display,false,this->OFFSETX_SPALTE1,this->OFFSETX_SPALTE2,this->OFFSETX_HEADLINE1,this->OFFSETX_HEADLINE2,this->OFFSETX_HEADLINE3,this->ZEILENHOEHE);
+    }
+
+    //Canmsg der Textzeilen initialisieren
+    Canmsg dummi;
+    for(int idx = 0;idx<screenBuffer_getFillLevel();idx++)
     {
-        nachrichten[idx] = new Textzeile(this->display,&canMessages[idx],false,this->OFFSETX_SPALTE1,this->OFFSETX_SPALTE2,this->OFFSETX_HEADLINE1,this->OFFSETX_HEADLINE2,this->OFFSETX_HEADLINE3,this->ZEILENHOEHE);
+        screenBuffer_getMessageAtPosition(dummi,idx);
+        nachrichten[idx]->setCanMsg(dummi);
     }
 
     this->colorBackgroundFreeze = this->display.makeColor(this->COLOR_BACKGROUND_FREEZE[0],this->COLOR_BACKGROUND_FREEZE[1],this->COLOR_BACKGROUND_FREEZE[2]);
     this->colorWritingBodyIsRtr = this->display.makeColor(this->COLOR_WRITING_BODY_ISRTR[0],this->COLOR_WRITING_BODY_ISRTR[1],this->COLOR_WRITING_BODY_ISRTR[2]);
     this->colorBackgroundHeader = this->display.makeColor(this->COLOR_BACKGROUND_HEADER[0],this->COLOR_BACKGROUND_HEADER[1],this->COLOR_BACKGROUND_HEADER[2]);
 
-    setHeadlinePosition();
-    printTable(this->kopfzeile);
-    drawTableLines();
-    printMessages();
+    this->setHeadlinePosition();
+    this->printTable(this->kopfzeile);
+    this->printMessages();
     
 }
 
@@ -26,7 +33,7 @@ Table::~Table()
 {
     if(this->nachrichten)
     {
-        for(int idx=0;idx<this->anzahlNachrichten;idx++)
+        for(int idx=0;idx<SCREEN_BUFFER_SIZE;idx++)
         {
             if(this->nachrichten[idx])
             {
@@ -69,10 +76,21 @@ void Table::printTable(String speicherPfad)
 void Table::printMessages()
 {
     uint8_t posY = this->OFFSETY_SPALTENNAMEN+2;
-    for(int idx = 0;idx<this->anzahlNachrichten;idx++)
-    {
-        this->nachrichten[idx]->printImportantContent(posY,this->COLOR_WRITING_BODY_DEFAULT);
-        posY = posY+this->ZEILENHOEHE;
+    
+    for(int idx = 0;idx<screenBuffer_getFillLevel();idx++)
+    {   
+        if(this->nachrichten[idx]->isRtr())
+        {
+            this->nachrichten[idx]->printImportantContent(posY,this->colorWritingBodyIsRtr);
+            posY = posY + this->ZEILENHOEHE;
+        }
+        else
+        {
+            this->nachrichten[idx]->printImportantContent(posY,this->COLOR_WRITING_BODY_DEFAULT);
+            posY = posY + this->ZEILENHOEHE;
+        }
+        
+        
     }
     
 }
@@ -108,6 +126,12 @@ void Table::loop()
     else
     {
         screenBuffer_enableUpdate();
+
+        //check for Updates in screenBuffer, if updates are deteced the table will be updated
+        if(screenBuffer_hasSomethingChanged())
+        {
+            updateMessages();
+        }
     }
     
 }
@@ -137,4 +161,28 @@ void Table::updateHeadlineBackground()
     }
     
  
+}
+
+void Table::updateMessages()
+{
+    this->anzahlNachrichten = screenBuffer_getFillLevel();
+
+    Canmsg dummi;
+    //neue Nachrichten aufnehmen        
+    for(int idx = 0;idx<this->anzahlNachrichten;idx++)
+    {
+        if(screenBuffer_hasThisMessageChanged(idx))
+        {
+            screenBuffer_getMessageAtPosition(dummi,idx);
+            this->nachrichten[idx]->setCanMsg(dummi);
+        }
+    }
+
+    //neue Nachricht drucken
+
+    /*Quellecode*/
+    
+      
+    
+    
 }

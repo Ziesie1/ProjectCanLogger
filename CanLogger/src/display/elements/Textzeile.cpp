@@ -1,36 +1,36 @@
 #include "display/elements/Textzeile.hpp"
 
-Textzeile::Textzeile(ILI9341& display,Canmsg* msg, bool isSelected, uint8_t offsetXSpalte1,
+Textzeile::Textzeile(ILI9341& display, bool isSelected, uint8_t offsetXSpalte1,
                      uint8_t offsetXSpalte2, uint8_t offsetHeadline1,uint8_t offsetHeadline2,uint8_t offsetHeadline3,uint8_t zeilenhoehe)
-        :display{display},message{msg},isSelected{isSelected},offsetXSpalte1{offsetXSpalte1},offsetXSpalte2{offsetXSpalte2},offsetXHeadline1{offsetHeadline1},offsetXHeadline2{offsetHeadline2},offsetXHeadline3{offsetHeadline3},zeilenhoehe{zeilenhoehe}
+        :display{display},isSelected{isSelected},offsetXSpalte1{offsetXSpalte1},offsetXSpalte2{offsetXSpalte2},offsetXHeadline1{offsetHeadline1},offsetXHeadline2{offsetHeadline2},offsetXHeadline3{offsetHeadline3},zeilenhoehe{zeilenhoehe}
 {
-
+    //screenBuffer_getMessageAtPosition(this->message,this->pos);
 }
 
 void Textzeile::printImportantContent(uint8_t posY,unsigned long Farbe)
 {
-    if(this->message)
+    
+//testobjekt + rtr
+    //Canmsg can = new Canmsg{0x101, 0x0, false, true, 0x1000, 8, 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef};
+    //erste Spalte mit Begrenzung
+    String s1 = String(this->message.GetStdIdentifier(),HEX);
+    this->display.printString(this->offsetXHeadline1,posY,s1.c_str(),Farbe,this->COLOR_BACKGROUND_UNSELECTED);
+    this->display.drawVerticalLine(this->offsetXSpalte1,posY,posY+this->zeilenhoehe,this->COLOR_TABLE_LINE);
+
+    //zweite Spalte mit Begrenzung
+    s1 = String(this->message.GetTime(),HEX);
+    this->display.printString(this->offsetXHeadline2,posY,s1.c_str(),Farbe,this->COLOR_BACKGROUND_UNSELECTED);
+    this->display.drawVerticalLine(this->offsetXSpalte2,posY,posY+this->zeilenhoehe,this->COLOR_TABLE_LINE);
+
+    //dritte Spalte 
+    s1 = "";
+    for(int i=0;i<this->message.GetCanLength();i++)
     {
-
-        //erste Spalte mit Begrenzung
-        String s1 = String(this->message->GetStdIdentifier(),HEX);
-        this->display.printString(this->offsetXHeadline1,posY,s1.c_str(),Farbe,this->COLOR_BACKGROUND_UNSELECTED);
-        this->display.drawVerticalLine(this->offsetXSpalte1,posY,posY+this->zeilenhoehe,this->COLOR_TABLE_LINE);
-
-        //zweite Spalte mit Begrenzung
-        s1 = String(this->message->GetTime(),HEX);
-        this->display.printString(this->offsetXHeadline2,posY,s1.c_str(),Farbe,this->COLOR_BACKGROUND_UNSELECTED);
-        this->display.drawVerticalLine(this->offsetXSpalte2,posY,posY+this->zeilenhoehe,this->COLOR_TABLE_LINE);
-
-        //dritte Spalte 
-        s1 = "";
-        for(int i=0;i<this->message->GetCanLength();i++)
-        {
-            s1+=String(this->message->GetCanByte(i),HEX);
-        }
-        this->display.printString(this->offsetXSpalte2+4,posY,s1.c_str(),Farbe,this->COLOR_BACKGROUND_UNSELECTED);
-        
+        s1+=String(this->message.GetCanByte(i),HEX);
     }
+    this->display.printString(this->offsetXSpalte2+4,posY,s1.c_str(),Farbe,this->COLOR_BACKGROUND_UNSELECTED);
+        
+    
 }
 void Textzeile::printWholeContent()
 {
@@ -43,4 +43,13 @@ void Textzeile::selectZeile()
 void Textzeile::unselectZeile()
 {
     this->isSelected = false;
+}
+bool Textzeile::isRtr()
+{
+    return this->message.GetRtr();
+}
+
+void Textzeile::setCanMsg(Canmsg& msg)
+{
+    this->message = msg;
 }

@@ -63,7 +63,7 @@ void screenBufferDeinit(void)
     screenBuffer = nullptr;
     screenBufferFillLevel = 0;
   }
-
+  
   if(screenBufferUserView)
   {
     for(int i=0; i<SCREEN_BUFFER_SIZE; i++)

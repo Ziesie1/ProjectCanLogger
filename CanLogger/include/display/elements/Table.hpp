@@ -44,7 +44,7 @@ class Table
 
 
     public:
-    Table(ILI9341& display, String kopfzeile, Canmsg* canMessages, int anzahl, bool status = false);
+    Table(ILI9341& display, String kopfzeile, int anzahl, bool status = false);
     ~Table();
     void drawTableLines();
     void printTable(String speicherPfad);
@@ -55,6 +55,7 @@ class Table
     bool getPausingStatus();
     void loop();
     void updateHeadlineBackground();
+    void updateMessages();
     
 
 };

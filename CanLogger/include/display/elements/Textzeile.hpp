@@ -3,12 +3,14 @@
 
 #include "display/ILI9341.hpp"
 #include "can/Canmsg.hpp"
+#include "display/screenBuffer.hpp"
 
 class Textzeile
 {
-    protected:
+protected:
     ILI9341& display;
-    Canmsg* message;
+    //int pos;
+    Canmsg message;
     bool isSelected;
     const unsigned long COLOR_BACKGROUND_SELECTED = RED100;
     const unsigned long COLOR_BACKGROUND_UNSELECTED = WHITE;
@@ -22,13 +24,14 @@ class Textzeile
 
 
 
-    public:
-    Textzeile(ILI9341& display, Canmsg *msg, bool isSelected, uint8_t offsetXSpalte1, uint8_t offsetXSpalte2, uint8_t offsetHeadline1,uint8_t offsetHeadline2,uint8_t offsetHeadline3,uint8_t zeilenhoehe);
+public:
+    Textzeile(ILI9341& display, bool isSelected, uint8_t offsetXSpalte1, uint8_t offsetXSpalte2, uint8_t offsetHeadline1,uint8_t offsetHeadline2,uint8_t offsetHeadline3,uint8_t zeilenhoehe);
     void printImportantContent(uint8_t posY,unsigned long Farbe);
     void printWholeContent();
     void selectZeile();
     void unselectZeile();
-
+    bool isRtr();
+    void setCanMsg(Canmsg& msg);
 };
 
 

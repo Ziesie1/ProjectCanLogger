@@ -24,12 +24,13 @@ LogPage::~LogPage()
 
   }
     
-
+    screenBuffer_disableUpdate();
+    screenBuffer_clearScreenBuffer();
 }
 
 void LogPage::loop()
 {
-    this->logTable->loop();
+    //this->logTable->loop();
 
     if(wasSingleTasterPressed())
     {
@@ -37,6 +38,8 @@ void LogPage::loop()
         {
             this->logTable->setPausingStatus(false);
             this->logTable->updateHeadlineBackground();
+            screenBuffer_enableUpdate();
+            
         }
         else
         {
@@ -44,10 +47,19 @@ void LogPage::loop()
         }
     }
 
+    if(wasEncoderButtonPressed())
+    {
+        this->logTable->setPausingStatus(true);
+        this->logTable->updateHeadlineBackground();
+        screenBuffer_disableUpdate();
+    }
+
     if(hasEncoderPosChanged())
     {
         this->logTable->setPausingStatus(true);
         this->logTable->updateHeadlineBackground();
+        screenBuffer_disableUpdate();
+        
     }
     
     
@@ -55,23 +67,22 @@ void LogPage::loop()
 
 void LogPage::startView()
 {
+ 
+    // for(int idx = 0;idx<2;idx++)
+    // {
+    //     sortCanMessageIntoBuffer(new Canmsg{});
+    // }
     
-
-    Canmsg* nachrichten = new Canmsg[screenBuffer_getFillLevel()];
-    for(int i=0;i<screenBuffer_getFillLevel();i++)
-    {
-        screenBuffer_getMessageAtPosition(nachrichten[i],i);
-    }
 
     if(statusSD)
     {
         this->display.fillScreen(WHITE);
-        this->logTable = new Table(this->display,getFullLogFilePath().c_str(),nachrichten,screenBuffer_getFillLevel());
+        this->logTable = new Table(this->display,getFullLogFilePath().c_str(),screenBuffer_getFillLevel());
     }
     else
     {
         this->display.fillScreen(WHITE);
-        this->logTable = new Table(this->display,"Ohne Speichern",nachrichten,screenBuffer_getFillLevel());
+        this->logTable = new Table(this->display,"Ohne Speichern",screenBuffer_getFillLevel());
         
     }
 }

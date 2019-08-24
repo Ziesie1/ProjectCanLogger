@@ -95,4 +95,6 @@ void HomePage::startView()
     this->pfeilNichtSpeichern = new Arrow{this->display,this->buttonNichtSpeichern,this->colorArrowSelected,this->COLOR_ARROW_UNSELECTED,!this->statusSD};
     this->pfeilSpeichern = new Arrow{this->display,this->buttonSpeichern,this->colorArrowSelected,this->COLOR_ARROW_UNSELECTED,this->statusSD};
 
+   
+
 }

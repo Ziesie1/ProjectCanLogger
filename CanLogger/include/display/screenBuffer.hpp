@@ -8,7 +8,7 @@ void printScreenBufferSerial(void);
 void printScreenBufferUserViewSerial(void);
 
 //behandlung einzelner Nachrichten (interne)
-//void sortCanMessageIntoBuffer(Canmsg const& msg);
+void sortCanMessageIntoBuffer(Canmsg const& msg);
 //void insertMessageHere(Canmsg const& msg, int pos);
 
 // steuern des frontendbuffer

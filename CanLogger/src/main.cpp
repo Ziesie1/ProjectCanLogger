@@ -30,6 +30,7 @@ void setup() {
   initTaster();
   screenBufferInit();
   screenBuffer_enableUpdate();
+  //loopScreenBuffer();
   display.init();
 
   if((CanUtility_Init(CAN_500_KBIT) != HAL_OK) || (CanUtility_EnableRecieve() != HAL_OK))
@@ -43,6 +44,11 @@ void setup() {
 
   CanUtility_EnableRecieve(); // Vorrübergehende aktivierung
 	
+  // Test
+  sortCanMessageIntoBuffer(new Canmsg{0x101, 0x0, false, false, 0x1000, 8, 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef});
+  sortCanMessageIntoBuffer(new Canmsg{0x102, 0x0, false, false, 0x1000, 8, 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef});
+  sortCanMessageIntoBuffer(new Canmsg{0x103, 0x0, false, false, 0x1000, 8, 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef});
+
   scom << "CanLogger ist Initialisiert" << endz;
 }
 
