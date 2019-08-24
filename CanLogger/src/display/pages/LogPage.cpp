@@ -65,7 +65,7 @@ void LogPage::loop()
     
 }
 
-void LogPage::startView()
+void LogPage::loadStartView()
 {
  
     // for(int idx = 0;idx<2;idx++)

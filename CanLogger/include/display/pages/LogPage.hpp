@@ -19,7 +19,7 @@ protected:
 public:
     LogPage(ILI9341& display, bool statusSD);
     void loop() override;
-    void startView() override;
+    void loadStartView() override;
     ~LogPage();
 };
 
