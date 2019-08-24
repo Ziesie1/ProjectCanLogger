@@ -25,7 +25,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 		{
 			if(!CanUtility_bufferCanRecMessages[CanUtility_bufferCanRecPointer])
 			{
-				CanUtility_bufferCanRecMessages[CanUtility_bufferCanRecPointer] = new Canmsg{true};
+				CanUtility_bufferCanRecMessages[CanUtility_bufferCanRecPointer] = new Canmsg{0x7ff, 0x3ffff, true, false, 0xffff, 0};
 			}
 			CanUtility_RecieveMessage(0, CanUtility_bufferCanRecMessages[CanUtility_bufferCanRecPointer]);
 			CanUtility_bufferCanRecPointer++;
@@ -254,7 +254,7 @@ HAL_StatusTypeDef CanUtility_Init(CAN_SpeedTypedef speed)
 		CanUtility_bufferCanRecMessages = new Canmsg*[CanUtility_CAN_BUFFER_REC_SIZE];
 		for(int i=0; i<CanUtility_CAN_BUFFER_REC_SIZE; i++)
 		{
-			CanUtility_bufferCanRecMessages[i] = new Canmsg{true};
+			CanUtility_bufferCanRecMessages[i] = new Canmsg{0x7ff, 0x3ffff, true, false, 0xffff, 0};
 		}
 		CanUtility_bufferCanRecPointer = 0;
 		CanUtility_discardedMessages = 0;
@@ -490,7 +490,7 @@ Canmsg* CanUtility_readFirstMessageFromBuffer(void)
 		{
 			CanUtility_bufferCanRecMessages[i] = CanUtility_bufferCanRecMessages[i+1];
 		}
-		CanUtility_bufferCanRecMessages[CanUtility_bufferCanRecPointer] = new Canmsg{true};
+		CanUtility_bufferCanRecMessages[CanUtility_bufferCanRecPointer] = new Canmsg{0x7ff, 0x3ffff, true, false, 0xffff, 0};
 	}
 	if(CanUtility_initialized)
 	{
