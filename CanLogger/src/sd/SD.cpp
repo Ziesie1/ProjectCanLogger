@@ -58,7 +58,29 @@ void init_SD()
 }
 
 /*
+    Start the process for the SD-Card.
+    input:
+    return:
+*/
+void startSD()
+{
+    canLogFile.open();
+}
+
+/*
+    Close the process for the SD-Card.
+    All data in Cache will be written to the SD-Card.
+    input:
+    return:
+*/
+void closeSD()
+{
+    canLogFile.close();
+}
+
+/*
     Create a new Canlog file in the default folder.
+    startSD() musst be called bevore!
 */
 void createNewCanLogFile()
 {
@@ -80,7 +102,17 @@ void createNewCanLogFile()
         ausgabe += canLogFile.getFileName();
         scom.printDebug(ausgabe);
         
-        canLogFile.writeStrLn("identifier(hex);RTR bit;time stamp(hex);data length(hex);byte 1(hex);byte 2(hex);byte 3(hex);byte 4(hex);byte 5(hex);byte 6(hex);byte 7(hex);byte 8(hex)");
+        canLogFile.open();
+
+        bool result = canLogFile.appendStrLn("identifier(hex);RTR bit;time stamp(hex);data length(hex);byte 1(hex);byte 2(hex);byte 3(hex);byte 4(hex);byte 5(hex);byte 6(hex);byte 7(hex);byte 8(hex)");
+        if(result == false)
+        {
+            String str = "Das Canlog file konnte nicht beschrieben werden:\n";
+            str += "\nIst die Speicherkarte noch eingesteckt?";
+            scom.printError(str);
+        }
+
+        canLogFile.close();
     }
 }
 

@@ -10,43 +10,75 @@ XFile::XFile(SdFat& sdCard)
     :sdCard{sdCard}
 { }
 
-// override file with string
-bool XFile::writeStr(String const& text)
+// // override file with string
+// bool XFile::writeStr(String const& text)
+// {
+//     //FUNCTION_TIME_X("bool XFile::writeStr(String const& text)")
+//     bool status = true;
+//     this->orgFile = this->sdCard.open(this->getTotalFilePath().c_str(), O_RDWR | O_CREAT | O_TRUNC);
+//     if(this->orgFile)
+//     {
+//         this->orgFile.print(text.c_str()); // Schreibt Char Array in die Datei
+//     }else{
+//         status = false;
+//     }
+//     this->orgFile.close();
+//     return status;
+// }
+
+// // override fFile with string, with CR&LF
+// bool XFile::writeStrLn(String const& text)
+// {
+//     String text_LF = text + XFile::LINE_FEED;
+//     return this->writeStr(text_LF);
+// }
+
+/*
+    Open/Create the file on SD-Card.
+    input: ---
+    return: true - succesful
+            false - failure
+*/
+bool XFile::open()
 {
-    //FUNCTION_TIME_X("bool XFile::writeStr(String const& text)")
-    bool status = true;
-    this->orgFile = this->sdCard.open(this->getTotalFilePath().c_str(), O_RDWR | O_CREAT | O_TRUNC);
-    if(this->orgFile)
+    this->orgFile = this->sdCard.open(this->getTotalFilePath().c_str(), O_RDWR | O_CREAT); // 9-10 ms
+    if(!this->orgFile)
     {
-        this->orgFile.print(text.c_str()); // Schreibt Char Array in die Datei
-    }else{
-        status = false;
+        return false;
     }
-    this->orgFile.close();
-    return status;
+    return true;
 }
 
-// override fFile with string, with CR&LF
-bool XFile::writeStrLn(String const& text)
+/*
+    Write the last bytes and close the file. 
+    input: ---
+    return: true - succesful
+            false - failure
+*/
+bool XFile::close()
 {
-    String text_LF = text + XFile::LINE_FEED;
-    return this->writeStr(text_LF);
+    this->orgFile.flush();
+    return this->orgFile.close();
 }
 
 // append string on current file
 bool XFile::appendStr(String const& text)
 {
-    //FUNCTION_TIME_X("XFile::appendStr(String const& text)")
+    //FUNCTION_TIME_X("XFile::appendStr(String const& text)") // 38-40ms
     bool status = true;
-    this->orgFile = this->sdCard.open(this->getTotalFilePath().c_str(), O_RDWR | O_CREAT);
+
+    //this->orgFile = this->sdCard.open(this->getTotalFilePath().c_str(), O_RDWR | O_CREAT); // 9-10 ms
+
     if(this->orgFile)
     {
-        this->orgFile.seekEnd(0);
-        this->orgFile.print(text.c_str());
+        this->orgFile.seekEnd(0); // 0 ms
+        this->orgFile.print(text.c_str()); // 4-5 ms
     }else{
         status = false;
     }
-    this->orgFile.close();
+
+    //this->orgFile.close(); // 25 ms
+    
     return status;
 }
 

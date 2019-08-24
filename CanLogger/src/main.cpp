@@ -39,7 +39,9 @@ void setup() {
  
   pageManager.openNewPage(new HomePage{display}); // Startseite setzen
 
-  createNewCanLogFile();
+  
+  createNewCanLogFile(); // vorrübergehende aktivierung
+  startSD();
 
   CanUtility_EnableRecieve(); // Vorrübergehende aktivierung
 	
@@ -50,6 +52,7 @@ void loop() {
   loopTaster();
   pageManager.loop();
   loopScreenBuffer();
+
 }
 
 void serialEvent() {

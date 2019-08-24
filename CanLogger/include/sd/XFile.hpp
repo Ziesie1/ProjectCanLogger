@@ -17,8 +17,10 @@ protected:
     
 public:
     XFile(SdFat& sdCard);
-    bool writeStr(String const& text);
-    bool writeStrLn(String const& text);
+    // bool writeStr(String const& text);
+    // bool writeStrLn(String const& text);
+    bool open();
+    bool close();
     bool appendStr(String const& text);
     bool appendStrLn(String const& text);
     void setFilePath(String const& filePath);
