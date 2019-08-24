@@ -80,7 +80,7 @@ void HomePage::loop()
     }
 }
 
-void HomePage::startView()
+void HomePage::loadStartView()
 {
 
     this->display.fillScreen(WHITE);

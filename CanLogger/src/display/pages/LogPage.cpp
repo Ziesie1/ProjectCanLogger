@@ -53,7 +53,7 @@ void LogPage::loop()
     
 }
 
-void LogPage::startView()
+void LogPage::loadStartView()
 {
     
 
