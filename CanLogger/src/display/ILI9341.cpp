@@ -1,4 +1,3 @@
-#include <Arduino.h>
 #include "display/ILI9341.hpp"
 #include "display/ILI9341_Definitions.hpp"
 #include "utilities/SerialCommunication.hpp"
