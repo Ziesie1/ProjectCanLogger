@@ -48,6 +48,7 @@ void setup() {
   scom << "CanLogger ist Initialisiert" << endz;
 }
 
+// Testweise
 int timeHelper = 0;
 void HAL_SYSTICK_Callback(void)
 {
@@ -58,6 +59,7 @@ void loop() {
   loopTaster();
   pageManager.loop();
   loopScreenBuffer();
+
   if(timeHelper>3000)
   {
     // printScreenBufferUserViewSerial();
