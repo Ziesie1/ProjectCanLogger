@@ -59,6 +59,7 @@ void init_SD()
 
 /*
     Start the process for the SD-Card.
+    Must be called bevore Canmessages can be saved to the SD-Card.
     input:
     return:
 */
@@ -69,7 +70,8 @@ void startSD()
 
 /*
     Close the process for the SD-Card.
-    All data in Cache will be written to the SD-Card.
+    Must be called before removing the SD-Card.
+    All data in cache will be written to the SD-Card.
     input:
     return:
 */
@@ -77,6 +79,7 @@ void closeSD()
 {
     canLogFile.close();
 }
+
 
 /*
     Create a new Canlog file in the default folder.

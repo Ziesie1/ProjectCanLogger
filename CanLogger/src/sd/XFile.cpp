@@ -70,7 +70,7 @@ bool XFile::close()
 */
 bool XFile::appendStr(String const& text)
 {
-    FUNCTION_TIME_X("XFile::appendStr(String const& text)") // 5 ms
+    //FUNCTION_TIME_X("XFile::appendStr(String const& text)") // 5 ms
     bool status = true;
 
     if(this->orgFile)
@@ -97,6 +97,16 @@ bool XFile::appendStrLn(String const& text)
     return this->appendStr(text_LF);
 }
 
+/*
+    Clear the hole file. Afterwards the file is empty.
+    input:  
+    return: true - succesful
+            false - failure
+*/
+bool XFile::clear()
+{
+    return this->orgFile.remove();
+}
 
 /*
     Set the filepath for the file.

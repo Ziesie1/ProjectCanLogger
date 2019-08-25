@@ -23,6 +23,7 @@ public:
     bool close();
     bool appendStr(String const& text);
     bool appendStrLn(String const& text);
+    bool clear();
     void setFilePath(String const& filePath);
     void setFileName(String const& fileName);
     bool exists();
