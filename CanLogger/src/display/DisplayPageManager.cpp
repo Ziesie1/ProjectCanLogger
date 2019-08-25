@@ -1,9 +1,7 @@
 #include "display/DisplayPageManager.hpp"
 
 DisplayPageManager::DisplayPageManager()
-{
-
-}
+{ }
 
 DisplayPageManager::~DisplayPageManager()
 {

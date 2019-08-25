@@ -4,6 +4,11 @@
 
 #include "display/pages/DisplayPage.hpp"
 
+/*
+    Die Klasse dient zur Verwaltung verschiedener DisplayPages.
+    Dabei übergibt man der Klasse eine DisplayPage und der DisplayPageManager ruft diese auf und löscht sie später. 
+    Es gibt eine Page im Fordergrund, wohingegen die anderen Pages auf dem Stack liegen und inaktiv sind.
+*/
 class DisplayPageManager
 {
     DisplayPage** pageArray = nullptr;

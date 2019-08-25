@@ -27,6 +27,10 @@ enum Color {
     ORANGE =        0x013DUL
 };
 
+/*
+    Mit der Klasse ILI9341, können die entsprechenden Display angesteuert werden.
+    Die Klasse bietet verschiedene Methoden zum beschreiben des Display an.
+*/
 class ILI9341
 {
     const uint32_t PIN_CS;

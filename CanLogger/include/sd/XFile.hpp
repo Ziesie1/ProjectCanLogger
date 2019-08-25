@@ -4,6 +4,10 @@
 #include <SdFat.h>
 #include <string.h>
 
+/*
+    Ein Objekt der Klasse XFile verwaltet eine Datei welche auf der SD-Karte gespeichert wird.
+    Die Klasse bietet verschiedene Funktionen zur Verwaltung der Datei.
+*/
 class XFile
 {
 public:
