@@ -11,11 +11,11 @@
 */
 void AddZerosToString(String& s,uint64_t const val,uint64_t const maxVal, uint8_t const numberSys)
 {
-  for(uint64_t i=numberSys; i<=maxVal; i*=numberSys)
-  {
-    if(val < i)
+    for(uint64_t i=numberSys; i<=maxVal; i*=numberSys)
     {
-      s+="0";
+        if(val < i)
+        {
+            s+="0";
+        }
     }
-  }
 }

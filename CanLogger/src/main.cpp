@@ -19,58 +19,60 @@ ILI9341 display {PC9, PC8, PA10, PA8, PB5, true};
 DisplayPageManager pageManager {};
 
 void setup() {
-  Serial.begin(115200);
-  scom.workWith(Serial); // scom Hardwareserial zuweisen
-  scom.setDebugMode(true); // Debugmodus einschalten
+    Serial.begin(115200);
+    scom.workWith(Serial); // scom Hardwareserial zuweisen
+    scom.setDebugMode(true); // Debugmodus einschalten
   
-  init_SD();
-  HAL_Init();
-  SystemClock_Config();
-  initEncoder();
-  initTaster();
-  screenBufferInit();
-  screenBuffer_enableUpdate();
-  display.init();
+    init_SD();
+    HAL_Init();
+    SystemClock_Config();
+    initEncoder();
+    initTaster();
+    screenBufferInit();
+    screenBuffer_enableUpdate();
+    display.init();
 
-  if((CanUtility_Init(CAN_500_KBIT) != HAL_OK) || (CanUtility_EnableRecieve() != HAL_OK))
-  {
-    while(1){}
-  }
+    if((CanUtility_Init(CAN_500_KBIT) != HAL_OK) || (CanUtility_EnableRecieve() != HAL_OK))
+    {
+        while(1){}
+    }
  
-  pageManager.openNewPage(new HomePage{display}); // Startseite setzen
+    pageManager.openNewPage(new HomePage{display}); // Startseite setzen
 
-  createNewCanLogFile();
+    createNewCanLogFile();
 
-  CanUtility_EnableRecieve(); // Vorrübergehende aktivierung
+    CanUtility_EnableRecieve(); // Vorrübergehende aktivierung
 	
-  scom << "CanLogger ist Initialisiert" << endz;
+    scom << "CanLogger ist Initialisiert" << endz;
 }
 
 int timeHelper = 0;
 void HAL_SYSTICK_Callback(void)
 {
-  timeHelper++;
+    timeHelper++;
 }
 
 void loop() {
-  loopTaster();
-  pageManager.loop();
-  loopScreenBuffer();
-  if(timeHelper>3000)
-  {
-    printScreenBufferUserViewSerial();
-    timeHelper = 0;
-  }
+    loopTaster();
+    pageManager.loop();
+    loopScreenBuffer();
+    if(timeHelper>3000)
+    {
+        printScreenBufferUserViewSerial();
+        timeHelper = 0;
+    }
 }
 
-void serialEvent() {
-  while (Serial.available()) {
-    char inChar = (char)Serial.read();
-    /*
-      Eine Ausgabe nicht beim Interrupt erlaubt, hier nur Testweise. // Bis das gesamt Konzept feststeht.
-    */
-    scom << "Charakter recieved:" << inChar << endz;
+void serialEvent() 
+{
+    while (Serial.available()) 
+    {
+        char inChar = (char)Serial.read();
+        /*
+            Eine Ausgabe nicht beim Interrupt erlaubt, hier nur Testweise. // Bis das gesamt Konzept feststeht.
+        */
+        scom << "Charakter recieved:" << inChar << endz;
 
-  }
+    }
   
 }

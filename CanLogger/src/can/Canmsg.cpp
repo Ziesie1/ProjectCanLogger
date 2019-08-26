@@ -1,5 +1,4 @@
 #include "can/Canmsg.hpp"
-#include "can/CanUtility.hpp"
 #include "utilities/utilities.hpp"
 #include "utilities/SerialCommunication.hpp"
 
@@ -37,7 +36,7 @@ Canmsg::Canmsg()
                         possible values of the single databits: 0 - 0xff
 */
 Canmsg::Canmsg(uint16_t stdId, uint32_t extId, bool isExtId, bool rtr, uint16_t time, 
-                uint8_t canLength, uint8_t const * const data)
+               uint8_t canLength, uint8_t const * const data)
     :Canmsg{stdId, extId, isExtId, rtr, time, canLength}
 {
     if(data != nullptr)
@@ -108,9 +107,9 @@ Canmsg::Canmsg(uint16_t stdId, uint32_t extId, bool isExtId, bool rtr, uint16_t 
                         the constructor will only copy the ammount of values specifies in canLength
 */
 Canmsg::Canmsg(uint16_t stdId, uint32_t extId, bool isExtId, bool rtr, uint16_t time, 
-			    uint8_t canLength, uint8_t databit0, uint8_t databit1, 
-			    uint8_t databit2, uint8_t databit3, uint8_t databit4, 
-			    uint8_t databit5, uint8_t databit6, uint8_t databit7)
+			   uint8_t canLength, uint8_t databit0, uint8_t databit1, 
+			   uint8_t databit2, uint8_t databit3, uint8_t databit4, 
+			   uint8_t databit5, uint8_t databit6, uint8_t databit7)
   :isExtIdentifier{isExtId}, rtr{rtr}, time{time}
 {
     messagesWithNew ++;
@@ -162,11 +161,11 @@ Canmsg::Canmsg(uint16_t stdId, uint32_t extId, bool isExtId, bool rtr, uint16_t 
 */
 void Canmsg::destroy(void)
 {
-  if(this->data)
-  {
-    delete[] this->data;
-  }
-  this->moveDestroy();
+    if(this->data)
+    {
+        delete[] this->data;
+    }
+    this->moveDestroy();
 }
 
 /* 
@@ -174,8 +173,8 @@ void Canmsg::destroy(void)
 */
 void Canmsg::moveDestroy(void)
 {
-  this->data = nullptr;
-  this->canLength = 0;
+    this->data = nullptr;
+    this->canLength = 0;
 }
 
 /* 
@@ -183,8 +182,8 @@ void Canmsg::moveDestroy(void)
 */
 Canmsg::~Canmsg()
 {
-  messagesWithNew--;
-  this->destroy();
+    messagesWithNew--;
+    this->destroy();
 }
 
 /* 
@@ -205,19 +204,19 @@ Canmsg::Canmsg(Canmsg const& other)
 */
 Canmsg& Canmsg::operator= (Canmsg const& other)
 {
-  this->destroy();
-  this->stdIdentifier = other.stdIdentifier;
-  this->extIdentifier = other.extIdentifier;
-  this->isExtIdentifier = other.isExtIdentifier;
-  this->rtr = other.rtr;
-  this->time = other.time;
-  this->canLength = other.canLength;
-  this->data = new uint8_t[this->maxLength];
-  for(byte i=0; i<maxLength; i++)
-  {
-    this->data[i] = other.data[i];
-  }
-  return *this;
+    this->destroy();
+    this->stdIdentifier = other.stdIdentifier;
+    this->extIdentifier = other.extIdentifier;
+    this->isExtIdentifier = other.isExtIdentifier;
+    this->rtr = other.rtr;
+    this->time = other.time;
+    this->canLength = other.canLength;
+    this->data = new uint8_t[this->maxLength];
+    for(byte i=0; i<maxLength; i++)
+    {
+        this->data[i] = other.data[i];
+    }
+    return *this;
 }	
 
 /* 
@@ -226,8 +225,8 @@ Canmsg& Canmsg::operator= (Canmsg const& other)
 */
 Canmsg::Canmsg(Canmsg && other)
 {
-  messagesWithNew++;
-  (*this) = std::move(other);
+    messagesWithNew++;
+    (*this) = std::move(other);
 }
 
 /*
@@ -236,16 +235,16 @@ Canmsg::Canmsg(Canmsg && other)
 */
 Canmsg& Canmsg::operator= (Canmsg && other)
 {
-  this->destroy();
-  this->stdIdentifier = other.stdIdentifier;
-  this->extIdentifier = other.extIdentifier;
-  this->isExtIdentifier = other.isExtIdentifier;
-  this->rtr = other.rtr;
-  this->time = other.time;
-  this->canLength = other.canLength;
-  this->data = other.data;
-  other.moveDestroy();
-  return (*this);
+    this->destroy();
+    this->stdIdentifier = other.stdIdentifier;
+    this->extIdentifier = other.extIdentifier;
+    this->isExtIdentifier = other.isExtIdentifier;
+    this->rtr = other.rtr;
+    this->time = other.time;
+    this->canLength = other.canLength;
+    this->data = other.data;
+    other.moveDestroy();
+    return (*this);
 }
 
 /* 
@@ -257,24 +256,24 @@ Canmsg::operator String() const
     String s="Identifier: ";
     if(this->isExtIdentifier)
     {
-      char32_t fullId = (this->stdIdentifier<<18)|this->extIdentifier;
-      AddZerosToString(s, fullId, Canmsg::maxStdId<<18|Canmsg::maxExtId, HEX);
-      s+=String(fullId, HEX);
+        char32_t fullId = (this->stdIdentifier<<18)|this->extIdentifier;
+        AddZerosToString(s, fullId, Canmsg::maxStdId<<18|Canmsg::maxExtId, HEX);
+        s+=String(fullId, HEX);
     }
     else
     {
-      AddZerosToString(s, this->stdIdentifier, Canmsg::maxStdId, HEX);
-      s+=String(this->stdIdentifier,HEX);
+        AddZerosToString(s, this->stdIdentifier, Canmsg::maxStdId, HEX);
+        s+=String(this->stdIdentifier,HEX);
     }
     s+="h RTR: ";
     s+=String(this->rtr);
     s+=" Time: ";
     AddZerosToString(s, this->time, Canmsg::maxTime, HEX);
     s+=String(this->time,HEX);
-	  s+="h Laenge: ";
+	s+="h Laenge: ";
     s+=String(this->canLength,HEX);
     s+="h Inhalt: ";
-    for(byte i=0;i<this->canLength;i++)
+    for(byte i=0;(i<this->canLength)&&(!this->rtr);i++)
     {
         AddZerosToString(s, this->data[i], Canmsg::maxDataVal, HEX);
         s+=String(this->data[i],HEX);
@@ -283,7 +282,10 @@ Canmsg::operator String() const
             s+=".";
         }   
     }
-    s+=" h";
+    if((this->canLength > 0) && (!this->rtr))
+    {
+        s+=" h";
+    }
     return s;
 }
 
@@ -296,14 +298,14 @@ Canmsg::operator String() const
 */
 uint8_t Canmsg::operator[](int idx) const
 {
-  if(idx<this->maxLength)
-  {
-    return this->data[idx];
-  }
-  else
-  {
-    return 0;
-  }
+    if(idx<this->maxLength)
+    {
+        return this->data[idx];
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 /*
@@ -314,38 +316,38 @@ uint8_t Canmsg::operator[](int idx) const
 */
 bool Canmsg::operator==(Canmsg const& other) const
 {
-  if(this->isExtIdentifier!=other.isExtIdentifier)
-  {
-    return false;
-  }
-  if(this->stdIdentifier!=other.stdIdentifier)
-  {
-    return false;
-  }
-  if(this->isExtIdentifier && (this->extIdentifier!=other.extIdentifier))
-  {
-    return false;
-  }
-  if(this->rtr!=other.rtr)
-  {
-    return false;
-  }
-  if(this->time!=other.time)
-  {
-    return false;
-  }
-  if(this->canLength!=other.canLength)
-  {
-    return false;
-  }
-  for(int i=0; i<this->canLength; i++)
-  {
-    if(this->data[i]!=other.data[i])
+    if(this->isExtIdentifier!=other.isExtIdentifier)
     {
-      return false;
+        return false;
     }
-  }
-  return true;
+    if(this->stdIdentifier!=other.stdIdentifier)
+    {
+        return false;
+    }
+    if(this->isExtIdentifier && (this->extIdentifier!=other.extIdentifier))
+    {
+        return false;
+    }
+    if(this->rtr!=other.rtr)
+    {
+        return false;
+    }
+    if(this->time!=other.time)
+    {
+        return false;
+    }
+    if(this->canLength!=other.canLength)
+    {
+        return false;
+    }
+    for(int i=0; i<this->canLength; i++)
+    {
+        if(this->data[i]!=other.data[i])
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
 /*
@@ -356,7 +358,7 @@ bool Canmsg::operator==(Canmsg const& other) const
 */
 bool Canmsg::operator!=(Canmsg const& other) const
 {
-  return !(*this==other);
+    return !(*this==other);
 }
 
 /* 
@@ -365,7 +367,7 @@ bool Canmsg::operator!=(Canmsg const& other) const
 */
 uint16_t Canmsg::GetStdIdentifier() const
 {
-  return this->stdIdentifier;
+    return this->stdIdentifier;
 }
 
 /* 
@@ -374,7 +376,7 @@ uint16_t Canmsg::GetStdIdentifier() const
 */
 uint32_t Canmsg::GetExtIdentifier() const
 {
-  return this->extIdentifier;  
+    return this->extIdentifier;  
 }
 
 /* 
@@ -384,14 +386,14 @@ uint32_t Canmsg::GetExtIdentifier() const
 */
 uint32_t Canmsg::GetFullId() const
 {
-  if(this->isExtIdentifier)
-  {
-    return ((this->stdIdentifier<<18)|this->extIdentifier);
-  }
-  else
-  {
-    return this->stdIdentifier;
-  }
+    if(this->isExtIdentifier)
+    {
+        return ((this->stdIdentifier<<18)|this->extIdentifier);
+    }
+    else
+    {
+        return this->stdIdentifier;
+    }
 }
 
 /* 
@@ -401,7 +403,7 @@ uint32_t Canmsg::GetFullId() const
 */
 bool Canmsg::GetIsExtIdentifier() const
 {
-  return this->isExtIdentifier;
+    return this->isExtIdentifier;
 }
 
 /* 
@@ -411,7 +413,7 @@ bool Canmsg::GetIsExtIdentifier() const
 */
 bool Canmsg::GetRtr() const
 {
-  return this->rtr;
+    return this->rtr;
 }
 
 /* 
@@ -420,7 +422,7 @@ bool Canmsg::GetRtr() const
 */
 uint16_t Canmsg::GetTime() const
 {
-  return this->time;
+    return this->time;
 }
 
 /* 
@@ -429,7 +431,7 @@ uint16_t Canmsg::GetTime() const
 */
 byte Canmsg::GetCanLength() const
 {
-  return this->canLength;
+    return this->canLength;
 }
 
 /* 
@@ -441,6 +443,6 @@ byte Canmsg::GetCanLength() const
 */
 byte Canmsg::GetCanByte(int const idx) const
 {
-  return (*this)[idx];
+    return (*this)[idx];
 }
 

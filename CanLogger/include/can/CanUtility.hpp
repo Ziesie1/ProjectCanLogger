@@ -5,6 +5,8 @@
 #include <Arduino.h>
 #include "can/Canmsg.hpp"
 
+constexpr int CanUtility_CAN_BUFFER_REC_SIZE = 50;
+
 typedef enum
 {
     //CAN_1000_KBIT   =   2 funktioniert zurzeit nicht /*transmisson speed of CAN-bus of 1000 kbit/s   */
@@ -32,14 +34,5 @@ bool CanUtility_isRecieveActive(void);
 bool CanUtility_hasFiFoOverflowOccured(void);
 bool CanUtility_whereNewMessagesDiscarded(void);
 int CanUtility_howManyMessagesWhereDiscarded(void);
-
-//extern CAN_HandleTypeDef CanUtility_hcan;
-//extern bool CanUtility_CanRecieveActive;
-
-constexpr int CanUtility_CAN_BUFFER_REC_SIZE = 50;
-//extern Canmsg** CanUtility_bufferCanRecMessages;
-//extern int CanUtility_bufferCanRecPointer;
-//extern int CanUtility_discardedMessages;
-//extern bool CanUtility_toManyMsgs;
 
 #endif //CANUTILITY
