@@ -35,11 +35,11 @@ private:
 public:	
 	Canmsg();
 	Canmsg(uint16_t stdId, uint32_t extId, bool isExtId, bool rtr, uint16_t time, 
-			uint8_t canLength, uint8_t const * const data);  
+		   uint8_t canLength, uint8_t const * const data);  
 	Canmsg(uint16_t stdId, uint32_t extId, bool isExtId, bool rtr, uint16_t time,
-			uint8_t canLength, uint8_t databit0 = 0x00, uint8_t databit1 = 0x00, 
-			uint8_t databit2 = 0x00, uint8_t databit3 = 0x00, uint8_t databit4 = 0x00, 
-			uint8_t databit5 = 0x00, uint8_t databit6 = 0x00, uint8_t databit7 = 0x00);  
+		   uint8_t canLength, uint8_t databit0 = 0x00, uint8_t databit1 = 0x00, 
+		   uint8_t databit2 = 0x00, uint8_t databit3 = 0x00, uint8_t databit4 = 0x00, 
+		   uint8_t databit5 = 0x00, uint8_t databit6 = 0x00, uint8_t databit7 = 0x00);  
 
 	~Canmsg();
 	Canmsg(Canmsg const& other);

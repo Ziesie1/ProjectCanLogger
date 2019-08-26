@@ -384,9 +384,9 @@ HAL_StatusTypeDef CanUtility_RecieveMessage(bool const fifo, Canmsg * msg)
 			msg->isExtIdentifier = ((CanUtility_hcan.Instance->sFIFOMailBox[fifo].RIR & CAN_RI0R_IDE) >> CAN_RI0R_IDE_Pos);
 			msg->rtr = ((CanUtility_hcan.Instance->sFIFOMailBox[fifo].RIR & CAN_RI0R_RTR) >> CAN_RI0R_RTR_Pos); //Remote transmission Reguest aus dem CAN_RIxR Register
 			msg->time = ((CanUtility_hcan.Instance->sFIFOMailBox[fifo].RDTR & CAN_RDT0R_TIME) >> CAN_RDT0R_TIME_Pos); //timestamp aus dem CAN_RDTxR Register
+			msg->canLength = ((CanUtility_hcan.Instance->sFIFOMailBox[fifo].RDTR & CAN_RDT0R_DLC) >> CAN_RDT0R_DLC_Pos); //anzahl der bytes aus dem CAN_RDTxR Register	
 			if(!(msg->rtr))
 			{
-				msg->canLength = ((CanUtility_hcan.Instance->sFIFOMailBox[fifo].RDTR & CAN_RDT0R_DLC) >> CAN_RDT0R_DLC_Pos); //anzahl der bytes aus dem CAN_RDTxR Register
 				msg->data[0] = ((CanUtility_hcan.Instance->sFIFOMailBox[fifo].RDLR & CAN_RDL0R_DATA0) >> CAN_RDL0R_DATA0_Pos); //Daten bytes aus dem CAN_RDLxR Register
 				msg->data[1] = ((CanUtility_hcan.Instance->sFIFOMailBox[fifo].RDLR & CAN_RDL0R_DATA1) >> CAN_RDL0R_DATA1_Pos);
 				msg->data[2] = ((CanUtility_hcan.Instance->sFIFOMailBox[fifo].RDLR & CAN_RDL0R_DATA2) >> CAN_RDL0R_DATA2_Pos);
@@ -398,7 +398,6 @@ HAL_StatusTypeDef CanUtility_RecieveMessage(bool const fifo, Canmsg * msg)
 			}
 			else
 			{
-				msg->canLength = 0;
 				for(int i=0; i<msg->maxLength; i++)
 				{
 					msg->data[i] = 0;
