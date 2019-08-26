@@ -4,6 +4,9 @@
 #include <Arduino.h>
 #include <string.h>
 
+/*
+    Mit einem Objekt der Klasse FunctionLifeTime kann die Zeit innerhalb von einer Methode oder einem Codeblock {} gemessen werden.
+*/
 class FunctionLifeTime
 {
     String function;

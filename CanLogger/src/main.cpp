@@ -38,14 +38,16 @@ void setup() {
     }
  
     pageManager.openNewPage(new HomePage{display}); // Startseite setzen
-
-    createNewCanLogFile();
+  
+    createNewCanLogFile(); // vorrübergehende aktivierung
+    startSD();
 
     CanUtility_EnableRecieve(); // Vorrübergehende aktivierung
 	
     scom << "CanLogger ist Initialisiert" << endz;
 }
 
+// Testweise
 int timeHelper = 0;
 void HAL_SYSTICK_Callback(void)
 {
@@ -56,10 +58,13 @@ void loop() {
     loopTaster();
     pageManager.loop();
     loopScreenBuffer();
+
     if(timeHelper>3000)
     {
-        printScreenBufferUserViewSerial();
-        timeHelper = 0;
+        // printScreenBufferUserViewSerial();
+        // timeHelper = 0;
+        closeSD();
+        startSD();
     }
 }
 

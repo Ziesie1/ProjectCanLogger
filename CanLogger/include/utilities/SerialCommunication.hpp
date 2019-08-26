@@ -4,6 +4,13 @@
 #include <Arduino.h>
 #include <string.h>
 
+/*
+    SerialCommunication dient zur geordneten seriellen Kommunikation mit dem PC.
+    Es sieht verschiedene Methoden für unterschiedliche Nachrichtentypen vor.
+        - normale Nachrichten 
+        - debug Nachrichten
+        - fehler Nachrichten
+*/
 class SerialCommunication 
 {
     static constexpr char DEBUG_CHAR = '*';

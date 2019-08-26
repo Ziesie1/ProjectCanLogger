@@ -346,8 +346,7 @@ bool screenBuffer_hasThisMessageChanged(int pos)
 */
 void loopScreenBuffer(void)
 {
-  // Bei zu vielen eingehenden Nachrichten bleibt er in der while() schleife gefangen
-  //FUNCTION_TIME_X("loopScreenBuffer(void)") //-> für eine Nachricht 47 ms, ohne Serial 43 ms
+    // FUNCTION_TIME_X("loopScreenBuffer(void)") //-> für eine Nachricht 10-20 ms
     if(CanUtility_isRecieveActive() && screenBufferInitialized)
     {
         if(CanUtility_getbufferCanRecMessagesFillLevel() > 0)
@@ -357,11 +356,11 @@ void loopScreenBuffer(void)
             if(curMsg)
             {
                 //screenBuffer:
-                sortCanMessageIntoBuffer(*curMsg);
+                sortCanMessageIntoBuffer(*curMsg); // 0 ms
 
                 //SD-Card:
-                saveNewCanMessage(*curMsg);
-
+                saveNewCanMessage(*curMsg); // 5-6 ms
+        
                 //loopback:
                 /*
                 CanUtility_SendMessage(curMsg);
@@ -370,8 +369,8 @@ void loopScreenBuffer(void)
                 //Serial:
                 String s = "Empfangene Nachricht: ";
                 s += static_cast<String>(*curMsg);
-                utilities::scom.printDebug(s);
-    
+                utilities::scom.printDebug(s); // 4 ms
+        
                 //free space:
                 delete curMsg;
             }
