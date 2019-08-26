@@ -30,7 +30,7 @@ LogPage::~LogPage()
 
 void LogPage::loop()
 {
-    //this->logTable->loop();
+    this->logTable->loop();
 
     if(wasSingleTasterPressed())
     {

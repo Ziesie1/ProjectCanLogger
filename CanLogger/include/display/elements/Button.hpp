@@ -3,6 +3,7 @@
 
 #include <string>
 #include "display/ILI9341.hpp"
+#include "display/elements/Table.hpp"
 using namespace std;
 class Button
 {
@@ -18,12 +19,9 @@ protected:
     string text;
     unsigned long textColor;
     bool isSelected;
-    const byte COLOR_FRAME_SELECTED[3] = {237,125,49};
-    unsigned long colorFrameSelected;
-    const byte COLOR_FRAME_UNSELECTED[3] = {1,64,118};
-    unsigned long colorFrameUnselected;
-    const byte COLOR_ARROW_SELECTED[3] = {237,125,49};
-    unsigned long colorArrowSelected;
+    const unsigned long COLOR_ORANGE_FRAME_SELECTED = Table::COLOR_ORANGE_WRITING_BODY_ISRTR;
+    const unsigned long COLOR_BLUE_FRAME_UNSELECTED = Table::COLOR_BLUE_BACKGROUND_HEADER;
+    const unsigned long COLOR_ORANGE_ARROW_SELECTED = Table::COLOR_ORANGE_WRITING_BODY_ISRTR;
     const unsigned long COLOR_ARROW_UNSELECTED = WHITE;
     const int FRAME_WIDTH = 3;
 

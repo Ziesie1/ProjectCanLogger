@@ -46,10 +46,11 @@ void setup() {
 	
   // Test
   sortCanMessageIntoBuffer(*(new Canmsg{0x101, 0x0, false, false, 0x1000, 8, 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef}));
-  sortCanMessageIntoBuffer(*(new Canmsg{0x102, 0x0, false, false, 0x1000, 8, 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef}));
+  sortCanMessageIntoBuffer(*(new Canmsg{0x102, 0x0, false, true, 0x1000, 8, 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef}));
   sortCanMessageIntoBuffer(*(new Canmsg{0x103, 0x0, false, false, 0x1000, 8, 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef}));
 
   scom << "CanLogger ist Initialisiert" << endz;
+ 
 }
 
 void loop() {
@@ -64,7 +65,21 @@ void serialEvent() {
     /*
       Eine Ausgabe nicht beim Interrupt erlaubt, hier nur Testweise. // Bis das gesamt Konzept feststeht.
     */
-    scom << "Charakter recieved:" << inChar << endz;
+   if(inChar == 'c') 
+   {
+      scom << "Charakter recieved:" << inChar << endz;
+      sortCanMessageIntoBuffer(*(new Canmsg{0x104, 0x0, false, false, 0x1000, 8, 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef}));
+      scom<<"Can ohne RTR"<<endz;
+
+   }
+   else
+   {
+      scom<<"Anderer Buchstabe"<<endz;
+      sortCanMessageIntoBuffer(*(new Canmsg{0x105, 0x0, false, true, 0x1000, 8, 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef}));
+      scom<<"Can mit RTR"<<endz;
+   }
+   
+   
 
   }
   

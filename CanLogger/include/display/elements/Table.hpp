@@ -7,7 +7,7 @@
 
 class Table
 {
-    protected:
+    public:
     ILI9341& display;
     uint8_t offsetXHeadlineStorage;
     const uint8_t OFFSETX_HEADLINE1 = 0;
@@ -25,16 +25,14 @@ class Table
     const unsigned long COLOR_WRITING_HEADER = WHITE;
     const unsigned long COLOR_WRITING_BODY_DEFAULT = BLACK;
     const unsigned long COLOR_BACKGROUND_BODY = WHITE;
-    const byte COLOR_BACKGROUND_HEADER[3] = {1,64,118};
-    unsigned long colorBackgroundHeader;
-    const byte COLOR_WRITING_BODY_ISRTR[3] = {237,125,49};
-    unsigned long colorWritingBodyIsRtr;
-    const byte COLOR_BACKGROUND_FREEZE[3] = {191,191,191};
-    unsigned long colorBackgroundFreeze;
+    static constexpr unsigned long COLOR_BLUE_BACKGROUND_HEADER = 0x007200; //R,G,B = 1,64,118
+    static constexpr unsigned long COLOR_ORANGE_WRITING_BODY_ISRTR = 0x0033FD; //R,G,B = 237,125,49
+    static constexpr unsigned long COLOR_GREY_BACKGROUND_FREEZE = 0x00BDF7; //R,G,B = 191,191,191;
     const String HEADLINE_SPALTE1 = "Idf.";
     const String HEADLINE_SPALTE2 = "TimeS.";
     const String HEADLINE_SPALTE3 = "Data";
     const String HEADLINE_FREEZE = "Freeze";
+
 
     String kopfzeile;
     Textzeile** nachrichten = nullptr;
@@ -56,6 +54,7 @@ class Table
     void loop();
     void updateHeadlineBackground();
     void updateMessages();
+    void printSingleMessage(int pos, unsigned long farbe);
     
 
 };

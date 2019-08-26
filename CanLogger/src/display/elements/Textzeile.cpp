@@ -10,8 +10,6 @@ Textzeile::Textzeile(ILI9341& display, bool isSelected, uint8_t offsetXSpalte1,
 void Textzeile::printImportantContent(uint8_t posY,unsigned long Farbe)
 {
     
-//testobjekt + rtr
-    //Canmsg can = new Canmsg{0x101, 0x0, false, true, 0x1000, 8, 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef};
     //erste Spalte mit Begrenzung
     String s1 = String(this->message.GetStdIdentifier(),HEX);
     this->display.printString(this->offsetXHeadline1,posY,s1.c_str(),Farbe,this->COLOR_BACKGROUND_UNSELECTED);
