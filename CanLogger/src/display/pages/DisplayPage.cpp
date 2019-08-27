@@ -3,16 +3,18 @@
 #include "buttons/Taster.hpp"
 
 /*
-    It reset the hardware encoder and button. Shortly afterward the page will be loaded.
-    input:  ---
-    return: ---
+    Will be called if the PageManager open another Page.
+    During this time, the Page is paused.
+    input: 
+    return: 
 */
-void DisplayPage::startView()
-{
-    getEncoderPos();
-    setEncoderPos(0);
-    wasEncoderButtonPressed();
-    wasSingleTasterPressed();
+void DisplayPage::pauseView()
+{ }
 
-    this->loadStartView();
-}
+/*
+    Will be called if the PageManager delete the Page.
+    input: 
+    return: 
+*/
+void DisplayPage::closeView()
+{ }

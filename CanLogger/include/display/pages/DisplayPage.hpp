@@ -11,8 +11,10 @@ class DisplayPage
 protected:
 public:
     virtual void loop() = 0;
-    virtual void startView();
-    virtual void loadStartView() = 0;
+    virtual void startView() = 0;
+    virtual void pauseView();
+    virtual void reloadView() = 0;
+    virtual void closeView();
     virtual ~DisplayPage(){}
 };
 

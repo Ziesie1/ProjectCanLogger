@@ -16,7 +16,9 @@ protected:
 public:
     LogPage(ILI9341& display, bool statusSD);
     void loop() override;
-    void loadStartView() override;
+    void startView() override;
+    void reloadView() override;
+    void closeView() override;
     ~LogPage();
 };
 

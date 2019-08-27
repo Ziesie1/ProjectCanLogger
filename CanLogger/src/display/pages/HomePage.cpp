@@ -81,14 +81,8 @@ void HomePage::loop()
     }
 }
 
-void HomePage::loadStartView()
+void HomePage::startView()
 {
-    CanUtility_DissableRecieve();
-    screenBuffer_disableUpdate();
-    screenBuffer_clearScreenBuffer();
-
-    closeSD();
-
     this->display.fillScreen(WHITE);
 
     uint16_t ymitte = ILI9341::VERTICAL_MAX/2;
@@ -100,4 +94,9 @@ void HomePage::loadStartView()
     this->buttonSpeichern = new Button{this->display, xmitte-this->BUTTON_WIDTH/2,ymitte+this->BUTTON_MID_DIST+this->BUTTON_Y_AXE_OFFSET,this->BUTTON_WIDTH,this->BUTTON_HIGH,this->colorButtonDefault,this->BUTTON_TEXT_DST_X,this->BUTTON_TEXT_DST_Y,"Logging - mit Speichern",this->COLOR_BUTTON_TEXT,this->statusSD};
     this->pfeilNichtSpeichern = new Arrow{this->display,this->buttonNichtSpeichern,this->colorArrowSelected,this->COLOR_ARROW_UNSELECTED,!this->statusSD};
     this->pfeilSpeichern = new Arrow{this->display,this->buttonSpeichern,this->colorArrowSelected,this->COLOR_ARROW_UNSELECTED,this->statusSD};
+}
+
+void HomePage::reloadView()
+{
+    this->startView();
 }

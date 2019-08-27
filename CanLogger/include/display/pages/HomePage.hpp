@@ -36,7 +36,8 @@ protected:
 public:
     HomePage(ILI9341& display);
     void loop() override;
-    void loadStartView() override;
+    void startView() override;
+    void reloadView() override;
     ~HomePage();
 };
 

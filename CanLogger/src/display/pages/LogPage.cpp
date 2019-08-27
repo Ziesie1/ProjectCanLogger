@@ -69,7 +69,7 @@ void LogPage::loop()
     
 }
 
-void LogPage::loadStartView()
+void LogPage::startView()
 {
     if(CanUtility_EnableRecieve() != HAL_OK)
     {
@@ -78,7 +78,7 @@ void LogPage::loadStartView()
     }
     screenBuffer_enableUpdate();
 
-    if(statusSD)
+    if(this->statusSD)
     {
         init_SD();
         createNewCanLogFile();
@@ -93,4 +93,19 @@ void LogPage::loadStartView()
         this->logTable = new Table(this->display,"Ohne Speichern",screenBuffer_getFillLevel());
         
     }
+}
+
+void LogPage::reloadView()
+{
+    this->startView();
+}
+
+void LogPage::closeView()
+{
+    CanUtility_DissableRecieve();
+    screenBuffer_disableUpdate();
+    screenBuffer_clearScreenBuffer();
+
+    if(this->statusSD)
+        closeSD();
 }
