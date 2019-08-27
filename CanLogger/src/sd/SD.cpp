@@ -77,6 +77,7 @@ void startSD()
 */
 void closeSD()
 {
+    sdCardInitialized = false;
     canLogFile.close();
 }
 

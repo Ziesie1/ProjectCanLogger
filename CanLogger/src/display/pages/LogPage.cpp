@@ -6,6 +6,10 @@
 #include "buttons/Taster.hpp"
 #include "can/CanUtility.hpp"
 #include "display/screenBuffer.hpp"
+#include "sd/SD.hpp"
+#include "utilities/SerialCommunication.hpp"
+
+using namespace utilities;
 
 extern DisplayPageManager pageManager; // verweißt auf das Objekt in Main
 
@@ -67,15 +71,19 @@ void LogPage::loop()
 
 void LogPage::loadStartView()
 {
- 
-    // for(int idx = 0;idx<2;idx++)
-    // {
-    //     sortCanMessageIntoBuffer(new Canmsg{});
-    // }
-    
+    if(CanUtility_EnableRecieve() != HAL_OK)
+    {
+        scom.printError("Konnte das Empfangen von Cannachrichten nicht aktivieren.\nDas Programm wird angehalten!");
+        while(1){}
+    }
+    screenBuffer_enableUpdate();
 
     if(statusSD)
     {
+        init_SD();
+        createNewCanLogFile();
+        startSD();
+
         this->display.fillScreen(WHITE);
         this->logTable = new Table(this->display,getFullLogFilePath().c_str(),screenBuffer_getFillLevel());
     }
