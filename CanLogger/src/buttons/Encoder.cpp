@@ -74,11 +74,16 @@ void initEncoder()
   scom.printDebug("Encoder ist Initialisiert");
 }
 
-// Gibt die aktuelle position des Encoders zurück
+// Gibt die aktuelle Position des Encoders zurück
 int getEncoderPos()
 {
   encoderPosChanged = false;
   return encoderPos;
+}
+
+void setEncoderPos(int pos)
+{
+  encoderPos = pos;
 }
 
 bool wasEncoderButtonPressed()
@@ -90,6 +95,8 @@ bool wasEncoderButtonPressed()
 
 bool hasEncoderPosChanged()
 {
+  bool ret = encoderPosChanged;
   encoderPosChanged = false;
-  return encoderPosChanged;
+  return ret;
+ 
 }

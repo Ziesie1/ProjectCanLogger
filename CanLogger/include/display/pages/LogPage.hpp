@@ -3,17 +3,24 @@
 
 #include "display/ILI9341.hpp"
 #include "display/pages/DisplayPage.hpp"
+#include "display/elements/Button.hpp"
+#include "display/elements/Table.hpp"
+#include "sd/SD.hpp"
+#include "display/screenBuffer.hpp"
 
 class LogPage : public DisplayPage
 {
 
 protected:
-
     ILI9341& display;
+    bool statusSD;
+    Table* logTable = nullptr;
+    
 public:
-    LogPage(ILI9341& display);
+    LogPage(ILI9341& display, bool statusSD);
     void loop() override;
-    void startView() override;
+    void loadStartView() override;
+    ~LogPage();
 };
 
 

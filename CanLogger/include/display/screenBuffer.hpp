@@ -9,6 +9,10 @@ constexpr int SCREEN_BUFFER_SIZE = 10;
 void printScreenBufferSerial(void);
 void printScreenBufferUserViewSerial(void);
 
+//behandlung einzelner Nachrichten (interne)
+void sortCanMessageIntoBuffer(Canmsg const& msg);
+//void insertMessageHere(Canmsg const& msg, int pos);
+
 // initialisierungsfunktionen
 void screenBufferInit(void);
 void screenBufferDeinit(void);

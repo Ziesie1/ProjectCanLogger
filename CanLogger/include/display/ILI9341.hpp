@@ -85,13 +85,17 @@ public:
 
     void fillScreen(int color);
     void drawOnePixel(unsigned long usX, unsigned long usY, unsigned long ulColor);
+    void drawLine(long usP1X, long usP1Y, long usP2X, long usP2Y, unsigned long ulColor);
     void drawHorizontalLine(unsigned short usStartX, unsigned short usEndX, unsigned short usY, unsigned long ulColor);
     void drawVerticalLine(unsigned short usX, unsigned short usStartY, unsigned short usEndY, unsigned long ulColor);
     void drawEmptyRect(unsigned long usStartX, unsigned long usStartY, unsigned long sizeX, unsigned long sizeY, unsigned long ulColor, byte frameSize = 1);
     void drawEmptyRect2(unsigned long usStartX, unsigned long usEndX, unsigned long usStartY, unsigned long usEndY, unsigned long ulColor, byte frameSize = 1);
     void drawFillRect(unsigned long usStartX, unsigned long usStartY, unsigned long SizeX, unsigned long SizeY, unsigned long ulColor);
     void drawFillRect2(unsigned long usStartX, unsigned long usEndX, unsigned long usStartY, unsigned long usEndY, unsigned long ulColor);
-    void drawBmp(unsigned short usX, unsigned short usY, unsigned short usSizeX, unsigned short usSizeY, uint16_t const *Bmp, byte size = 1);   
+    void drawFillQuarterCircle(long usPX, long usPY, long radius, byte quarter, unsigned long ulColor);
+    void drawFillCircle(long usPX, long usPY, long radius, unsigned long ulColor);
+    void drawEmptyCircle(long usPX, long usPY, long radius, unsigned long ulColor, byte frameSize = 1);
+    void drawBmp(unsigned short usX, unsigned short usY, unsigned short usSizeX, unsigned short usSizeY, uint16_t const *Bmp, byte size = 1); 
     
     void printChar(unsigned short usX, unsigned short usY, char c, unsigned long fColor, unsigned long bColor, byte size = 1);
     void printChar8x16(unsigned short usX, unsigned short usY, char c, unsigned long fColor, unsigned long bColor);

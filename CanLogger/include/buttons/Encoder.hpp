@@ -5,5 +5,5 @@ void initEncoder();
 bool hasEncoderPosChanged();
 int getEncoderPos();
 bool wasEncoderButtonPressed();
-
+void setEncoderPos(int pos);
 #endif

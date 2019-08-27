@@ -77,7 +77,5 @@ void serialEvent()
             Eine Ausgabe nicht beim Interrupt erlaubt, hier nur Testweise. // Bis das gesamt Konzept feststeht.
         */
         scom << "Charakter recieved:" << inChar << endz;
-
     }
-  
 }

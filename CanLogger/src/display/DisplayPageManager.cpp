@@ -95,7 +95,10 @@ bool DisplayPageManager::deleteOpenPage()
     {
         delete[] this->pageArray;
         this->pageArray = nullptr;
-    }else{
+    }
+    else
+    {
+        
         this->pageArray[this->pageArraySize-1]->startView();
     }
     
