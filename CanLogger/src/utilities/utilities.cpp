@@ -19,3 +19,17 @@ void AddZerosToString(String& s,uint64_t const val,uint64_t const maxVal, uint8_
         }
     }
 }
+
+/* 
+    function to add zeros to a String that every String will have the same ammount of chars
+    Input:  s           - reference to the String that should be modified
+            maxSymbols  - maximum possible ammount the String can reach
+*/
+void AddBlanksToString(String& s, uint64_t const maxSymbols)
+{
+    for(uint64_t i=s.length(); i<maxSymbols; i++)
+    {
+        s += " ";
+    }
+}
+
