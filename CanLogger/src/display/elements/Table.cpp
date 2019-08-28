@@ -131,7 +131,10 @@ void Table::loop()
             updateMessages();
         }
     }
-    
+    if(CanUtility_whereNewMessagesDiscarded())
+    {
+        setDiscardMassagesCounter();
+    }
 }
 
 void Table::updateHeadlineBackground()
@@ -195,4 +198,9 @@ void Table::printSingleMessage(int pos, unsigned long farbe)
     this->nachrichten[pos]->printImportantContent(posYMessage,farbe);
 }
 
+void Table::setDiscardMassagesCounter()
+{
+    String counter = "( " + String(CanUtility_howManyMessagesWhereDiscarded(), DEC) + " )";
+    this->display.printString(0, 0, counter.c_str(), this->COLOR_DISCARD_MASSAGE_COUNTER, this->COLOR_BLUE_BACKGROUND_HEADER, 1);
+}
 

@@ -4,6 +4,7 @@
 #include "display/elements/Textzeile.hpp"
 #include "display/ILI9341.hpp"
 #include "display/screenBuffer.hpp"
+#include "can/CanUtility.hpp"
 
 class Table
 {
@@ -25,6 +26,7 @@ class Table
     const unsigned long COLOR_WRITING_HEADER = WHITE;
     const unsigned long COLOR_WRITING_BODY_DEFAULT = BLACK;
     const unsigned long COLOR_BACKGROUND_BODY = WHITE;
+    const unsigned long COLOR_DISCARD_MASSAGE_COUNTER = RED100;
     static constexpr unsigned long COLOR_BLUE_BACKGROUND_HEADER = 0x007200; //R,G,B = 1,64,118
     static constexpr unsigned long COLOR_ORANGE_WRITING_BODY_ISRTR = 0x0033FD; //R,G,B = 237,125,49
     static constexpr unsigned long COLOR_GREY_BACKGROUND_FREEZE = 0x00BDF7; //R,G,B = 191,191,191;
@@ -55,6 +57,7 @@ class Table
     void updateHeadlineBackground();
     void updateMessages();
     void printSingleMessage(int pos, unsigned long farbe);
+    void setDiscardMassagesCounter();
     
 
 };
