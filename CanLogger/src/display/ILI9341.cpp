@@ -407,6 +407,26 @@ void ILI9341::fillScreen(int color)
 }
 
 /*
+	Draw a direct line from point 1 to point 2.
+*/
+void ILI9341::drawLine(long usP1X, long usP1Y, long usP2X, long usP2Y, unsigned long ulColor)
+{
+	long vecX = usP2X-usP1X;
+	long vecY = usP2Y-usP1Y;
+	long vec_betrag = static_cast<long>(round(sqrt(vecX*vecX+vecY*vecY)));
+
+	this->drawOnePixel(usP1X, usP1Y, ulColor);
+	this->drawOnePixel(usP2X, usP2Y, ulColor);
+
+	for(long pos = 1; pos < vec_betrag; pos++)
+	{
+		long posx = usP1X +  static_cast<long>(round((double)vecX/vec_betrag*pos));
+		long posy = usP1Y +  static_cast<long>(round((double)vecY/vec_betrag*pos));
+		this->drawOnePixel(posx, posy, ulColor);
+	}
+}
+
+/*
 	Zeichnet einen einzelnen Pixel auf dem Display.
 */
 void ILI9341::drawOnePixel(unsigned long usX, unsigned long usY, unsigned long ulColor)
@@ -524,6 +544,108 @@ void ILI9341::drawFillRect(unsigned long usStartX, unsigned long usStartY,
 	}
 }
 
+/*
+	Draw a quartered filled Circle.
+	@arg quarter, is between 1 - 4 and is based on the cartesian coordinate system
+*/
+void ILI9341::drawFillQuarterCircle(long usPX, long usPY, long radius, byte quarter, unsigned long ulColor)
+{
+	long calcx = 1;
+	long calcy = -1;
+	switch(quarter)
+	{
+		case 1: break;
+		case 2: calcx = -1; break;
+		case 3: calcx = -1; calcy = 1; break;
+		case 4: calcy = 1; break;
+	}
+
+	for(long x = 0; abs(x) <= radius; x+=calcx)
+	{
+		for(long y = 0; abs(y) <= radius; y+=calcy)
+		{
+			long absoulute = static_cast<long>(round(sqrt(x*x+y*y)));
+			if(absoulute > radius)
+				break;
+			this->drawOnePixel(usPX+x,usPY+y,ulColor);
+		}
+	}
+}
+
+/*
+	Draw a filled Circle.
+*/
+void ILI9341::drawFillCircle(long usPX, long usPY, long radius, unsigned long ulColor)
+{
+	this->drawFillQuarterCircle(usPX,usPY,radius,1,ulColor);
+	this->drawFillQuarterCircle(usPX,usPY,radius,2,ulColor);
+	this->drawFillQuarterCircle(usPX,usPY,radius,3,ulColor);
+	this->drawFillQuarterCircle(usPX,usPY,radius,4,ulColor);
+}
+
+/*
+	Draw an empty Circle.
+*/
+void ILI9341::drawEmptyCircle(long usPX, long usPY, long radius, unsigned long ulColor, byte frameSize)
+{
+	frameSize--; // einen abziehen
+	// I
+	for(long x = 0; abs(x) <= radius; x+=1)
+	{
+		for(long y = -radius; y <= 0; y+=1)
+		{
+			long absoulute = static_cast<long>(round(sqrt(x*x+y*y)));
+			if(absoulute >= radius-frameSize && absoulute <= radius)
+			{
+				this->drawOnePixel(usPX+x,usPY+y,ulColor);
+			}
+			if(absoulute < radius-frameSize)
+				break;
+		}
+	}
+	// II
+	for(long x = 0; abs(x) <= radius; x-=1)
+	{
+		for(long y = -radius; y <= 0; y+=1)
+		{
+			long absoulute = static_cast<long>(round(sqrt(x*x+y*y)));
+			if(absoulute >= radius-frameSize && absoulute <= radius)
+			{
+				this->drawOnePixel(usPX+x,usPY+y,ulColor);
+			}
+			if(absoulute < radius-frameSize)
+				break;
+		}
+	}
+	// III
+	for(long x = 0; abs(x) <= radius; x-=1)
+	{
+		for(long y = radius; y >= 0; y-=1)
+		{
+			long absoulute = static_cast<long>(round(sqrt(x*x+y*y)));
+			if(absoulute >= radius-frameSize && absoulute <= radius)
+			{
+				this->drawOnePixel(usPX+x,usPY+y,ulColor);
+			}
+			if(absoulute < radius-frameSize)
+				break;
+		}
+	}
+	// IV
+	for(long x = 0; abs(x) <= radius; x+=1)
+	{
+		for(long y = radius; y >= 0; y-=1)
+		{
+			long absoulute = static_cast<long>(round(sqrt(x*x+y*y)));
+			if(absoulute >= radius-frameSize && absoulute <= radius)
+			{
+				this->drawOnePixel(usPX+x,usPY+y,ulColor);
+			}
+			if(absoulute < radius-frameSize)
+				break;
+		}
+	}
+}
 
 /*
 	Zeichnet ein Bild an die angegeben Position.

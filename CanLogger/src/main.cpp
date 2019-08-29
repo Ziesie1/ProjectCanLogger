@@ -23,49 +23,30 @@ void setup() {
     scom.workWith(Serial); // scom Hardwareserial zuweisen
     scom.setDebugMode(true); // Debugmodus einschalten
   
-    init_SD();
     HAL_Init();
     SystemClock_Config();
     initEncoder();
     initTaster();
     screenBufferInit();
-    screenBuffer_enableUpdate();
     display.init();
 
-    if((CanUtility_Init(CAN_500_KBIT) != HAL_OK) || (CanUtility_EnableRecieve() != HAL_OK))
+    if((CanUtility_Init(CAN_500_KBIT) != HAL_OK))
     {
+        scom.printError("Konnte CanUtility nicht Initialisieren.\nDas Programm wird angehalten!");
         while(1){}
     }
  
     pageManager.openNewPage(new HomePage{display}); // Startseite setzen
   
-    createNewCanLogFile(); // vorrübergehende aktivierung
-    startSD();
-
-    CanUtility_EnableRecieve(); // Vorrübergehende aktivierung
-	
     scom << "CanLogger ist Initialisiert" << endz;
 }
 
-// Testweise
-int timeHelper = 0;
-void HAL_SYSTICK_Callback(void)
-{
-    timeHelper++;
-}
 
 void loop() {
     loopTaster();
     pageManager.loop();
     loopScreenBuffer();
 
-    if(timeHelper>3000)
-    {
-        // printScreenBufferUserViewSerial();
-        // timeHelper = 0;
-        closeSD();
-        startSD();
-    }
 }
 
 void serialEvent() 
@@ -77,7 +58,5 @@ void serialEvent()
             Eine Ausgabe nicht beim Interrupt erlaubt, hier nur Testweise. // Bis das gesamt Konzept feststeht.
         */
         scom << "Charakter recieved:" << inChar << endz;
-
     }
-  
 }

@@ -318,7 +318,7 @@ bool screenBuffer_hasSomethingChanged(void)
 }
 
 /*
-		chek if the message at a specified position in userView changed
+		check if the message at a specified position in userView changed
 		Input:  pos	- position of the message in userView
 				          range: 0-(SCREEN_BUFFER_SIZE-1)
 		return: true  - this message was Updated

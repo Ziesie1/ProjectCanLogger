@@ -1,4 +1,8 @@
 #include "display/DisplayPageManager.hpp"
+#include "buttons/Encoder.hpp"
+#include "buttons/Taster.hpp"
+
+void clearButtonState();
 
 DisplayPageManager::DisplayPageManager()
 { }
@@ -42,6 +46,8 @@ void DisplayPageManager::loop()
 */
 void DisplayPageManager::openNewPage(DisplayPage* page)
 {
+    clearButtonState();
+
     if(!this->pageArray)
     {
         // noch keine Page vorhanden
@@ -51,7 +57,7 @@ void DisplayPageManager::openNewPage(DisplayPage* page)
         page->startView();
         return;
     }
-
+    
     // Array kopieren
     DisplayPage* copyArray[this->pageArraySize];
     for(int i = 0; i < this->pageArraySize; i++)
@@ -71,7 +77,8 @@ void DisplayPageManager::openNewPage(DisplayPage* page)
     this->pageArray[this->pageArraySize] = page;
     this->pageArraySize++;
 
-    page->startView();
+    this->pageArray[this->pageArraySize-1]->pauseView(); // alte Page pausieren
+    page->startView(); // neue Page aufrufen
 }
 
 /*
@@ -84,8 +91,11 @@ bool DisplayPageManager::deleteOpenPage()
         return false;
     }
 
+    clearButtonState();
+
     if(this->pageArray[this->pageArraySize-1])
     {
+        this->pageArray[this->pageArraySize-1]->closeView(); // alte Page auf das schließen vorbereiten
         delete this->pageArray[this->pageArraySize-1]; // seite löschen
         this->pageArray[this->pageArraySize-1] = nullptr;
     }
@@ -95,9 +105,22 @@ bool DisplayPageManager::deleteOpenPage()
     {
         delete[] this->pageArray;
         this->pageArray = nullptr;
-    }else{
-        this->pageArray[this->pageArraySize-1]->startView();
+    }
+    else
+    {
+        this->pageArray[this->pageArraySize-1]->reloadView(); // alte Page zum neuladen aufrufen
     }
     
     return true;
+}
+
+/*
+    Clear alle states of the Buttons.
+*/
+void clearButtonState()
+{
+    getEncoderPos();
+    setEncoderPos(0);
+    wasEncoderButtonPressed();
+    wasSingleTasterPressed();
 }
