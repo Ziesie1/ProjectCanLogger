@@ -9,7 +9,6 @@
     Die Klasse Textzeile wird verwendet, um CAN-Nachrichten auf dem Display darzustellen.
     Dementsprechend sind die Instanzen der Klasse Textzeile wichtige Bestandteile der Klasse Table.
 */
-
 class Textzeile
 {
     protected:

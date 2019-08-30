@@ -12,26 +12,34 @@
 using namespace utilities;
 
 extern DisplayPageManager pageManager; // verweißt auf das Objekt in Main
-
+/*
+    Constructor of the class LogPage
+    input: display          - Reference of the display where the LogPage will be printed on
+           status           - pausing status, if it´s true "Table" will go in freze mode and the printet messages staing constant
+*/
 LogPage::LogPage(ILI9341& display, bool statusSD)
  :display{display}, statusSD{statusSD}
 {
     
 }
-
+/*
+    The destructor of the class Table "LogPage" calls the destructors of all created objects and stops the creenbuffer updates.
+*/
 LogPage::~LogPage()
 {
   if(this->logTable)
   {
     delete this->logTable;
     this->logTable = nullptr;
-
   }
     
     screenBuffer_disableUpdate();
     screenBuffer_clearScreenBuffer();
 }
 
+/*
+    The loop methode recognice detect if a userinput was set and calls the according acttions. Futhermore it calls the Table loop.
+*/
 void LogPage::loop()
 {
     this->logTable->loop();
@@ -62,13 +70,13 @@ void LogPage::loop()
     {
         this->logTable->setPausingStatus(true);
         this->logTable->updateHeadlineBackground();
-        screenBuffer_disableUpdate();
-        
+        screenBuffer_disableUpdate(); 
     }
-    
-    
 }
 
+/*
+    prints the start screen for runnung mode, generats the Table
+*/
 void LogPage::startView()
 {
     if(CanUtility_EnableRecieve() != HAL_OK)
@@ -85,21 +93,24 @@ void LogPage::startView()
         startSD();
 
         this->display.fillScreen(WHITE);
-        this->logTable = new Table(this->display,getFullLogFilePath().c_str(),screenBuffer_getFillLevel());
+        this->logTable = new Table(this->display, getFullLogFilePath().c_str(), screenBuffer_getFillLevel());
     }
     else
     {
         this->display.fillScreen(WHITE);
-        this->logTable = new Table(this->display,"Ohne Speichern",screenBuffer_getFillLevel());
-        
+        this->logTable = new Table(this->display, "Ohne Speichern", screenBuffer_getFillLevel()); 
     }
 }
-
+/*
+    relode the start screen.
+*/
 void LogPage::reloadView()
 {
     this->startView();
 }
-
+/*
+    stop logging, go back to homescreen
+*/
 void LogPage::closeView()
 {
     CanUtility_DissableRecieve();

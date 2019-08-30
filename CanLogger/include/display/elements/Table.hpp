@@ -5,7 +5,9 @@
 #include "display/ILI9341.hpp"
 #include "display/screenBuffer.hpp"
 #include "can/CanUtility.hpp"
-
+/*
+    This Class creates an inteface where the "Textzeilen", the log file and other information can be printed in a Table.
+*/
 class Table
 {
     public:
@@ -59,7 +61,6 @@ class Table
     void printSingleMessage(int pos, unsigned long farbe);
     void setDiscardMassagesCounter();
     
-
 };
 
 

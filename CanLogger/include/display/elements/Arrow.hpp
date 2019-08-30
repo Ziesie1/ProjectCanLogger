@@ -3,7 +3,9 @@
 
 #include "display/ILI9341.hpp"
 #include "display/elements/Button.hpp"
-
+/*
+    This class prints an arrow left to the selected button on the homescreen
+*/
 class Arrow
 {
     protected:
@@ -23,7 +25,7 @@ class Arrow
 
 
     public:
-    Arrow(ILI9341& display,Button* button, unsigned long colorSelected, unsigned long colorUnselected,bool isSelected);
+    Arrow(ILI9341& display, Button* button, unsigned long colorSelected, unsigned long colorUnselected, bool isSelected);
     void draw(unsigned long Farbe);
     void setPositions();
 };

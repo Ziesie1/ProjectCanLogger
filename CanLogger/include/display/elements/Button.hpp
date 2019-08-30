@@ -5,6 +5,9 @@
 #include "display/ILI9341.hpp"
 #include "display/elements/Table.hpp"
 using namespace std;
+/*
+    This class creates a button for selection in the homescreen menu.
+*/
 class Button
 {
 protected:
@@ -40,7 +43,6 @@ public:
     uint16_t getSizeX();
     uint16_t getPosY();
     uint16_t getSizeY();
-    
 
 };
 

@@ -3,15 +3,15 @@
 
 /*
     Constructor of the class Textzeile
-    Input: display - Reference of the display where the "Textzeile" will be printed on,
-           isSelected - selection status, referring to the functionality of scrollingthis attribut becomes important
-           offsetXSpalte1 - X offset of the tables first vertical gridline
-           offsetXSpalte2 - X offset of the tables second vertical gridline
-           offsetHeadline1 - X offset of the Headline "Idf."  
-           offsetHeadline2 - X offset of the Headline "Time" 
-           offsetHeadline3 - X offset of the Headline "Data"
-           zeilenhoehe - height of each "Textzeile" when printed 
-    Return: -
+    input: display          - Reference of the display where the "Textzeile" will be printed on,
+           isSelected       - selection status, referring to the functionality of scrollingthis attribut becomes important
+           offsetXSpalte1   - X offset of the tables first vertical gridline
+           offsetXSpalte2   - X offset of the tables second vertical gridline
+           offsetHeadline1  - X offset of the Headline "Idf."  
+           offsetHeadline2  - X offset of the Headline "Time" 
+           offsetHeadline3  - X offset of the Headline "Data"
+           zeilenhoehe      - height of each "Textzeile" when printed 
+
 */
 Textzeile::Textzeile(ILI9341& display, bool isSelected, uint8_t offsetXSpalte1,
                      uint8_t offsetXSpalte2, uint8_t offsetHeadline1, uint8_t offsetHeadline2, 
@@ -23,36 +23,33 @@ Textzeile::Textzeile(ILI9341& display, bool isSelected, uint8_t offsetXSpalte1,
 
 /*
     This methode prints the most important content of the CAN-messages of the frontend buffer into the logtable shown on the display
-    Input: posY - Y coordinate of the printing start 
-           farbe - printing colour 
-           
-    Return: -
+    input: posY     - Y coordinate of the printing start 
+           farbe    - printing colour 
 */
 void Textzeile::printImportantContent(uint8_t posY, unsigned long farbe)
 {
-    
     //erste Spalte mit Begrenzung
     String s1 = String(this->message.GetFullId(),HEX);
-    AddBlanksToString(s1,8);
+    AddBlanksToString(s1, 8);
     s1.toUpperCase();
-    this->display.printString(this->offsetXHeadline1,posY,s1.c_str(),farbe,this->COLOR_BACKGROUND_UNSELECTED);
-    this->display.drawVerticalLine(this->offsetXSpalte1,posY,posY+this->zeilenhoehe,this->COLOR_TABLE_LINE);
+    this->display.printString(this->offsetXHeadline1, posY, s1.c_str(), farbe, this->COLOR_BACKGROUND_UNSELECTED);
+    this->display.drawVerticalLine(this->offsetXSpalte1, posY, posY + this->zeilenhoehe, this->COLOR_TABLE_LINE);
 
     //zweite Spalte mit Begrenzung
     s1 = String(this->message.GetTime(),HEX);
-    AddBlanksToString(s1,4);
+    AddBlanksToString(s1, 4);
     s1.toUpperCase();
-    this->display.printString(this->offsetXHeadline2,posY,s1.c_str(),farbe,this->COLOR_BACKGROUND_UNSELECTED);
-    this->display.drawVerticalLine(this->offsetXSpalte2,posY,posY+this->zeilenhoehe,this->COLOR_TABLE_LINE);
+    this->display.printString(this->offsetXHeadline2, posY, s1.c_str(), farbe,this->COLOR_BACKGROUND_UNSELECTED);
+    this->display.drawVerticalLine(this->offsetXSpalte2, posY, posY + this->zeilenhoehe, this->COLOR_TABLE_LINE);
 
     //dritte Spalte 
     s1 = "";
     if(!this->message.GetRtr())
     {
-        for(int i=0;i<this->message.GetCanLength();i++)
+        for(int i = 0; i<this->message.GetCanLength(); i++)
         {
-            AddZerosToString(s1, this->message[i], this->message.maxDataVal, HEX);
-            s1+=String(this->message.GetCanByte(i),HEX);
+            AddZerosToString(s1, this->message[i], this->message.maxDataVal,HEX);
+            s1 += String(this->message.GetCanByte(i),HEX);
         }
         s1.toUpperCase();
     }
@@ -62,15 +59,11 @@ void Textzeile::printImportantContent(uint8_t posY, unsigned long farbe)
         s1 += String(this->message.GetCanLength());
     }
     AddBlanksToString(s1,16);
-    this->display.printString(this->offsetXSpalte2+4,posY,s1.c_str(),farbe,this->COLOR_BACKGROUND_UNSELECTED);
-        
-    
+    this->display.printString(this->offsetXSpalte2 + 4, posY, s1.c_str(), farbe, this->COLOR_BACKGROUND_UNSELECTED);
 }
 
 /*
     This methode changes the selection status to true
-    input: -
-    return: -
 */
 void Textzeile::selectZeile()
 {
@@ -79,8 +72,6 @@ void Textzeile::selectZeile()
 
 /*
     This methode changes the selection status to false
-    input: -
-    return: -
 */
 void Textzeile::unselectZeile()
 {
@@ -89,9 +80,8 @@ void Textzeile::unselectZeile()
 
 /*
     This methode returns the RTR status of the illustrazed CAN-message
-    input: -
-    return: true - CAN-message is a RTR-message
-            false - CAN-message isn't a RTR-message
+    return: true    - CAN-message is a RTR-message
+            false   - CAN-message isn't a RTR-message
 */
 bool Textzeile::isRtr()
 {
@@ -100,8 +90,7 @@ bool Textzeile::isRtr()
 
 /*
     This methode sets CAN-message of the "Textzeile"
-    input: msg - reference to a CAN-message of the frontend buffer
-    return: -
+    input: msg  - reference to a CAN-message of the frontend buffer
 */
 void Textzeile::setCanMsg(Canmsg& msg)
 {
