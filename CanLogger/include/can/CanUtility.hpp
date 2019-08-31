@@ -34,5 +34,6 @@ bool CanUtility_isRecieveActive(void);
 bool CanUtility_hasFiFoOverflowOccured(void);
 bool CanUtility_whereNewMessagesDiscarded(void);
 int CanUtility_howManyMessagesWhereDiscarded(void);
+void CanUtility_resetDiscardcounter(void);
 
 #endif //CANUTILITY

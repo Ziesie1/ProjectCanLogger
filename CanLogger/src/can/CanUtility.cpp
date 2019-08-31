@@ -562,3 +562,11 @@ int CanUtility_howManyMessagesWhereDiscarded(void)
 	return CanUtility_discardedMessages;
 }
 
+/*
+	resets the counter of the discarded messages
+*/
+void CanUtility_resetDiscardcounter(void)
+{
+	CanUtility_discardedMessages = 0;
+}
+

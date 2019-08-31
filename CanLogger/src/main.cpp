@@ -41,12 +41,23 @@ void setup() {
     scom << "CanLogger ist Initialisiert" << endz;
 }
 
+/*
+//für Serielle Ausgaben zum testen
+int timeCounter1ms = 0;
+void HAL_SYSTICK_Callback(void)
+{
+    if(timeCounter1ms > 10000)
+    {
+        timeCounter1ms = 0;
+    }    
+    timeCounter1ms++;
+}
+*/
 
 void loop() {
     loopTaster();
     pageManager.loop();
     loopScreenBuffer();
-
 }
 
 void serialEvent() 
