@@ -442,7 +442,7 @@ HAL_StatusTypeDef CanUtility_RecieveMessage(bool const fifo, Canmsg * msg)
 */
 HAL_StatusTypeDef CanUtility_SendMessage(Canmsg *const msg)
 {
-	if(msg && CanUtility_initialized)
+	if(msg && CanUtility_initialized && !CanUtility_getSilentMode())
 	{
 		if(HAL_CAN_GetTxMailboxesFreeLevel(&CanUtility_hcan) != 0)
 		{
