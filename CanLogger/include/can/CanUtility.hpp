@@ -18,18 +18,22 @@ typedef enum
     CAN_100_KBIT    =   20  /*transmisson speed of CAN-bus of 100 kbit/s    */
 } CAN_SpeedTypedef;
 
-HAL_StatusTypeDef CanUtility_Init(CAN_SpeedTypedef speed);
+HAL_StatusTypeDef CanUtility_Init(CAN_SpeedTypedef speed, bool const silent);
 HAL_StatusTypeDef CanUtility_DeInit(void);
 
 HAL_StatusTypeDef CanUtility_EnableRecieve(void);
 HAL_StatusTypeDef CanUtility_DissableRecieve(void);
 HAL_StatusTypeDef CanUtility_RecieveMessage(bool const fifo, Canmsg *const msg);
 HAL_StatusTypeDef CanUtility_SendMessage(Canmsg *const msg);
+HAL_StatusTypeDef CanUtility_setTransmissionMode(bool const silent);
+HAL_StatusTypeDef CanUtility_setTransmissionSpeed(CAN_SpeedTypedef speed);
 
 Canmsg* CanUtility_readFirstMessageFromBuffer(void);
 int CanUtility_getbufferCanRecMessagesFillLevel(void);
 bool CanUtility_isMessagePending(void);
 
+bool CanUtility_getSilentMode(void);
+CAN_SpeedTypedef CanUtility_getTransmissionSpeed(void);
 bool CanUtility_isRecieveActive(void);
 bool CanUtility_hasFiFoOverflowOccured(void);
 bool CanUtility_whereNewMessagesDiscarded(void);

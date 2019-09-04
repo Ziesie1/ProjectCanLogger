@@ -30,7 +30,7 @@ void setup() {
     screenBufferInit();
     display.init();
 
-    if((CanUtility_Init(CAN_500_KBIT) != HAL_OK))
+    if((CanUtility_Init(CAN_500_KBIT, false) != HAL_OK))
     {
         scom.printError("Konnte CanUtility nicht Initialisieren.\nDas Programm wird angehalten!");
         while(1){}

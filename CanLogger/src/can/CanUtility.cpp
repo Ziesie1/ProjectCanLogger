@@ -13,6 +13,9 @@ bool CanUtility_toManyMsgs = false;
 
 bool CanUtility_initialized = false;
 
+bool CanUtility_silentMode = false;
+CAN_SpeedTypedef CanUtility_transmissionSpeed = CAN_500_KBIT;
+
 /* 
 	interrupt handler that is called when messages are pending in FIFO 0
 	Input: hcan	- pointer to CAN-handle
@@ -149,7 +152,7 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef *hcan)
 	Input: 	hcan	- pointer to CAN-handle
 			speed	- transmission speed of the CAN-bus
 */
-void FillCAN_Handle(CAN_HandleTypeDef& hcan, CAN_SpeedTypedef speed)
+void FillCAN_Handle(CAN_HandleTypeDef& hcan, CAN_SpeedTypedef speed, bool const silent)
 {
 	hcan.Instance = CAN1;
 	hcan.Init.Prescaler = speed;
@@ -163,6 +166,14 @@ void FillCAN_Handle(CAN_HandleTypeDef& hcan, CAN_SpeedTypedef speed)
 	hcan.Init.AutoRetransmission = ENABLE;
 	hcan.Init.ReceiveFifoLocked = DISABLE;
 	hcan.Init.TransmitFifoPriority = DISABLE;
+	if(silent)
+	{
+		hcan.Init.Mode = CAN_MODE_SILENT;
+	}
+	else
+	{
+		hcan.Init.Mode = CAN_MODE_NORMAL;
+	}
 }
 
 /* 
@@ -191,12 +202,12 @@ void FillCAN_Filter(CAN_FilterTypeDef& canFilter)
 			HAL_ERROR	- an error occured while initializing, 
 						  check the serial output for further details
 */
-HAL_StatusTypeDef CanUtility_Init(CAN_SpeedTypedef speed)
+HAL_StatusTypeDef CanUtility_Init(CAN_SpeedTypedef speed, bool const silent)
 {	
 	if(!CanUtility_initialized)
 	{
 		//initialize CAN-handler:
-		FillCAN_Handle(CanUtility_hcan, speed);
+		FillCAN_Handle(CanUtility_hcan, speed, silent);
 		if(HAL_CAN_Init(&CanUtility_hcan) != HAL_OK)
 		{
 			String s = "Fehler während der CAN initialisierung. Status: ";
@@ -205,6 +216,8 @@ HAL_StatusTypeDef CanUtility_Init(CAN_SpeedTypedef speed)
 			s += String(HAL_CAN_GetError(&CanUtility_hcan),HEX); 
 			utilities::scom.printError(s);
 			return HAL_ERROR;
+			CanUtility_silentMode = silent;
+			CanUtility_transmissionSpeed = speed;
 		}
 		else
 		{
@@ -570,3 +583,34 @@ void CanUtility_resetDiscardcounter(void)
 	CanUtility_discardedMessages = 0;
 }
 
+bool CanUtility_getSilentMode(void)
+{
+	return CanUtility_silentMode;
+}
+
+CAN_SpeedTypedef CanUtility_getTransmissionSpeed(void)
+{
+	return CanUtility_transmissionSpeed;
+}
+
+HAL_StatusTypeDef CanUtility_setTransmissionMode(bool const silent)
+{
+	if(CanUtility_initialized)
+	{
+		CanUtility_DeInit();
+		CanUtility_Init(CanUtility_getTransmissionSpeed(), silent);
+		return HAL_OK;
+	}
+	return HAL_ERROR;
+}
+
+HAL_StatusTypeDef CanUtility_setTransmissionSpeed(CAN_SpeedTypedef speed)
+{
+	if(CanUtility_initialized)
+	{
+		CanUtility_DeInit();
+		CanUtility_Init(speed, CanUtility_getSilentMode());
+		return HAL_OK;
+	}
+	return HAL_ERROR;
+}
