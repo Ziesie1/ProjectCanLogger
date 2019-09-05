@@ -47,11 +47,11 @@ void HomePage::loop()
     {
         if(this->buttonSpeichern->getStatus())
         {
-            pageManager.openNewPage(new LogPage{display,true});
+            pageManager.openNewPage(new LogPage{this->display, true, getFullLogFilePath().c_str()});
         }
         else
         {
-           pageManager.openNewPage(new LogPage{display,false});
+           pageManager.openNewPage(new LogPage{this->display,false, "Ohne Speichern"});
         }   
     }
     if(hasEncoderPosChanged())

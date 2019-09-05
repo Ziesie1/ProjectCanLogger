@@ -10,9 +10,8 @@
 */
 class Table
 {
-    public:
+    protected:
     ILI9341& display;
-    uint8_t offsetXHeadlineStorage;
     const uint8_t OFFSETX_HEADLINE1 = 0;
     const uint8_t OFFSETX_SPALTE1 = 64; //vertikale Linie 1
     const uint8_t OFFSETX_HEADLINE2 = 66;
@@ -29,30 +28,24 @@ class Table
     const unsigned long COLOR_WRITING_BODY_DEFAULT = BLACK;
     const unsigned long COLOR_BACKGROUND_BODY = WHITE;
     const unsigned long COLOR_DISCARD_MASSAGE_COUNTER = RED100;
-    static constexpr unsigned long COLOR_BLUE_BACKGROUND_HEADER = 0x007200; //R,G,B = 1,64,118
-    static constexpr unsigned long COLOR_ORANGE_WRITING_BODY_ISRTR = 0x0033FD; //R,G,B = 237,125,49
-    static constexpr unsigned long COLOR_GREY_BACKGROUND_FREEZE = 0x00BDF7; //R,G,B = 191,191,191;
     const String HEADLINE_SPALTE1 = "Idf.";
     const String HEADLINE_SPALTE2 = "Time";
     const String HEADLINE_SPALTE3 = "Data";
     const String HEADLINE_FREEZE = "Freeze";
-
-
-    String kopfzeile;
     Textzeile** nachrichten = nullptr;
     int anzahlNachrichten;
-
     bool pausing;
 
 
     public:
-    Table(ILI9341& display, String kopfzeile, int anzahl, bool status = false);
+    static constexpr unsigned long COLOR_BLUE_BACKGROUND_HEADER = 0x007200; //R,G,B = 1,64,118
+    static constexpr unsigned long COLOR_ORANGE_WRITING_BODY_ISRTR = 0x0033FD; //R,G,B = 237,125,49
+    static constexpr unsigned long COLOR_GREY_BACKGROUND_FREEZE = 0x00BDF7; //R,G,B = 191,191,191;
+    Table(ILI9341& display, int anzahl, bool status = false);
     ~Table();
     void drawTableLines();
-    void printTable(String speicherPfad);
+    void printTable();
     void printMessages();
-    void setHeadlinePosition();
-    void setBackroundHeader();
     void setPausingStatus(bool status);
     bool getPausingStatus();
     void loop();
