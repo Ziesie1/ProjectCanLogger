@@ -31,6 +31,7 @@ protected:
 
     ILI9341& display;
     bool statusSD;
+    bool statusSettings;
    
     Button* buttonNichtSpeichern;
     Arrow*  pfeilNichtSpeichern;

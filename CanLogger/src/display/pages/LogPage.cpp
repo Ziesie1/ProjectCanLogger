@@ -94,7 +94,7 @@ void LogPage::startView()
     
     screenBuffer_enableUpdate();
     this->display.fillScreen(WHITE);
-    this->kopfzeile = new Kopfzeile{this->display, headline};
+    this->kopfzeile = new Kopfzeile{this->display, this->headline};
     this->logTable = new Table(this->display, screenBuffer_getFillLevel());
 
     if(this->statusSD)

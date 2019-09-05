@@ -6,6 +6,7 @@
 #include "buttons/Encoder.hpp"
 #include "sd/SD.hpp"
 #include "can/CanUtility.hpp"
+#include "display/pages/SettingPage.hpp"
 
 extern DisplayPageManager pageManager; // verweißt auf das Objekt in Main
 
@@ -14,7 +15,7 @@ extern DisplayPageManager pageManager; // verweißt auf das Objekt in Main
     input: display - Reference of the display where the homescreen will be printed on
 */
 HomePage::HomePage(ILI9341& display)
-    :display{display}, statusSD{false}
+    :display{display}, statusSD{false},statusSettings{false}
 {
     
 }
@@ -30,12 +31,18 @@ HomePage::~HomePage()
     if(this->buttonSpeichern)
         delete this->buttonSpeichern;
     this->buttonSpeichern = nullptr;
+    if(this->buttonEinstellungen)
+        delete this->buttonEinstellungen;
+    this->buttonEinstellungen = nullptr;
     if(this->pfeilNichtSpeichern)
         delete this->pfeilNichtSpeichern;
     this->pfeilNichtSpeichern = nullptr;
     if(this->pfeilSpeichern)
         delete this->pfeilSpeichern;
     this->pfeilSpeichern = nullptr;
+    if(this->pfeilEinstellungen)
+        delete this->pfeilEinstellungen;
+    this->pfeilEinstellungen = nullptr;
 }
 
 /*
@@ -43,7 +50,7 @@ HomePage::~HomePage()
 */
 void HomePage::loop()
 {
-    if(wasEncoderButtonPressed() && (getEncoderPos() == 0 || getEncoderPos() == 1 || getEncoderPos() == 3))
+    if(wasEncoderButtonPressed() && (getEncoderPos() == 0 || getEncoderPos() == 1 || getEncoderPos() == 2))
     {
         if(this->buttonSpeichern->getStatus())
         {
@@ -55,7 +62,7 @@ void HomePage::loop()
         }
         else
         {
-            /* code */
+            pageManager.openNewPage(new SettingPage(this->display,"Einstellungen"));
         }
            
     }
@@ -64,6 +71,7 @@ void HomePage::loop()
         if(getEncoderPos() == 0)
         {
             this->statusSD = false;
+            statusSettings = false;
             this->buttonNichtSpeichern->selectButton();
             this->pfeilNichtSpeichern->draw(this->COLOR_ARROW_SELECTED);
             this->buttonSpeichern->unselectButton();
@@ -74,6 +82,7 @@ void HomePage::loop()
         if(getEncoderPos() == 1)
         {
             this->statusSD = true;
+            statusSettings = false;
             this->buttonNichtSpeichern->unselectButton();
             this->pfeilNichtSpeichern->draw(this->COLOR_ARROW_UNSELECTED);
             this->buttonSpeichern->selectButton();
@@ -84,6 +93,7 @@ void HomePage::loop()
         if(getEncoderPos() == 2)
         {
             this->statusSD = false;
+            statusSettings = true;
             this->buttonNichtSpeichern->unselectButton();
             this->pfeilNichtSpeichern->draw(this->COLOR_ARROW_UNSELECTED);
             this->buttonSpeichern->unselectButton();
@@ -114,13 +124,13 @@ void HomePage::startView()
 
     this->display.drawBmp(xmitte-OSTFALIA_LOGO_SIZE_X / 2, IMAGE_DST_Y + 25, OSTFALIA_LOGO_SIZE_X, OSTFALIA_LOGO_SIZE_Y, OSTFALIA_LOGO, 1);
 
-    this->buttonNichtSpeichern = new Button{this->display, static_cast<uint16_t>(xmitte - this->BUTTON_WIDTH / 2), static_cast<uint16_t>(this->FIRST_BUTTON_Y_OFFSET),this->BUTTON_WIDTH,this->BUTTON_HIGH,this->COLOR_BUTTON_DEFAULT,this->BUTTON_TEXT_DST_X,this->BUTTON_TEXT_DST_Y,"Logging - ohne Speichern", this->COLOR_BUTTON_TEXT, !this->statusSD};
+    this->buttonNichtSpeichern = new Button{this->display, static_cast<uint16_t>(xmitte - this->BUTTON_WIDTH / 2), static_cast<uint16_t>(this->FIRST_BUTTON_Y_OFFSET),this->BUTTON_WIDTH,this->BUTTON_HIGH,this->COLOR_BUTTON_DEFAULT,this->BUTTON_TEXT_DST_X,this->BUTTON_TEXT_DST_Y,"Logging - ohne Speichern", this->COLOR_BUTTON_TEXT, !this->statusSD && !this->statusSettings};
     this->buttonSpeichern = new Button{this->display, static_cast<uint16_t>(xmitte - this->BUTTON_WIDTH / 2), static_cast<uint16_t>(this->FIRST_BUTTON_Y_OFFSET+this->BUTTON_Y_DISTANCE+this->BUTTON_HIGH), this->BUTTON_WIDTH, this->BUTTON_HIGH, this->COLOR_BUTTON_DEFAULT, this->BUTTON_TEXT_DST_X, this->BUTTON_TEXT_DST_Y, "Logging - mit Speichern", this->COLOR_BUTTON_TEXT, this->statusSD};
-    this->buttonEinstellungen = new Button{this->display, static_cast<uint16_t>(xmitte - this->BUTTON_WIDTH / 2), static_cast<uint16_t>(this->FIRST_BUTTON_Y_OFFSET+2*(this->BUTTON_Y_DISTANCE+this->BUTTON_HIGH)), this->BUTTON_WIDTH, this->BUTTON_HIGH, this->COLOR_BUTTON_DEFAULT, static_cast<byte>((this->BUTTON_WIDTH-13*8)/2), this->BUTTON_TEXT_DST_Y, "Einstellungen", this->COLOR_BUTTON_TEXT, !this->statusSD && !this->buttonNichtSpeichern->getStatus()};
+    this->buttonEinstellungen = new Button{this->display, static_cast<uint16_t>(xmitte - this->BUTTON_WIDTH / 2), static_cast<uint16_t>(this->FIRST_BUTTON_Y_OFFSET+2*(this->BUTTON_Y_DISTANCE+this->BUTTON_HIGH)), this->BUTTON_WIDTH, this->BUTTON_HIGH, this->COLOR_BUTTON_DEFAULT, static_cast<byte>((this->BUTTON_WIDTH-13*8)/2), this->BUTTON_TEXT_DST_Y, "Einstellungen", this->COLOR_BUTTON_TEXT, this->statusSettings};
 
-    this->pfeilNichtSpeichern = new Arrow{this->display, this->buttonNichtSpeichern, this->COLOR_ARROW_SELECTED, this->COLOR_ARROW_UNSELECTED, !this->statusSD};
+    this->pfeilNichtSpeichern = new Arrow{this->display, this->buttonNichtSpeichern, this->COLOR_ARROW_SELECTED, this->COLOR_ARROW_UNSELECTED, !this->statusSD && !statusSettings};
     this->pfeilSpeichern = new Arrow{this->display, this->buttonSpeichern, this->COLOR_ARROW_SELECTED, this->COLOR_ARROW_UNSELECTED, this->statusSD};
-    this->pfeilEinstellungen = new Arrow{this->display, this->buttonEinstellungen, this->COLOR_ARROW_SELECTED, this->COLOR_ARROW_UNSELECTED,  !this->statusSD && !this->buttonNichtSpeichern->getStatus()};
+    this->pfeilEinstellungen = new Arrow{this->display, this->buttonEinstellungen, this->COLOR_ARROW_SELECTED, this->COLOR_ARROW_UNSELECTED,  statusSettings};
     
 }
 
