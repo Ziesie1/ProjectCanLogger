@@ -43,16 +43,21 @@ HomePage::~HomePage()
 */
 void HomePage::loop()
 {
-    if(wasEncoderButtonPressed() && (getEncoderPos() == 0 || getEncoderPos() == 1))
+    if(wasEncoderButtonPressed() && (getEncoderPos() == 0 || getEncoderPos() == 1 || getEncoderPos() == 3))
     {
         if(this->buttonSpeichern->getStatus())
         {
             pageManager.openNewPage(new LogPage{this->display, true, getFullLogFilePath().c_str()});
         }
-        else
+        else if(this->buttonNichtSpeichern->getStatus())
         {
            pageManager.openNewPage(new LogPage{this->display,false, "Ohne Speichern"});
-        }   
+        }
+        else
+        {
+            /* code */
+        }
+           
     }
     if(hasEncoderPosChanged())
     {  
@@ -111,16 +116,16 @@ void HomePage::startView()
 
     this->buttonNichtSpeichern = new Button{this->display, static_cast<uint16_t>(xmitte - this->BUTTON_WIDTH / 2), static_cast<uint16_t>(this->FIRST_BUTTON_Y_OFFSET),this->BUTTON_WIDTH,this->BUTTON_HIGH,this->COLOR_BUTTON_DEFAULT,this->BUTTON_TEXT_DST_X,this->BUTTON_TEXT_DST_Y,"Logging - ohne Speichern", this->COLOR_BUTTON_TEXT, !this->statusSD};
     this->buttonSpeichern = new Button{this->display, static_cast<uint16_t>(xmitte - this->BUTTON_WIDTH / 2), static_cast<uint16_t>(this->FIRST_BUTTON_Y_OFFSET+this->BUTTON_Y_DISTANCE+this->BUTTON_HIGH), this->BUTTON_WIDTH, this->BUTTON_HIGH, this->COLOR_BUTTON_DEFAULT, this->BUTTON_TEXT_DST_X, this->BUTTON_TEXT_DST_Y, "Logging - mit Speichern", this->COLOR_BUTTON_TEXT, this->statusSD};
-    this->buttonEinstellungen = new Button{this->display, static_cast<uint16_t>(xmitte - this->BUTTON_WIDTH / 2), static_cast<uint16_t>(this->FIRST_BUTTON_Y_OFFSET+2*(this->BUTTON_Y_DISTANCE+this->BUTTON_HIGH)), this->BUTTON_WIDTH, this->BUTTON_HIGH, this->COLOR_BUTTON_DEFAULT, static_cast<byte>((this->BUTTON_WIDTH-13*8)/2), this->BUTTON_TEXT_DST_Y, "Einstellungen", this->COLOR_BUTTON_TEXT, this->statusSD};
+    this->buttonEinstellungen = new Button{this->display, static_cast<uint16_t>(xmitte - this->BUTTON_WIDTH / 2), static_cast<uint16_t>(this->FIRST_BUTTON_Y_OFFSET+2*(this->BUTTON_Y_DISTANCE+this->BUTTON_HIGH)), this->BUTTON_WIDTH, this->BUTTON_HIGH, this->COLOR_BUTTON_DEFAULT, static_cast<byte>((this->BUTTON_WIDTH-13*8)/2), this->BUTTON_TEXT_DST_Y, "Einstellungen", this->COLOR_BUTTON_TEXT, !this->statusSD && !this->buttonNichtSpeichern->getStatus()};
 
     this->pfeilNichtSpeichern = new Arrow{this->display, this->buttonNichtSpeichern, this->COLOR_ARROW_SELECTED, this->COLOR_ARROW_UNSELECTED, !this->statusSD};
     this->pfeilSpeichern = new Arrow{this->display, this->buttonSpeichern, this->COLOR_ARROW_SELECTED, this->COLOR_ARROW_UNSELECTED, this->statusSD};
-    this->pfeilEinstellungen = new Arrow{this->display, this->buttonEinstellungen, this->COLOR_ARROW_SELECTED, this->COLOR_ARROW_UNSELECTED, this->statusSD};
+    this->pfeilEinstellungen = new Arrow{this->display, this->buttonEinstellungen, this->COLOR_ARROW_SELECTED, this->COLOR_ARROW_UNSELECTED,  !this->statusSD && !this->buttonNichtSpeichern->getStatus()};
     
 }
 
 /*
-    relode the already
+    reloade the already
 */
 void HomePage::reloadView()
 {
