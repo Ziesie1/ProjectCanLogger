@@ -12,13 +12,14 @@
 using namespace utilities;
 
 extern DisplayPageManager pageManager; // verweißt auf das Objekt in Main
+
 /*
     Constructor of the class LogPage
     input: display          - Reference of the display where the LogPage will be printed on
            status           - pausing status, if it´s true "Table" will go in freze mode and the printet messages staing constant
 */
-LogPage::LogPage(ILI9341& display, bool statusSD)
- :display{display}, statusSD{statusSD}
+LogPage::LogPage(ILI9341& display, bool statusSD, String headline)
+ :display{display}, statusSD{statusSD}, headline{headline}
 {
     
 }
@@ -31,6 +32,12 @@ LogPage::~LogPage()
   {
     delete this->logTable;
     this->logTable = nullptr;
+  }
+
+  if(this->kopfzeile)
+  {
+      delete this->kopfzeile;
+      this->kopfzeile = nullptr;
   }
     
     screenBuffer_disableUpdate();
@@ -84,7 +91,11 @@ void LogPage::startView()
         scom.printError("Konnte das Empfangen von Cannachrichten nicht aktivieren.\nDas Programm wird angehalten!");
         while(1){}
     }
+    
     screenBuffer_enableUpdate();
+    this->display.fillScreen(WHITE);
+    this->kopfzeile = new Kopfzeile{this->display, headline};
+    this->logTable = new Table(this->display, screenBuffer_getFillLevel());
 
     if(this->statusSD)
     {
@@ -92,14 +103,9 @@ void LogPage::startView()
         createNewCanLogFile();
         startSD();
 
-        this->display.fillScreen(WHITE);
-        this->logTable = new Table(this->display, getFullLogFilePath().c_str(), screenBuffer_getFillLevel());
+       
     }
-    else
-    {
-        this->display.fillScreen(WHITE);
-        this->logTable = new Table(this->display, "Ohne Speichern", screenBuffer_getFillLevel()); 
-    }
+    
 }
 /*
     relode the start screen.

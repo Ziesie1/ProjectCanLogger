@@ -8,8 +8,8 @@
            status           - pausing status, if it´s true the display will go in freze mode and the printet messages stay constant
 
 */
-Table::Table(ILI9341& display, String kopfzeile, int anzahl, bool status)
-    :display{display}, kopfzeile{kopfzeile}, anzahlNachrichten{anzahl}, pausing{status}
+Table::Table(ILI9341& display, int anzahl, bool status)
+    :display{display}, anzahlNachrichten{anzahl}, pausing{status}
 {
     this->nachrichten = new Textzeile * [SCREEN_BUFFER_SIZE];
 
@@ -27,8 +27,7 @@ Table::Table(ILI9341& display, String kopfzeile, int anzahl, bool status)
         nachrichten[idx]->setCanMsg(dummi);
     }
 
-    this->setHeadlinePosition();
-    this->printTable(this->kopfzeile);
+    this->printTable();
     this->printMessages();   
 }
 
@@ -67,11 +66,9 @@ void Table::drawTableLines()
     This methode printsthe whol table, fillis the headllines and calls "drawTableLines".
     input: speicherPfad - leter of the first line, "file path" if "speichern" is selected else "Ohne Speichern"
 */
-void Table::printTable(String speicherPfad)
+void Table::printTable()
 {
-    setBackroundHeader();
-
-    this->display.printString(this->offsetXHeadlineStorage, 0, speicherPfad.c_str(), this->COLOR_WRITING_HEADER, this->COLOR_BLUE_BACKGROUND_HEADER, 1);
+    this->display.drawFillRect(0,this->OFFSETY_KOPFZEILE,this->DISPLAY_X,this->OFFSETY_KOPFZEILE,this->COLOR_BLUE_BACKGROUND_HEADER);
     this->display.printString(this->OFFSETX_HEADLINE1,this->OFFSETY_KOPFZEILE,this->HEADLINE_SPALTE1.c_str(),this->COLOR_WRITING_HEADER, this->COLOR_BLUE_BACKGROUND_HEADER, 1);
     this->display.drawVerticalLine(this->OFFSETX_SPALTE1, this->OFFSETY_KOPFZEILE, this->OFFSETY_SPALTENNAMEN,BLACK);
     this->display.printString(this->OFFSETX_HEADLINE2, this->OFFSETY_KOPFZEILE, this->HEADLINE_SPALTE2.c_str(),this->COLOR_WRITING_HEADER, this->COLOR_BLUE_BACKGROUND_HEADER, 1);
@@ -103,21 +100,7 @@ void Table::printMessages()
     }
 }
 
-/*
-    Setting the startpsition for the headline input. The text has to be printed in the middel of the line. 
-*/
-void Table::setHeadlinePosition()
-{
-    this->offsetXHeadlineStorage = (this->DISPLAY_X - (this->kopfzeile.length() * 8)) / 2;
-}
 
-/*
-    Drawing the Header Background.
-*/
-void Table::setBackroundHeader()
-{
-    this->display.drawFillRect(0, 0, this->DISPLAY_X, this->OFFSETY_SPALTENNAMEN, this->COLOR_BLUE_BACKGROUND_HEADER);
-}
 
 /*
     Setting the pausinng status for freze mode.
