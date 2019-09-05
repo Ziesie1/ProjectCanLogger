@@ -102,7 +102,7 @@ void HomePage::startView()
 }
 
 /*
-    go back to start screen
+    relode the already
 */
 void HomePage::reloadView()
 {

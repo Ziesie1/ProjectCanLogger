@@ -31,5 +31,6 @@ void Arrow::draw(unsigned long Farbe)
 void Arrow::setPositions()
 {
     this->posX1 = this->button->getPosX() - 9; //-9 Damit nicht in den Button geschrieben wird
-    this->posY1 = this->button->getPosY() + (this->button->getSizeY() * (1 / 4));
+    this->posY1 = (this->button->getPosY() + (this->button->getSizeY() / 4));
+    //this->posY1 = ( (this->button->getSizeY() * (1 / 4)));
 }

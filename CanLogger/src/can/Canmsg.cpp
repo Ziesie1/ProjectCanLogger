@@ -310,7 +310,7 @@ uint8_t Canmsg::operator[](int idx) const
 
 /*
     operator which checks if to CAN-messages are congruent
-    Input:  other - a reference to a CAN-message that will be compared with this CAN-message
+    input:  other - a reference to a CAN-message that will be compared with this CAN-message
     return: true  - messages are congruent
             false - messages are not congruent
 */
