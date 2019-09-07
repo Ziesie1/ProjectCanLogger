@@ -1,6 +1,11 @@
 #include "display/elements/Kopfzeile.hpp"
 
-
+/*
+    Constructor of the class Kopfzeile
+    input: display - reference to the used display-object
+           headline - text, which is supposed to be shown as the headline
+    output: -
+*/
 Kopfzeile::Kopfzeile(ILI9341& display, String headline)
     :display{display}, headline{headline}
 {
@@ -24,4 +29,5 @@ void Kopfzeile::setHeadlinePosition()
 void Kopfzeile::setBackroundHeader()
 {
     this->display.drawFillRect(0, 0, this->DISPLAY_X, this->OFFSET_Y_HEADLINE, this->COLOR_BLUE_BACKGROUND);
+    this->display.drawHorizontalLine(0,this->DISPLAY_X,this->OFFSET_Y_HEADLINE,BLACK);
 }

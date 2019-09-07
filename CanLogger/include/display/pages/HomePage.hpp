@@ -14,7 +14,7 @@ class HomePage : public DisplayPage
 
 protected:
     const byte BUTTON_WIDTH = 204;
-    const uint16_t BUTTON_HIGH = 32;
+    const  uint16_t BUTTON_HIGH = 32;
     const uint16_t BUTTON_MID_DIST = 20;
     const uint16_t BUTTON_Y_AXE_OFFSET = 80;
     const uint16_t FIRST_BUTTON_Y_OFFSET = 160;
