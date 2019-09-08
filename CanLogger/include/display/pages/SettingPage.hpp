@@ -9,7 +9,7 @@
 
 class SettingPage : public DisplayPage
 {
-    protected:
+protected:
     ILI9341& display;
     String kopfzeile;
     Kopfzeile* header;
@@ -39,7 +39,9 @@ class SettingPage : public DisplayPage
     Button* buttonSpecial1;
     Button* buttonSpecial2;
 
-    public:
+    int lastEncoderPos = 0; // Position des Drehimpulsgebers
+
+public:
     SettingPage(ILI9341& display,  String headline);
     void loop() override;
     void startView() override;

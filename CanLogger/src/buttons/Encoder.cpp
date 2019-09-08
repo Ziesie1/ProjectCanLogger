@@ -74,17 +74,18 @@ void initEncoder()
   scom.printDebug("Encoder ist Initialisiert");
 }
 
-// Gibt die aktuelle Position des Encoders zurück
-int getEncoderPos()
+/*
+    Gibt die relative Position des Encoders zurück.
+    Dabei werden die inkrementalen Schritte seid der letzen Abfrage gezählt.
+*/
+int getRelativeEncoderPos()
 {
   encoderPosChanged = false;
-  return encoderPos;
+  int ret = encoderPos;
+  encoderPos = 0;
+  return ret;
 }
 
-void setEncoderPos(int pos)
-{
-  encoderPos = pos;
-}
 
 bool wasEncoderButtonPressed()
 {
@@ -99,4 +100,14 @@ bool hasEncoderPosChanged()
   encoderPosChanged = false;
   return ret;
  
+}
+
+/*
+  Setzt den aktuellen Status des Inkrementalgers zurück.
+*/
+void resetEncoderStates()
+{
+  encoderPosChanged = false;
+  encoderPos = 0;
+  tasterPressed = false;
 }

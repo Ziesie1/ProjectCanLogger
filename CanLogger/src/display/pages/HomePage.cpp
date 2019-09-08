@@ -50,7 +50,7 @@ HomePage::~HomePage()
 */
 void HomePage::loop()
 {
-    if(wasEncoderButtonPressed() && (getEncoderPos() == 0 || getEncoderPos() == 1 || getEncoderPos() == 2))
+    if(wasEncoderButtonPressed() && (this->lastEncoderPos == 0 || this->lastEncoderPos == 1 || this->lastEncoderPos == 2))
     {
         if(this->buttonSpeichern->getStatus())
         {
@@ -66,9 +66,12 @@ void HomePage::loop()
         }
            
     }
+
     if(hasEncoderPosChanged())
     {  
-        if(getEncoderPos() == 0)
+        this->lastEncoderPos += getRelativeEncoderPos(); // Encoderpositon updaten
+
+        if(this->lastEncoderPos == 0)
         {
             this->statusSD = false;
             statusSettings = false;
@@ -79,7 +82,8 @@ void HomePage::loop()
             this->buttonEinstellungen->unselectButton();
             this->pfeilEinstellungen->draw(this->COLOR_ARROW_UNSELECTED);
         }
-        if(getEncoderPos() == 1)
+
+        if(this->lastEncoderPos == 1)
         {
             this->statusSD = true;
             statusSettings = false;
@@ -90,7 +94,8 @@ void HomePage::loop()
             this->buttonEinstellungen->unselectButton();
             this->pfeilEinstellungen->draw(this->COLOR_ARROW_UNSELECTED);
         }
-        if(getEncoderPos() == 2)
+
+        if(this->lastEncoderPos == 2)
         {
             this->statusSD = false;
             statusSettings = true;
@@ -102,13 +107,13 @@ void HomePage::loop()
             this->pfeilEinstellungen->draw(this->COLOR_ARROW_SELECTED);
         }
 
-        if(getEncoderPos() > 2)
+        if(this->lastEncoderPos > 2)
         {
-            setEncoderPos(2);
+            this->lastEncoderPos = 2;
         }
-        if(getEncoderPos() < 0)
+        if(this->lastEncoderPos < 0)
         {
-            setEncoderPos(0);
+            this->lastEncoderPos = 0;
         }
     }
 }

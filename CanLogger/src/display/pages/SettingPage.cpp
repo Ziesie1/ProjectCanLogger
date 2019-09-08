@@ -62,7 +62,9 @@ void SettingPage::loop()
 {
     if(hasEncoderPosChanged())
     {
-        if(getEncoderPos() == 0)
+        this->lastEncoderPos += getRelativeEncoderPos();
+        
+        if(this->lastEncoderPos == 0)
         {
             
             this->buttonSpecial1->selectButton();
@@ -70,14 +72,14 @@ void SettingPage::loop()
             this->buttonDiscard->unselectButton();
             this->buttonStore->unselectButton();
         }
-        else if(getEncoderPos() == 1)
+        else if(this->lastEncoderPos == 1)
         {
             this->buttonSpecial1->unselectButton();
             this->buttonSpecial2->selectButton();
             this->buttonDiscard->unselectButton();
             this->buttonStore->unselectButton();
         }
-        else if (getEncoderPos() == 2)
+        else if(this->lastEncoderPos == 2)
         {
             this->buttonSpecial1->unselectButton();
             this->buttonSpecial2->unselectButton();
@@ -85,7 +87,7 @@ void SettingPage::loop()
             this->buttonStore->unselectButton();
             
         }
-        else if (getEncoderPos() == 3)
+        else if(this->lastEncoderPos == 3)
         {
             this->buttonSpecial1->unselectButton();
             this->buttonSpecial2->unselectButton();
@@ -93,14 +95,14 @@ void SettingPage::loop()
             this->buttonStore->selectButton();
         }
 
-        if(getEncoderPos()<0)
+        if(this->lastEncoderPos<0)
         {
-            setEncoderPos(0);
+            this->lastEncoderPos = 0;
         }
 
-        if(getEncoderPos()>3)
+        if(this->lastEncoderPos>3)
         {
-            setEncoderPos(3);
+            this->lastEncoderPos = 3;
         }
         
     }
@@ -120,7 +122,6 @@ void SettingPage::loop()
 */
 void SettingPage::startView() 
 {
-    setEncoderPos(0);
     this->display.fillScreen(WHITE);
     this->header = new Kopfzeile{this->display, this->kopfzeile};
     setElements();

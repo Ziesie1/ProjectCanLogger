@@ -119,8 +119,6 @@ bool DisplayPageManager::deleteOpenPage()
 */
 void clearButtonState()
 {
-    getEncoderPos();
-    setEncoderPos(0);
-    wasEncoderButtonPressed();
+    resetEncoderStates();
     wasSingleTasterPressed();
 }

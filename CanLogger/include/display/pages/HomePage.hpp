@@ -32,6 +32,8 @@ protected:
     ILI9341& display;
     bool statusSD;
     bool statusSettings;
+
+    int lastEncoderPos = 0; // Position des Drehimpulsgebers
    
     Button* buttonNichtSpeichern;
     Arrow*  pfeilNichtSpeichern;
