@@ -1,5 +1,6 @@
 #include "display/elements/Textzeile.hpp"
 #include "utilities/utilities.hpp"
+#include "display/elements/Table.hpp"
 
 /*
     Constructor of the class Textzeile
@@ -24,10 +25,15 @@ Textzeile::Textzeile(ILI9341& display, bool isSelected, uint8_t offsetXSpalte1,
 /*
     This methode prints the most important content of the CAN-messages of the frontend buffer into the logtable shown on the display
     input: posY     - Y coordinate of the printing start 
-           farbe    - printing colour 
 */
-void Textzeile::printImportantContent(uint8_t posY, unsigned long farbe)
+void Textzeile::printImportantContent(uint8_t posY)
 {
+    unsigned long farbe = Table::COLOR_WRITING_BODY_DEFAULT;
+    if(this->message.GetRtr())
+    {
+        farbe = Table::COLOR_ORANGE_WRITING_BODY_ISRTR;
+    }
+
     //erste Spalte mit Begrenzung
     String s1 = String(this->message.GetFullId(),HEX);
     AddBlanksToString(s1, 8);
@@ -52,14 +58,32 @@ void Textzeile::printImportantContent(uint8_t posY, unsigned long farbe)
             s1 += String(this->message.GetCanByte(i),HEX);
         }
         s1.toUpperCase();
+        AddBlanksToString(s1,16);
+
+        for(unsigned int i = 0; i < s1.length(); i+=2)
+        {
+            String twoChars = "";
+            twoChars += s1[i];
+            twoChars += s1[i+1];
+
+            if(i % 4 == 0)
+            {
+                farbe = Table::COLOR_WRITING_BODY_DEFAULT;
+            }else{
+                farbe = Table::COLOR_WRITING_BODY_NEXT_BYTE;
+            }
+
+            this->display.printString(this->offsetXSpalte2 + 4 + i*8, posY, twoChars.c_str(), farbe, this->COLOR_BACKGROUND_UNSELECTED);
+        }
     }
     else
     {
         s1 += "Laenge: ";
         s1 += String(this->message.GetCanLength());
+        AddBlanksToString(s1,16);
+        this->display.printString(this->offsetXSpalte2 + 4, posY, s1.c_str(), farbe, this->COLOR_BACKGROUND_UNSELECTED);
     }
-    AddBlanksToString(s1,16);
-    this->display.printString(this->offsetXSpalte2 + 4, posY, s1.c_str(), farbe, this->COLOR_BACKGROUND_UNSELECTED);
+    
 }
 
 /*

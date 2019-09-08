@@ -87,16 +87,8 @@ void Table::printMessages()
     
     for(int idx = 0; idx<screenBuffer_getFillLevel(); idx++)
     {   
-        if(this->nachrichten[idx]->isRtr())
-        {
-            this->nachrichten[idx]->printImportantContent(posY, this->COLOR_ORANGE_WRITING_BODY_ISRTR);
-            posY = posY + this->ZEILENHOEHE;
-        }
-        else
-        {
-            this->nachrichten[idx]->printImportantContent(posY, this->COLOR_WRITING_BODY_DEFAULT);
-            posY = posY + this->ZEILENHOEHE;
-        }
+        this->nachrichten[idx]->printImportantContent(posY);
+        posY = posY + this->ZEILENHOEHE;
     }
 }
 
@@ -187,14 +179,8 @@ void Table::updateMessages()
         {
             screenBuffer_getMessageAtPosition(dummi, idx);
             this->nachrichten[idx]->setCanMsg(dummi);
-            if(nachrichten[idx]->isRtr())
-            {
-                printSingleMessage(idx,COLOR_ORANGE_WRITING_BODY_ISRTR);
-            }
-            else
-            {
-                printSingleMessage(idx,COLOR_WRITING_BODY_DEFAULT);
-            }
+            printSingleMessage(idx);
+
         }
     } 
 }
@@ -204,11 +190,11 @@ void Table::updateMessages()
     input:  pos     - positin in "nachrichten"
             collor  - collor for printing
 */
-void Table::printSingleMessage(int pos, unsigned long farbe)
+void Table::printSingleMessage(int pos)
 {
     uint8_t startOffsetY = this->OFFSETY_SPALTENNAMEN + 2;
     uint8_t posYMessage = (pos*this->ZEILENHOEHE) + startOffsetY;
-    this->nachrichten[pos]->printImportantContent(posYMessage, farbe);
+    this->nachrichten[pos]->printImportantContent(posYMessage);
 }
 
 /* 

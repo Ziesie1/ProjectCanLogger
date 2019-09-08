@@ -31,7 +31,7 @@ class Textzeile
         Textzeile(ILI9341& display, bool isSelected, uint8_t offsetXSpalte1, 
                   uint8_t offsetXSpalte2, uint8_t offsetHeadline1, uint8_t offsetHeadline2, 
                   uint8_t offsetHeadline3, uint8_t zeilenhoehe);
-        void printImportantContent(uint8_t posY, unsigned long farbe);
+        void printImportantContent(uint8_t posY);
         void selectZeile();
         void unselectZeile();
         bool isRtr();
