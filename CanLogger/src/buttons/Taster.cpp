@@ -37,7 +37,7 @@ void loopTaster()
             {
                 tasterPressed = true;
             }
-            //scom << "Zustand Taster2: " << pinStatus << endz; // später auskommentieren
+            
         }
     }
 }

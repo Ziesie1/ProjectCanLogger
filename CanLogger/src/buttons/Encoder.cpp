@@ -40,7 +40,7 @@ void doEncoderA()
     }
   
     alteZeitEncoder = millis();
-    //scom << encoderPos << endz; // später auskommentieren
+    
    }
 }
 
@@ -56,8 +56,6 @@ void doEncoderTast()
     }
     alteZeitEncoderTaster = millis();
 
-    //scom<<"Interrupt ausgelöst"<<endz; // später auskommentieren
-    //scom<<tasterSet<<endz; // später auskommentieren
   }
 }
 
