@@ -12,7 +12,6 @@
 #include "utilities/utilities.hpp"
 
 
-
 using namespace utilities; // für scom
 
 ILI9341 display {PC9, PC8, PA10, PA8, PB5, true};
@@ -46,7 +45,7 @@ void loop() {
     loopTaster();
     pageManager.loop();
     loopScreenBuffer();
-
+    
 }
 
 void serialEvent() 

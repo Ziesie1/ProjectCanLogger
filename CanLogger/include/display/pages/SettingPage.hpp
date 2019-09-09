@@ -5,7 +5,11 @@
 #include "display/pages/DisplayPage.hpp"
 #include "display/elements/Table.hpp"
 #include "display/elements/Kopfzeile.hpp"
-#include  "display/elements/Button.hpp"
+//#include "display/elements/Button.hpp"
+//#include "display/elements/SelectionButton.hpp"
+#include "display/elements/SpeedSelectionButton.hpp"
+#include "display/elements/SilentSelectionButton.hpp"
+
 
 class SettingPage : public DisplayPage
 {
@@ -30,14 +34,12 @@ protected:
     const uint16_t BUTTON_POS_Y = 280;
     const String BUTTON_DISCARD_TEXT = "Verwerfen";
     const String BUTTON_STORE_TEXT = "Speichern";
-    String buttonSpecial1Text = "Text1";
-    String buttonSpecial2Text = "Text2";
     const unsigned long COLOR_BUTTON_DEFAULT = Table::COLOR_BLUE_BACKGROUND_HEADER;
     const unsigned long COLOR_BUTTON_TEXT = WHITE;
     Button* buttonDiscard;
     Button* buttonStore;
-    Button* buttonSpecial1;
-    Button* buttonSpecial2;
+    SpeedSelectionButton* speedSelect;
+    SilentSelectionButton* silentSelect;
 
     int lastEncoderPos = 0; // Position des Drehimpulsgebers
 

@@ -2,10 +2,16 @@
 
 /*
     Constructor of the class Button
-    input:  display - reference of the display where the Button will be printed
-            startx  - start position on x-axis
-            starty  - start position on y-axis
-            sizeX   - button width
+    input:  display     - reference of the display where the Button will be printed
+            startx      - start position on x-axis
+            starty      - start position on y-axis
+            sizeX       - button width
+            sizeY       - button hight
+            backColor   - button collor
+            byte offsetX- text offst on x-scale
+            byte offsetY- text offst in y-scale
+            string text - text printet on the button
+            textColor   - collor of the text
 */
 Button::Button(ILI9341& display, uint16_t startX, uint16_t startY, uint16_t sizeX, 
         uint16_t sizeY, unsigned long backColor, byte offsetX, byte offsetY, string text, unsigned long textColor,
@@ -18,14 +24,66 @@ Button::Button(ILI9341& display, uint16_t startX, uint16_t startY, uint16_t size
                selectButton();
            }
        }
+
+ /*
+    Constructor of the class Button with text in the middle.
+    input:  display     - reference of the display where the Button will be printed
+            startx      - start position on x-axis
+            starty      - start position on y-axis
+            sizeX       - button width
+            sizeY       - button hight
+            backColor   - button collor
+            byte offsetX- text offst on x-scale
+            byte offsetY- text offst in y-scale
+            string text - text printet on the button
+            textColor   - collor of the text
+*/
+Button::Button(ILI9341& display, uint16_t startX, uint16_t startY, uint16_t sizeX, 
+        uint16_t sizeY, unsigned long backColor,string text, unsigned long textColor,
+        bool isSelected)
+       :display{display}, startX{startX}, startY{startY}, sizeX{sizeX}, sizeY{sizeY}, backColor{backColor}, text{text}, textColor{textColor}, isSelected{false}
+       {
+           setTextOffset();
+           drawButton();
+           if(isSelected)
+           {
+               selectButton();
+           }
+
+       }
+
+ /*
+    Constructor of the class Button for extending classes.
+    input:  display     - reference of the display where the Button will be printed
+            startx      - start position on x-axis
+            starty      - start position on y-axis
+            sizeX       - button width
+            sizeY       - button hight
+            backColor   - button collor
+            string text - text printet on the button
+            textColor   - collor of the text
+*/
+Button::Button(ILI9341& display, uint16_t startX, uint16_t startY, uint16_t sizeX, 
+        uint16_t sizeY, unsigned long backColor, unsigned long textColor, bool isSelected)
+       :display{display}, startX{startX}, startY{startY}, sizeX{sizeX}, sizeY{sizeY}, backColor{backColor}, textColor{textColor}, isSelected{false}
+       {
+       }
        
 /*
-    This methode prints the Button.
+    This methode prints the button.
 */
 void Button::drawButton()
 {
     this->display.drawFillRect(this->startX, this->startY, this->sizeX, this->sizeY, this->backColor);
-    this->display.printString(this->startX + this->offsetX, this->startY + this->offsetY, this->text.c_str(), this->textColor, this->backColor, 1);
+    this->printText();
+}
+
+/*
+    draw button text
+*/
+void Button::printText()
+{
+    this->display.printString(this->startX + this->offsetX, this->startY + this->offsetY, this->text.c_str(), this->textColor, this->backColor, 1); 
 }
 /*
     Request of the button status 
@@ -85,4 +143,13 @@ uint16_t Button::getPosY()
 uint16_t Button::getSizeY()
 {
     return this->sizeY;
+}
+
+/*
+    declarate the text offset for text in middle positon
+*/
+void Button::setTextOffset()
+{
+    this->offsetY =(this->sizeY - 14) / 2;
+    this->offsetX =(this->sizeX - (text.length() * 8))/2;
 }

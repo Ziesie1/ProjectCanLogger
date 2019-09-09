@@ -62,7 +62,7 @@ void HomePage::loop()
         }
         else
         {
-            pageManager.openNewPage(new SettingPage(this->display,"Einstellungen"));
+            pageManager.openNewPage(new SettingPage{this->display, "Einstellungen"});
         }
            
     }

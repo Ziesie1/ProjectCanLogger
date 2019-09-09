@@ -40,15 +40,15 @@ SettingPage::~SettingPage()
          delete this->buttonStore;
          this->buttonStore = nullptr;
      }
-     if(this->buttonSpecial1)
+     if(this->speedSelect)
      {
-         delete this->buttonSpecial1;
-         this->buttonSpecial1 = nullptr;
+         delete this->speedSelect;
+         this->speedSelect = nullptr;
      }
-     if(this->buttonSpecial2)
+     if(this->silentSelect)
      {
-         delete this->buttonSpecial2;
-         this->buttonSpecial2 = nullptr;
+         delete this->silentSelect;
+         this->silentSelect = nullptr;
      }
 }
 
@@ -60,58 +60,74 @@ SettingPage::~SettingPage()
 */
 void SettingPage::loop()
 {
-    if(hasEncoderPosChanged())
+    if(speedSelect->loop() || silentSelect->loop())
     {
-        this->lastEncoderPos += getRelativeEncoderPos();
-        
-        if(this->lastEncoderPos == 0)
-        {
-            
-            this->buttonSpecial1->selectButton();
-            this->buttonSpecial2->unselectButton();
-            this->buttonDiscard->unselectButton();
-            this->buttonStore->unselectButton();
-        }
-        else if(this->lastEncoderPos == 1)
-        {
-            this->buttonSpecial1->unselectButton();
-            this->buttonSpecial2->selectButton();
-            this->buttonDiscard->unselectButton();
-            this->buttonStore->unselectButton();
-        }
-        else if(this->lastEncoderPos == 2)
-        {
-            this->buttonSpecial1->unselectButton();
-            this->buttonSpecial2->unselectButton();
-            this->buttonDiscard->selectButton();
-            this->buttonStore->unselectButton();
-            
-        }
-        else if(this->lastEncoderPos == 3)
-        {
-            this->buttonSpecial1->unselectButton();
-            this->buttonSpecial2->unselectButton();
-            this->buttonDiscard->unselectButton();
-            this->buttonStore->selectButton();
-        }
 
-        if(this->lastEncoderPos<0)
-        {
-            this->lastEncoderPos = 0;
-        }
-
-        if(this->lastEncoderPos>3)
-        {
-            this->lastEncoderPos = 3;
-        }
-        
-    }
-
-    
-
-    if(wasSingleTasterPressed())
+    }else
     {
-        pageManager.deleteOpenPage();
+        if(hasEncoderPosChanged())
+        {
+            this->lastEncoderPos += getRelativeEncoderPos();
+            
+            if(this->lastEncoderPos == 0)
+            {
+                
+                this->speedSelect->selectButton();
+                this->silentSelect->unselectButton();
+                this->buttonDiscard->unselectButton();
+                this->buttonStore->unselectButton();
+            }
+            else if(this->lastEncoderPos == 1)
+            {
+                this->speedSelect->unselectButton();
+                this->silentSelect->selectButton();
+                this->buttonDiscard->unselectButton();
+                this->buttonStore->unselectButton();
+            }
+            else if(this->lastEncoderPos == 2)
+            {
+                this->speedSelect->unselectButton();
+                this->silentSelect->unselectButton();
+                this->buttonDiscard->selectButton();
+                this->buttonStore->unselectButton();
+                
+            }
+            else if(this->lastEncoderPos == 3)
+            {
+                this->speedSelect->unselectButton();
+                this->silentSelect->unselectButton();
+                this->buttonDiscard->unselectButton();
+                this->buttonStore->selectButton();
+            }else if(this->lastEncoderPos<0)
+            {
+                this->lastEncoderPos = 0;
+            }else if(this->lastEncoderPos>3)
+            {
+                this->lastEncoderPos = 3;
+            }
+        }else if(wasSingleTasterPressed())
+        {
+            pageManager.deleteOpenPage();
+        }else if(wasEncoderButtonPressed())
+        {
+            if(lastEncoderPos == 0)
+            {
+                speedSelect->pressButton();
+            }else if(lastEncoderPos == 1)
+            {
+                silentSelect->pressButton();
+            }else if(lastEncoderPos > 1)
+            {
+                if(lastEncoderPos == 3)
+                {
+                    speedSelect->saveValue();
+                    silentSelect->saveValue();
+                }
+                pageManager.deleteOpenPage();
+            }
+
+            
+        }
     }
 }
 
@@ -125,7 +141,7 @@ void SettingPage::startView()
     this->display.fillScreen(WHITE);
     this->header = new Kopfzeile{this->display, this->kopfzeile};
     setElements();
-    this->buttonSpecial1->selectButton();
+    this->speedSelect->selectButton();
 }
 
 /*
@@ -160,9 +176,9 @@ void SettingPage::setElements()
     this->display.printString(this->TRANSFER_RATE_SILENT_MODE_POS_X, this->SILENT_MODE_POS_Y, this->SILENT_MODE.c_str(), this->COLOR_BLACK_SETTING_WRITING, this->COLOR_WHITE_BACKGROUND_SETTING, 1);
 
     //Buttons
-    this->buttonDiscard = new Button{this->display, static_cast<uint16_t>((this->DISPLAY_X/2-this->BUTTON_WIDTH)/2), this->BUTTON_POS_Y, this->BUTTON_WIDTH, this->BUTTON_HIGH, this->COLOR_BUTTON_DEFAULT, static_cast<byte>((this->BUTTON_WIDTH - this->BUTTON_DISCARD_TEXT.length()*8)/2), static_cast<byte>((this->BUTTON_HIGH-16)/2),this->BUTTON_DISCARD_TEXT.c_str(),this->COLOR_BUTTON_TEXT, false};
-    this->buttonStore = new Button{this->display, static_cast<uint16_t>((this->DISPLAY_X/2-this->BUTTON_WIDTH)/2+this->DISPLAY_X/2), this->BUTTON_POS_Y, this->BUTTON_WIDTH, this->BUTTON_HIGH, this->COLOR_BUTTON_DEFAULT, static_cast<byte>((this->BUTTON_WIDTH - this->BUTTON_STORE_TEXT.length()*8)/2), static_cast<byte>((this->BUTTON_HIGH-16)/2), this->BUTTON_STORE_TEXT.c_str(), this->COLOR_BUTTON_TEXT, false};
-    this->buttonSpecial1 = new Button{this->display, this->BUTTON_SPECIAL_POS_X, this->TRANSFER_RATE_POS_Y, this->BUTTON_SPECIAL_WIDTH, this->BUTTON_SPECIAL_HIGH, this->COLOR_BUTTON_DEFAULT, static_cast<byte>((this->BUTTON_SPECIAL_WIDTH - this->buttonSpecial1Text.length()*8)/2), static_cast<byte>((this->BUTTON_SPECIAL_HIGH - 16)/2), this->buttonSpecial1Text.c_str(), this->COLOR_BUTTON_TEXT, false};
-    this->buttonSpecial2 = new Button{this->display, this->BUTTON_SPECIAL_POS_X, this->SILENT_MODE_POS_Y, this->BUTTON_SPECIAL_WIDTH, this->BUTTON_SPECIAL_HIGH, this->COLOR_BUTTON_DEFAULT, static_cast<byte>((this->BUTTON_SPECIAL_WIDTH - this->buttonSpecial2Text.length()*8)/2), static_cast<byte>((this->BUTTON_SPECIAL_HIGH - 16)/2), this->buttonSpecial2Text.c_str(),this->COLOR_BUTTON_TEXT, false};
+    this->buttonDiscard = new Button{this->display, static_cast<uint16_t>((this->DISPLAY_X / 2-this->BUTTON_WIDTH) / 2), this->BUTTON_POS_Y, this->BUTTON_WIDTH, this->BUTTON_HIGH, this->COLOR_BUTTON_DEFAULT, this->BUTTON_DISCARD_TEXT.c_str(), this->COLOR_BUTTON_TEXT, false};
+    this->buttonStore = new Button{this->display, static_cast<uint16_t>((this->DISPLAY_X / 2-this->BUTTON_WIDTH) / 2 + this->DISPLAY_X / 2), this->BUTTON_POS_Y, this->BUTTON_WIDTH, this->BUTTON_HIGH, this->COLOR_BUTTON_DEFAULT, this->BUTTON_STORE_TEXT.c_str(), this->COLOR_BUTTON_TEXT, false};
+    this->speedSelect = new SpeedSelectionButton{this->display, this->BUTTON_SPECIAL_POS_X, this->TRANSFER_RATE_POS_Y, this->BUTTON_SPECIAL_WIDTH, this->BUTTON_SPECIAL_HIGH, this->COLOR_BUTTON_DEFAULT, this->COLOR_BUTTON_TEXT, true};
+    this->silentSelect = new SilentSelectionButton{this->display, this->BUTTON_SPECIAL_POS_X, this->SILENT_MODE_POS_Y, this->BUTTON_SPECIAL_WIDTH, this->BUTTON_SPECIAL_HIGH, this->COLOR_BUTTON_DEFAULT, this->COLOR_BUTTON_TEXT, false};
     
 }
