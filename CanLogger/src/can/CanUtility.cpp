@@ -13,7 +13,7 @@ bool CanUtility_toManyMsgs = false;
 
 bool CanUtility_initialized = false;
 
-bool CanUtility_silentMode = false;
+CAN_TransmissionMode CanUtility_currentMode = CAN_TransmissionMode_Normal;
 CAN_SpeedTypedef CanUtility_transmissionSpeed = CAN_500_KBIT;
 
 /* 
@@ -86,6 +86,20 @@ void CAN_RX0_IRQHandler(void)
 }
 #endif
 
+void CanUtility_enterInitMode(void)
+{
+	CanUtility_hcan.Instance->MCR |= CAN_MCR_INRQ;
+    while(!(CanUtility_hcan.Instance->MSR & CAN_MSR_INAK))
+    {}
+}
+
+void CanUtility_leaveInitMode(void)
+{
+	CanUtility_hcan.Instance->MCR &= ~CAN_MCR_INRQ;
+    while(CanUtility_hcan.Instance->MSR & CAN_MSR_INAK)
+    {}
+}
+
 /* 
 	function that initializes the GPIO-Pins for CAN peripherals
 	Input: hcan	- pointer to CAN-handle
@@ -152,7 +166,7 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef *hcan)
 	Input: 	hcan	- pointer to CAN-handle
 			speed	- transmission speed of the CAN-bus
 */
-void FillCAN_Handle(CAN_HandleTypeDef& hcan, CAN_SpeedTypedef speed, bool const silent)
+void FillCAN_Handle(CAN_HandleTypeDef& hcan, CAN_SpeedTypedef speed)
 {
 	hcan.Instance = CAN1;
 	hcan.Init.Prescaler = speed;
@@ -166,14 +180,6 @@ void FillCAN_Handle(CAN_HandleTypeDef& hcan, CAN_SpeedTypedef speed, bool const 
 	hcan.Init.AutoRetransmission = ENABLE;
 	hcan.Init.ReceiveFifoLocked = DISABLE;
 	hcan.Init.TransmitFifoPriority = DISABLE;
-	if(silent)
-	{
-		hcan.Init.Mode = CAN_MODE_SILENT;
-	}
-	else
-	{
-		hcan.Init.Mode = CAN_MODE_NORMAL;
-	}
 }
 
 /* 
@@ -202,12 +208,12 @@ void FillCAN_Filter(CAN_FilterTypeDef& canFilter)
 			HAL_ERROR	- an error occured while initializing, 
 						  check the serial output for further details
 */
-HAL_StatusTypeDef CanUtility_Init(CAN_SpeedTypedef speed, bool const silent)
+HAL_StatusTypeDef CanUtility_Init(CAN_SpeedTypedef speed)
 {	
 	if(!CanUtility_initialized)
 	{
 		//initialize CAN-handler:
-		FillCAN_Handle(CanUtility_hcan, speed, silent);
+		FillCAN_Handle(CanUtility_hcan, speed);
 		if(HAL_CAN_Init(&CanUtility_hcan) != HAL_OK)
 		{
 			String s = "Fehler während der CAN initialisierung. Status: ";
@@ -216,7 +222,7 @@ HAL_StatusTypeDef CanUtility_Init(CAN_SpeedTypedef speed, bool const silent)
 			s += String(HAL_CAN_GetError(&CanUtility_hcan),HEX); 
 			utilities::scom.printError(s);
 			return HAL_ERROR;
-			CanUtility_silentMode = silent;
+			CanUtility_currentMode = CAN_TransmissionMode_Normal;
 			CanUtility_transmissionSpeed = speed;
 		}
 		else
@@ -442,7 +448,7 @@ HAL_StatusTypeDef CanUtility_RecieveMessage(bool const fifo, Canmsg * msg)
 */
 HAL_StatusTypeDef CanUtility_SendMessage(Canmsg *const msg)
 {
-	if(msg && CanUtility_initialized && !CanUtility_getSilentMode())
+	if(msg && CanUtility_initialized && CanUtility_getTransmissionMode() != CAN_TransmissionMode_Silent && CanUtility_getTransmissionMode() != CAN_TransmissionMode_Silent_Loopback)
 	{
 		if(HAL_CAN_GetTxMailboxesFreeLevel(&CanUtility_hcan) != 0)
 		{
@@ -583,9 +589,9 @@ void CanUtility_resetDiscardcounter(void)
 	CanUtility_discardedMessages = 0;
 }
 
-bool CanUtility_getSilentMode(void)
+CAN_TransmissionMode CanUtility_getTransmissionMode(void)
 {
-	return CanUtility_silentMode;
+	return CanUtility_currentMode;
 }
 
 CAN_SpeedTypedef CanUtility_getTransmissionSpeed(void)
@@ -593,12 +599,31 @@ CAN_SpeedTypedef CanUtility_getTransmissionSpeed(void)
 	return CanUtility_transmissionSpeed;
 }
 
-HAL_StatusTypeDef CanUtility_setTransmissionMode(bool const silent)
+HAL_StatusTypeDef CanUtility_setTransmissionMode(CAN_TransmissionMode const mode)
 {
 	if(CanUtility_initialized)
 	{
-		CanUtility_DeInit();
-		CanUtility_Init(CanUtility_getTransmissionSpeed(), silent);
+		CanUtility_enterInitMode();
+		/*Silent*/
+		if((mode == CAN_TransmissionMode_Silent_Loopback || mode == CAN_TransmissionMode_Silent) && (CanUtility_getTransmissionMode() != CAN_TransmissionMode_Silent_Loopback) && (CanUtility_getTransmissionMode() != CAN_TransmissionMode_Silent))
+		{
+			CanUtility_hcan.Instance->BTR |= CAN_BTR_SILM;
+		}
+		else if((mode == CAN_TransmissionMode_Loopback || mode == CAN_TransmissionMode_Normal) && (CanUtility_getTransmissionMode() != CAN_TransmissionMode_Normal) && (CanUtility_getTransmissionMode() != CAN_TransmissionMode_Loopback))
+		{
+			CanUtility_hcan.Instance->BTR &= ~CAN_BTR_SILM;
+		}
+		/*Loopback*/
+		if((mode == CAN_TransmissionMode_Silent_Loopback || mode == CAN_TransmissionMode_Loopback) && (CanUtility_getTransmissionMode() != CAN_TransmissionMode_Silent_Loopback) && (CanUtility_getTransmissionMode() != CAN_TransmissionMode_Loopback))
+		{
+			CanUtility_hcan.Instance->BTR |= CAN_BTR_LBKM;
+		}
+		else if((mode == CAN_TransmissionMode_Silent || mode == CAN_TransmissionMode_Normal) && (CanUtility_getTransmissionMode() != CAN_TransmissionMode_Silent) && (CanUtility_getTransmissionMode() != CAN_TransmissionMode_Normal))
+		{
+			CanUtility_hcan.Instance->BTR &= ~CAN_BTR_LBKM;
+		}
+		CanUtility_leaveInitMode();
+		CanUtility_currentMode = mode;
 		return HAL_OK;
 	}
 	return HAL_ERROR;
@@ -608,8 +633,10 @@ HAL_StatusTypeDef CanUtility_setTransmissionSpeed(CAN_SpeedTypedef speed)
 {
 	if(CanUtility_initialized)
 	{
-		CanUtility_DeInit();
-		CanUtility_Init(speed, CanUtility_getSilentMode());
+		CanUtility_enterInitMode();
+		CanUtility_hcan.Instance->BTR &= ~CAN_BTR_BRP;
+		CanUtility_hcan.Instance->BTR |= (speed - 1);
+		CanUtility_leaveInitMode();
 		return HAL_OK;
 	}
 	return HAL_ERROR;

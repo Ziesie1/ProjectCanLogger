@@ -11,6 +11,8 @@
 #include "display/screenBuffer.hpp"
 #include "utilities/utilities.hpp"
 
+#define TEST
+#include "utilities/testmessages.hpp"
 
 
 using namespace utilities; // für scom
@@ -30,7 +32,7 @@ void setup() {
     screenBufferInit();
     display.init();
 
-    if((CanUtility_Init(CAN_500_KBIT, false) != HAL_OK))
+    if((CanUtility_Init(CAN_500_KBIT) != HAL_OK))
     {
         scom.printError("Konnte CanUtility nicht Initialisieren.\nDas Programm wird angehalten!");
         while(1){}
@@ -46,7 +48,7 @@ void setup() {
 int timeCounter1ms = 0;
 void HAL_SYSTICK_Callback(void)
 {
-    if(timeCounter1ms > 10000)
+    if(timeCounter1ms > 5000)
     {
         timeCounter1ms = 0;
     }    
@@ -58,6 +60,9 @@ void loop() {
     loopTaster();
     pageManager.loop();
     loopScreenBuffer();
+    #ifdef TEST
+    sendTestmessages();
+    #endif //TEST
 }
 
 void serialEvent() 
