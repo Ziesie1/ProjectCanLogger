@@ -11,6 +11,8 @@
 #include "display/screenBuffer.hpp"
 #include "utilities/utilities.hpp"
 
+#define TEST
+#include "utilities/testmessages.hpp"
 
 
 using namespace utilities; // für scom
@@ -41,12 +43,26 @@ void setup() {
     scom << "CanLogger ist Initialisiert" << endz;
 }
 
+/*
+//für Serielle Ausgaben zum testen
+int timeCounter1ms = 0;
+void HAL_SYSTICK_Callback(void)
+{
+    if(timeCounter1ms > 5000)
+    {
+        timeCounter1ms = 0;
+    }    
+    timeCounter1ms++;
+}
+*/
 
 void loop() {
     loopTaster();
     pageManager.loop();
     loopScreenBuffer();
-
+    #ifdef TEST
+    sendTestmessages();
+    #endif //TEST
 }
 
 void serialEvent() 
