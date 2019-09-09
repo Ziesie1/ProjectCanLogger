@@ -13,6 +13,7 @@ protected:
 
     static const byte speeBuffSize = 6;
     const string speedTextBuff[speeBuffSize] = {"100 kBit","125 kBit","200 kBit","250 kBit","400 kBit","500 kBit"};
+    const bool RING_BUFF_VALUE = true;
 
     virtual void readValue();
 

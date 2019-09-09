@@ -6,7 +6,7 @@ SpeedSelectionButton::SpeedSelectionButton (ILI9341& display, uint16_t startX, u
                                 uint16_t sizeY, unsigned long backColor,
                                 unsigned long textColor, bool isSelected)
                                 :SelectionButton(display, startX,  startY, sizeX, sizeY, backColor, textColor,
-                                    isSelected, true, speeBuffSize)
+                                    isSelected, RING_BUFF_VALUE, speeBuffSize)
                                 {
                                     this->textBuff = new string[this->textBuffSize];
 
@@ -28,7 +28,7 @@ SpeedSelectionButton::SpeedSelectionButton (ILI9341& display, uint16_t startX, u
                                 unsigned long textColor, bool isSelected)
                                 :SelectionButton(display, startX,  startY, sizeX, sizeY, backColor, textColor,
                                     isSelected, true, 6)
-                                {/*
+                                {
                                     this->text = "speed";
                                     this->setTextOffset();
                                     this->drawButton();
@@ -67,7 +67,6 @@ SpeedSelectionButton::~SpeedSelectionButton()
 
 void SpeedSelectionButton::saveValue()
 {
-    /*
     switch (this->buffPos)
     {
     case 0: CanUtility_setTransmissionSpeed(CAN_100_KBIT); break;
@@ -77,13 +76,12 @@ void SpeedSelectionButton::saveValue()
     case 4: CanUtility_setTransmissionSpeed(CAN_400_KBIT); break;
     case 5: CanUtility_setTransmissionSpeed(CAN_500_KBIT); break;
     }
-    */
+    
 }
 
 void SpeedSelectionButton::readValue()
 {
-    /*
-    switch (CanUtility_getTransmissionSpeed(void))
+    switch (CanUtility_getTransmissionSpeed())
     {
     case CAN_100_KBIT: this->buffPos= 0; break;
     case CAN_125_KBIT: this->buffPos= 1; break;
@@ -93,6 +91,5 @@ void SpeedSelectionButton::readValue()
     case CAN_500_KBIT: this->buffPos= 5; break;
     default: break;
     }
-    */
-    this->buffPos= 0;
+
 }

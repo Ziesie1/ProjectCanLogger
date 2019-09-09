@@ -41,7 +41,7 @@ void SelectionButton::setText()
     this->initText();
     this->display.drawFillRect(this->startX + FRAME_WIDTH, this->startY + FRAME_WIDTH, this->sizeX - 2 * FRAME_WIDTH, this->sizeY - 2 * FRAME_WIDTH, this->backColor);
     this->printText();
-    
+    this->display.drawEmptyRect(this->startX, this->startY, this->sizeX, this->sizeY, this->COLOR_GREEN_FRAME_PRESSED, this->FRAME_WIDTH);//nur fürs erste 
 }
 
 void SelectionButton::initText()
@@ -72,7 +72,7 @@ bool SelectionButton::loop()
                 }
             }else
             {
-                if(this->buffPos > (textBuffSize - 1))
+                if(this->buffPos > (this->textBuffSize - 1))
                 {
                     this->buffPos = this->textBuffSize - 1;
                 }else if(buffPos < 0)

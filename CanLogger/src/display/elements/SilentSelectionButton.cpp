@@ -6,7 +6,7 @@ SilentSelectionButton::SilentSelectionButton (ILI9341& display, uint16_t startX,
                                 uint16_t sizeY, unsigned long backColor,
                                 unsigned long textColor, bool isSelected)
                                 :SelectionButton(display, startX,  startY, sizeX, sizeY, backColor, textColor,
-                                    isSelected, false, silentBuffSize)
+                                    isSelected, RING_BUFF_VALUE, silentBuffSize)
                                 {   
                                     this->textBuff = new string[this->textBuffSize];
 
@@ -57,28 +57,38 @@ SilentSelectionButton::~SilentSelectionButton()
 
 void SilentSelectionButton::saveValue()
 {
-    /*
-    if(this->buffPos = 1)
+    
+    if(this->buffPos == 0)
     {
-        CanUtility_setTransmissionMode(true);
-    }else
+        if((CanUtility_getTransmissionMode() == CAN_TransmissionMode_Normal) || (CanUtility_getTransmissionMode() == CAN_TransmissionMode_Silent))
+        {
+            CanUtility_setTransmissionMode(CAN_TransmissionMode_Silent);
+        }else if ((CanUtility_getTransmissionMode() == CAN_TransmissionMode_Loopback) || (CanUtility_getTransmissionMode() == CAN_TransmissionMode_Silent_Loopback))
+        {
+            CanUtility_setTransmissionMode(CAN_TransmissionMode_Silent_Loopback);
+        }  
+    }else if(this->buffPos == 1)
     {
-        CanUtility_setTransmissionMode(false);
+        if((CanUtility_getTransmissionMode() == CAN_TransmissionMode_Normal) || (CanUtility_getTransmissionMode() == CAN_TransmissionMode_Silent))
+        {
+            CanUtility_setTransmissionMode(CAN_TransmissionMode_Normal);
+        }else if ((CanUtility_getTransmissionMode() == CAN_TransmissionMode_Loopback) || (CanUtility_getTransmissionMode() == CAN_TransmissionMode_Silent_Loopback))
+        {
+            CanUtility_setTransmissionMode(CAN_TransmissionMode_Loopback);
+        }  
     }
-    */
+    
 }
 
 
 void SilentSelectionButton::readValue()
 {
-    /*
-    if(CanUtility_getSilentMode())
-    {
-        this->buffPos = 0;
-    }else
+    if((CanUtility_getTransmissionMode() == CAN_TransmissionMode_Normal) || (CanUtility_getTransmissionMode() == CAN_TransmissionMode_Loopback))
     {
         this->buffPos = 1;
+    }else if (CanUtility_getTransmissionMode() == CAN_TransmissionMode_Silent || CanUtility_getTransmissionMode() == CAN_TransmissionMode_Silent_Loopback)
+    {
+        this->buffPos = 0;
     }
-    */
-    this->buffPos = 1;
+    
 }

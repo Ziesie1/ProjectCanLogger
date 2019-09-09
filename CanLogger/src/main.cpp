@@ -59,13 +59,9 @@ void loop() {
     loopTaster();
     pageManager.loop();
     loopScreenBuffer();
-<<<<<<< HEAD
-    
-=======
     #ifdef TEST
     sendTestmessages();
     #endif //TEST
->>>>>>> ff890565bece3d54b17469c47cf8bff1c8677e26
 }
 
 void serialEvent() 

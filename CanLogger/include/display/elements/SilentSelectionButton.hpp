@@ -13,6 +13,7 @@ class SilentSelectionButton : public SelectionButton
 protected:
     static const byte silentBuffSize = 2;
     const string silentTextBuff[2] = {"on", "off"};
+    const bool RING_BUFF_VALUE = false;
 
     virtual void readValue();
 
