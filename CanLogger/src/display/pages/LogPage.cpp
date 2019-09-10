@@ -98,8 +98,8 @@ void LogPage::startView()
     if(this->statusSD)
     {
         init_SD();
-        startSD();
         createNewCanLogFile();
+        startSD();
         this->kopfzeile = new Kopfzeile{this->display,getFullLogFilePath().c_str()};
     }
     else
