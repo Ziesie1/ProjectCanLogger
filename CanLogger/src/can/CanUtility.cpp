@@ -580,9 +580,13 @@ bool CanUtility_hasFiFoOverflowOccured(void)
 			false	- no messages were discarded 
 */
 bool CanUtility_whereNewMessagesDiscarded(void)
-{
+{	
 	bool temp = CanUtility_discardedMessages != CanUtility_discardedMessagesLastState;
 	CanUtility_discardedMessagesLastState = CanUtility_discardedMessages;
+	if(CanUtility_discardedMessages == 0)
+	{
+		return false;
+	}
 	return temp;
 }
 
@@ -630,7 +634,7 @@ CAN_SpeedTypedef CanUtility_getTransmissionSpeed(void)
 */
 HAL_StatusTypeDef CanUtility_setTransmissionMode(CAN_TransmissionMode const mode)
 {
-	if(CanUtility_initialized)
+	if(CanUtility_initialized && (mode <= CAN_TransmissionMode_Silent_Loopback))
 	{
 		CanUtility_enterInitMode();
 		/*Silent*/
@@ -667,7 +671,7 @@ HAL_StatusTypeDef CanUtility_setTransmissionMode(CAN_TransmissionMode const mode
 */
 HAL_StatusTypeDef CanUtility_setTransmissionSpeed(CAN_SpeedTypedef speed)
 {
-	if(CanUtility_initialized)
+	if(CanUtility_initialized && (speed <= (CAN_BTR_BRP_Msk+1)))
 	{
 		CanUtility_enterInitMode();
 		CanUtility_hcan.Instance->BTR &= ~CAN_BTR_BRP;
