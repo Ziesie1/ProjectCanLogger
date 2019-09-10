@@ -51,6 +51,10 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 		
 }*/
 
+/* 
+	interrupt handler that is called when a overflow in FIFO 0 is occured
+	Input: hcan	- pointer to CAN-handle
+*/
 void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *hcan)
 {
 	if(hcan->ErrorCode == HAL_CAN_ERROR_RX_FOV0)
@@ -86,6 +90,12 @@ void CAN_RX0_IRQHandler(void)
 }
 #endif
 
+/*
+	function that enters the initialization mode of the CAN hardware
+	note:   to leave the initilization mode call the function "CanUtility_leaveInitMode()"
+			it is highly recommended to leave the initialization mode in the same function 
+			it is entered to ensure the usability of the CAN hardware
+*/
 void CanUtility_enterInitMode(void)
 {
 	CanUtility_hcan.Instance->MCR |= CAN_MCR_INRQ;
@@ -93,6 +103,10 @@ void CanUtility_enterInitMode(void)
     {}
 }
 
+/*
+	function that leaves the initialization mode of the CAN hardware
+	intended to be called after "CanUtility_enterInitMode()" and applying some settings
+*/
 void CanUtility_leaveInitMode(void)
 {
 	CanUtility_hcan.Instance->MCR &= ~CAN_MCR_INRQ;
@@ -589,16 +603,31 @@ void CanUtility_resetDiscardcounter(void)
 	CanUtility_discardedMessages = 0;
 }
 
+/*
+	returns the current transmission mode 
+	return:	CAN_TransmissionMode	- value that represents the current transmission mode of the CAN hardware
+*/
 CAN_TransmissionMode CanUtility_getTransmissionMode(void)
 {
 	return CanUtility_currentMode;
 }
 
+/*
+	returns the current transmission speed 
+	return:	CAN_SpeedTypedef	- value that represents the current transmission baud rate of the CAN hardware
+*/
 CAN_SpeedTypedef CanUtility_getTransmissionSpeed(void)
 {
 	return CanUtility_transmissionSpeed;
 }
 
+/*
+    sets the transmission mode of the CAN hardware
+    Input:	mode that the CAN hardware should be set in
+	return: HAL_OK		- everything is working as it is supposed to be
+			HAL_ERROR	- an error occured while setting up the peripherals, 
+						  check if the Peripherals are allready initialized
+*/
 HAL_StatusTypeDef CanUtility_setTransmissionMode(CAN_TransmissionMode const mode)
 {
 	if(CanUtility_initialized)
@@ -629,14 +658,22 @@ HAL_StatusTypeDef CanUtility_setTransmissionMode(CAN_TransmissionMode const mode
 	return HAL_ERROR;
 }
 
+/*
+    sets the transmission baud rate of the CAN hardware
+    Input:	baud rate that the CAN hardware should communicate with
+	return: HAL_OK		- everything is working as it is supposed to be
+			HAL_ERROR	- an error occured while setting up the peripherals, 
+						  check if the Peripherals are allready initialized
+*/
 HAL_StatusTypeDef CanUtility_setTransmissionSpeed(CAN_SpeedTypedef speed)
 {
 	if(CanUtility_initialized)
 	{
 		CanUtility_enterInitMode();
 		CanUtility_hcan.Instance->BTR &= ~CAN_BTR_BRP;
-		CanUtility_hcan.Instance->BTR |= (speed - 1);
+		CanUtility_hcan.Instance->BTR |= ((speed - 1) & CAN_BTR_BRP);
 		CanUtility_leaveInitMode();
+		CanUtility_transmissionSpeed = speed;
 		return HAL_OK;
 	}
 	return HAL_ERROR;
