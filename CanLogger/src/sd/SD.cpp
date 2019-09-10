@@ -136,7 +136,7 @@ bool saveNewCanMessage(Canmsg const& msg)
     if(sdCardInitialized)
     {
         String output = "";
-        AddZerosToString(output,msg.GetFullId(),msg.maxExtId,HEX); // nullen hinzufügen
+        AddZerosToString(output,msg.GetFullId(),msg.maxFullId,HEX); // nullen hinzufügen
         output += String(msg.GetFullId(), HEX) + ";";
         output += String(msg.GetRtr()) + ";";
         

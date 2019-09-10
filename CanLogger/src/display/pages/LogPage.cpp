@@ -125,7 +125,8 @@ void LogPage::closeView()
     CanUtility_DissableRecieve();
     screenBuffer_disableUpdate();
     screenBuffer_clearScreenBuffer();
-
+    CanUtility_resetDiscardcounter();
+    
     if(this->statusSD)
         closeSD();
 }
