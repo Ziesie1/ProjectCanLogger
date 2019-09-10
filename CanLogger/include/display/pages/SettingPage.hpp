@@ -15,7 +15,6 @@ class SettingPage : public DisplayPage
 {
 protected:
     ILI9341& display;
-    String kopfzeile;
     Kopfzeile* header;
     const uint16_t DISPLAY_X = 240;
     const uint16_t DISPLAY_Y = 320;
@@ -44,7 +43,7 @@ protected:
     int lastEncoderPos = 0; // Position des Drehimpulsgebers
 
 public:
-    SettingPage(ILI9341& display,  String headline);
+    SettingPage(ILI9341& display);
     void loop() override;
     void startView() override;
     void reloadView() override;
