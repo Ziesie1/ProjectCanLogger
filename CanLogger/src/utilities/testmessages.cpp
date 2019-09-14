@@ -31,8 +31,9 @@ void sendTestmessages(void)
         CAN_SpeedTypedef currentSpeed = CanUtility_getTransmissionSpeed();
 
         Canmsg send{};
-        for(int i=0;i<10;i++)
+        for(int i=0;i<SCREEN_BUFFER_SIZE+1;i++)
         {
+            send = Canmsg{0x100+i, 0, false, false, 1000, 8, 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0};
             switch(i)
             {
                 case 1: send = Canmsg{0x2, 0, false, false, 1000, 8, 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0}; 
@@ -53,9 +54,10 @@ void sendTestmessages(void)
                 case 6: send = Canmsg{0xc, 1, true, false, 1000, 6, 0x66, 0x55, 0x44, 0x33, 0x22, 0x11, 0x00, 0xff};  
                         CanUtility_setTransmissionSpeed(CAN_100_KBIT);
                         break;
-                case 7: send = Canmsg{send.maxStdId, send.maxExtId, true, false, 1000, 8, 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0}; break;
-                case 8: send = Canmsg{0xa, 0, false, false, 1000, 8, 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0}; break;
-                case 9: send = Canmsg{0xb, 0, false, false, 1000, 8, 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0}; break;
+                case 7: send = Canmsg{send.maxStdId, send.maxExtId, true, false, 1000, 8, 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0}; 
+                        break;
+                case 8: send = Canmsg{0x150, 0, false, false, 1000, 8, 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0}; 
+                        break;
             }
             CanUtility_SendMessage(&send);
             delay(10);

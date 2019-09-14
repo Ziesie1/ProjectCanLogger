@@ -3,7 +3,7 @@
 
 #include "can/Canmsg.hpp"
 
-constexpr int SCREEN_BUFFER_SIZE = 10;
+constexpr int SCREEN_BUFFER_SIZE = 16;
 
 //Debug:
 void printScreenBufferSerial(void);
