@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include "sd/SD.hpp"
-#include "can/Canmsg.hpp"
 #include "can/CanUtility.hpp"
 #include "utilities/SerialCommunication.hpp"
 #include "buttons/Encoder.hpp"
@@ -22,7 +21,7 @@ DisplayPageManager pageManager {};
 void setup() {
     Serial.begin(115200);
     scom.workWith(Serial); // scom Hardwareserial zuweisen
-    scom.setDebugMode(true); // Debugmodus einschalten
+    //scom.setDebugMode(true); // Debugmodus einschalten
   
     HAL_Init();
     SystemClock_Config();
@@ -41,7 +40,6 @@ void setup() {
   
     scom << "CanLogger ist Initialisiert" << endz;
 }
-
 
 void loop() {
     loopTaster();
