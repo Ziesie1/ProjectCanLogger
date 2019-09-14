@@ -10,6 +10,7 @@ int CanUtility_bufferCanRecPointer;
 int CanUtility_discardedMessages = 0;
 int CanUtility_discardedMessagesLastState = 0;
 bool CanUtility_toManyMsgs = false;
+int CanUtility_recievedMessages = 0;
 
 bool CanUtility_initialized = false;
 
@@ -32,6 +33,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 			}
 			CanUtility_RecieveMessage(0, CanUtility_bufferCanRecMessages[CanUtility_bufferCanRecPointer]);
 			CanUtility_bufferCanRecPointer++;
+			CanUtility_recievedMessages++;
 		}
 		else
 		{
