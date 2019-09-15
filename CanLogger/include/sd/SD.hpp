@@ -5,9 +5,9 @@
 #include "can/Canmsg.hpp"
 
 void init_SD();
-void startSD();
-void closeSD();
 void createNewCanLogFile();
+void startWriting();
+void stopWriting();
 String getFullLogFilePath();
 bool saveNewCanMessage(Canmsg const& msg);
 

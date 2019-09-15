@@ -10,8 +10,8 @@
 #include "display/screenBuffer.hpp"
 #include "utilities/utilities.hpp"
 
-#define TEST_SENDANDRECEIVE_MESSAGES
-#include "utilities/testmessages.hpp"
+// #define TEST_SENDANDRECEIVE_MESSAGES
+// #include "utilities/testmessages.hpp"
 
 using namespace utilities; // für scom
 

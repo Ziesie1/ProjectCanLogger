@@ -64,19 +64,19 @@ void init_SD()
     input:
     return:
 */
-void startSD()
+void startWriting()
 {
     canLogFile.open();
 }
 
 /*
-    Close the process for the SD-Card.
+    Stop the process for the SD-Card.
     Must be called before removing the SD-Card.
     All data in cache will be written to the SD-Card.
     input:
     return:
 */
-void closeSD()
+void stopWriting()
 {
     sdCardInitialized = false;
     canLogFile.close();
