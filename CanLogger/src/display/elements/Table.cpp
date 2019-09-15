@@ -83,7 +83,7 @@ void Table::printTable()
 */
 void Table::printMessages()
 {
-    uint8_t posY = this->OFFSETY_SPALTENNAMEN+2;
+    uint16_t posY = this->OFFSETY_SPALTENNAMEN+2;
     
     for(int idx = 0; idx<screenBuffer_getFillLevel(); idx++)
     {   
@@ -192,8 +192,8 @@ void Table::updateMessages()
 */
 void Table::printSingleMessage(int pos)
 {
-    uint8_t startOffsetY = this->OFFSETY_SPALTENNAMEN + 2;
-    uint8_t posYMessage = (pos*this->ZEILENHOEHE) + startOffsetY;
+    uint16_t startOffsetY = this->OFFSETY_SPALTENNAMEN + 2;
+    uint16_t posYMessage = (pos*this->ZEILENHOEHE) + startOffsetY;
     this->nachrichten[pos]->printImportantContent(posYMessage);
 }
 
