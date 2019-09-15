@@ -8,12 +8,11 @@ extern DisplayPageManager pageManager;
 /*
     Constructor of the class SettingPage
     Input: display - reference to the used display-object
-           headline - headine of the site
     return: -
 */
 
-SettingPage::SettingPage(ILI9341& display,  String headline)
-    :display{display}, kopfzeile{headline}
+SettingPage::SettingPage(ILI9341& display)
+    :display{display}
 {
 
 }
@@ -139,7 +138,7 @@ void SettingPage::loop()
 void SettingPage::startView() 
 {
     this->display.fillScreen(WHITE);
-    this->header = new Kopfzeile{this->display, this->kopfzeile};
+    this->header = new Kopfzeile{this->display, "Einstellungen"};
     setElements();
     this->speedSelect->selectButton();
 }

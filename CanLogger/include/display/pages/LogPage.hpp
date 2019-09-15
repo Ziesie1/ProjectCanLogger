@@ -21,7 +21,7 @@ protected:
    
     
 public:
-    LogPage(ILI9341& display, bool statusSD, String headline);
+    LogPage(ILI9341& display, bool statusSD);
     void loop() override;
     void startView() override;
     void reloadView() override;

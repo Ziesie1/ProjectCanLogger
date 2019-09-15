@@ -60,6 +60,7 @@ void init_SD()
 /*
     Start the process for the SD-Card.
     Must be called bevore Canmessages can be saved to the SD-Card.
+    createNewCanLogFile() must be called bevore!
     input:
     return:
 */
@@ -84,7 +85,6 @@ void closeSD()
 
 /*
     Create a new Canlog file in the default folder.
-    startSD() musst be called bevore!
 */
 void createNewCanLogFile()
 {
@@ -136,7 +136,7 @@ bool saveNewCanMessage(Canmsg const& msg)
     if(sdCardInitialized)
     {
         String output = "";
-        AddZerosToString(output,msg.GetFullId(),msg.maxExtId,HEX); // nullen hinzufügen
+        AddZerosToString(output,msg.GetFullId(),msg.maxFullId,HEX); // nullen hinzufügen
         output += String(msg.GetFullId(), HEX) + ";";
         output += String(msg.GetRtr()) + ";";
         
@@ -151,6 +151,7 @@ bool saveNewCanMessage(Canmsg const& msg)
                 output += String(msg.GetCanByte(i),HEX);
             }else{
                 AddZerosToString(output,0,msg.maxDataVal,HEX);
+                output += "0";
             }
             if(i < 8-1)
                 output += ";";

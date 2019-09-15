@@ -18,8 +18,8 @@ extern DisplayPageManager pageManager; // verweißt auf das Objekt in Main
     input: display          - Reference of the display where the LogPage will be printed on
            status           - pausing status, if it´s true "Table" will go in freze mode and the printet messages staing constant
 */
-LogPage::LogPage(ILI9341& display, bool statusSD, String headline)
- :display{display}, statusSD{statusSD}, headline{headline}
+LogPage::LogPage(ILI9341& display, bool statusSD)
+ :display{display}, statusSD{statusSD}
 {
     
 }
@@ -94,17 +94,20 @@ void LogPage::startView()
     
     screenBuffer_enableUpdate();
     this->display.fillScreen(WHITE);
-    this->kopfzeile = new Kopfzeile{this->display, this->headline};
-    this->logTable = new Table(this->display, screenBuffer_getFillLevel());
 
     if(this->statusSD)
     {
         init_SD();
         createNewCanLogFile();
         startSD();
-
-       
+        this->kopfzeile = new Kopfzeile{this->display,getFullLogFilePath().c_str()};
     }
+    else
+    {
+        this->kopfzeile = new Kopfzeile{this->display, "Ohne Speichern"};
+    }
+    
+    this->logTable = new Table(this->display, screenBuffer_getFillLevel());
     
 }
 /*
@@ -122,7 +125,8 @@ void LogPage::closeView()
     CanUtility_DissableRecieve();
     screenBuffer_disableUpdate();
     screenBuffer_clearScreenBuffer();
-
+    CanUtility_resetDiscardcounter();
+    
     if(this->statusSD)
         closeSD();
 }

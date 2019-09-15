@@ -54,15 +54,15 @@ void HomePage::loop()
     {
         if(this->buttonSpeichern->getStatus())
         {
-            pageManager.openNewPage(new LogPage{this->display, true, getFullLogFilePath().c_str()});
+            pageManager.openNewPage(new LogPage{this->display,true});
         }
         else if(this->buttonNichtSpeichern->getStatus())
         {
-           pageManager.openNewPage(new LogPage{this->display,false, "Ohne Speichern"});
+           pageManager.openNewPage(new LogPage{this->display,false});
         }
         else
         {
-            pageManager.openNewPage(new SettingPage{this->display, "Einstellungen"});
+            pageManager.openNewPage(new SettingPage{this->display});
         }
            
     }
