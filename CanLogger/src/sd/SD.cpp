@@ -58,6 +58,32 @@ void init_SD()
 }
 
 /*
+    Start the process for the SD-Card.
+    Must be called bevore Canmessages can be saved to the SD-Card.
+    createNewCanLogFile() must be called bevore!
+    input:
+    return:
+*/
+void startSD()
+{
+    canLogFile.open();
+}
+
+/*
+    Close the process for the SD-Card.
+    Must be called before removing the SD-Card.
+    All data in cache will be written to the SD-Card.
+    input:
+    return:
+*/
+void closeSD()
+{
+    sdCardInitialized = false;
+    canLogFile.close();
+}
+
+
+/*
     Create a new Canlog file in the default folder.
 */
 void createNewCanLogFile()
@@ -80,7 +106,17 @@ void createNewCanLogFile()
         ausgabe += canLogFile.getFileName();
         scom.printDebug(ausgabe);
         
-        canLogFile.writeStrLn("identifier(hex);RTR bit;time stamp(hex);data length(hex);byte 1(hex);byte 2(hex);byte 3(hex);byte 4(hex);byte 5(hex);byte 6(hex);byte 7(hex);byte 8(hex)");
+        canLogFile.open();
+
+        bool result = canLogFile.appendStrLn("identifier(hex);RTR bit;time stamp(hex);data length(hex);byte 1(hex);byte 2(hex);byte 3(hex);byte 4(hex);byte 5(hex);byte 6(hex);byte 7(hex);byte 8(hex)");
+        if(result == false)
+        {
+            String str = "Das Canlog file konnte nicht beschrieben werden:\n";
+            str += "\nIst die Speicherkarte noch eingesteckt?";
+            scom.printError(str);
+        }
+
+        canLogFile.close();
     }
 }
 
@@ -100,7 +136,7 @@ bool saveNewCanMessage(Canmsg const& msg)
     if(sdCardInitialized)
     {
         String output = "";
-        AddZerosToString(output,msg.GetFullId(),msg.maxExtId,HEX); // nullen hinzufügen
+        AddZerosToString(output,msg.GetFullId(),msg.maxFullId,HEX); // nullen hinzufügen
         output += String(msg.GetFullId(), HEX) + ";";
         output += String(msg.GetRtr()) + ";";
         
@@ -115,6 +151,7 @@ bool saveNewCanMessage(Canmsg const& msg)
                 output += String(msg.GetCanByte(i),HEX);
             }else{
                 AddZerosToString(output,0,msg.maxDataVal,HEX);
+                output += "0";
             }
             if(i < 8-1)
                 output += ";";

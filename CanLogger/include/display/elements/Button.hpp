@@ -5,6 +5,9 @@
 #include "display/ILI9341.hpp"
 #include "display/elements/Table.hpp"
 using namespace std;
+/*
+    This class creates a button for selection in the homescreen menu.
+*/
 class Button
 {
 protected:
@@ -16,7 +19,7 @@ protected:
     unsigned long backColor;
     byte offsetX;
     byte offsetY;
-    string text;
+    string text = "";
     unsigned long textColor;
     bool isSelected;
     const unsigned long COLOR_ORANGE_FRAME_SELECTED = Table::COLOR_ORANGE_WRITING_BODY_ISRTR;
@@ -25,11 +28,16 @@ protected:
     const unsigned long COLOR_ARROW_UNSELECTED = WHITE;
     const int FRAME_WIDTH = 3;
 
-
+    Button (ILI9341& display, uint16_t startX, uint16_t startY, uint16_t sizeX, 
+            uint16_t sizeY, unsigned long backColor, unsigned long textColor, bool isSelected);
+    void printText();
+    void setTextOffset();
 
 public:
     Button (ILI9341& display, uint16_t startX, uint16_t startY, uint16_t sizeX, 
             uint16_t sizeY, unsigned long backColor,byte offsetX, byte offsetY, string text, unsigned long textColor, bool isSelected);
+    Button (ILI9341& display, uint16_t startX, uint16_t startY, uint16_t sizeX, 
+            uint16_t sizeY, unsigned long backColor, string text, unsigned long textColor, bool isSelected);
     bool getStatus();
     void drawButton();
     void selectButton();
@@ -40,7 +48,6 @@ public:
     uint16_t getSizeX();
     uint16_t getPosY();
     uint16_t getSizeY();
-    
 
 };
 

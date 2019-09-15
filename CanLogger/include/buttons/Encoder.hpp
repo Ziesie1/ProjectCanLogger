@@ -3,7 +3,8 @@
 
 void initEncoder();
 bool hasEncoderPosChanged();
-int getEncoderPos();
+int getRelativeEncoderPos();
 bool wasEncoderButtonPressed();
-void setEncoderPos(int pos);
+void resetEncoderStates();
+
 #endif

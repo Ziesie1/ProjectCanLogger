@@ -1,4 +1,3 @@
-#include <Arduino.h>
 #include "utilities/FunctionLifeTime.hpp"
 #include "utilities/SerialCommunication.hpp"
 

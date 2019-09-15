@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include "sd/SD.hpp"
-#include "can/Canmsg.hpp"
 #include "can/CanUtility.hpp"
 #include "utilities/SerialCommunication.hpp"
 #include "buttons/Encoder.hpp"
@@ -11,7 +10,8 @@
 #include "display/screenBuffer.hpp"
 #include "utilities/utilities.hpp"
 
-
+#define TEST_SENDANDRECEIVE_MESSAGES
+#include "utilities/testmessages.hpp"
 
 using namespace utilities; // für scom
 
@@ -19,68 +19,46 @@ ILI9341 display {PC9, PC8, PA10, PA8, PB5, true};
 DisplayPageManager pageManager {};
 
 void setup() {
-  Serial.begin(115200);
-  scom.workWith(Serial); // scom Hardwareserial zuweisen
-  scom.setDebugMode(true); // Debugmodus einschalten
+    Serial.begin(115200);
+    scom.workWith(Serial); // scom Hardwareserial zuweisen
+    //scom.setDebugMode(true); // Debugmodus einschalten
   
-  init_SD();
-  HAL_Init();
-  SystemClock_Config();
-  initEncoder();
-  initTaster();
-  screenBufferInit();
-  screenBuffer_enableUpdate();
-  //loopScreenBuffer();
-  display.init();
+    HAL_Init();
+    SystemClock_Config();
+    initEncoder();
+    initTaster();
+    screenBufferInit();
+    display.init();
 
-  if((CanUtility_Init(CAN_500_KBIT) != HAL_OK) || (CanUtility_EnableRecieve() != HAL_OK))
-  {
-    while(1){}
-  }
+    if((CanUtility_Init(CAN_500_KBIT) != HAL_OK))
+    {
+        scom.printError("Konnte CanUtility nicht Initialisieren.\nDas Programm wird angehalten!");
+        while(1){}
+    }
  
-  pageManager.openNewPage(new HomePage{display}); // Startseite setzen
-
-  createNewCanLogFile();
-
-  CanUtility_EnableRecieve(); // Vorrübergehende aktivierung
-	
-  // Test
-  sortCanMessageIntoBuffer(*(new Canmsg{0x101, 0x0, false, false, 0x1000, 8, 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef}));
-  sortCanMessageIntoBuffer(*(new Canmsg{0x102, 0x0, false, true, 0x1000, 8, 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef}));
-  sortCanMessageIntoBuffer(*(new Canmsg{0x103, 0x0, false, false, 0x1000, 8, 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef}));
-
-  scom << "CanLogger ist Initialisiert" << endz;
- 
+    pageManager.openNewPage(new HomePage{display}); // Startseite setzen
+  
+    scom << "CanLogger ist Initialisiert" << endz;
 }
 
 void loop() {
-  loopTaster();
-  pageManager.loop();
-  loopScreenBuffer();
+    loopTaster();
+    pageManager.loop();
+    loopScreenBuffer();
+
+    #ifdef TEST_SENDANDRECEIVE_MESSAGES
+    sendTestmessages();
+    #endif //TEST
 }
 
-void serialEvent() {
-  while (Serial.available()) {
-    char inChar = (char)Serial.read();
-    /*
-      Eine Ausgabe nicht beim Interrupt erlaubt, hier nur Testweise. // Bis das gesamt Konzept feststeht.
-    */
-   if(inChar == 'c') 
-   {
-      scom << "Charakter recieved:" << inChar << endz;
-      sortCanMessageIntoBuffer(*(new Canmsg{0x104, 0x0, false, false, 0x1000, 8, 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef}));
-      scom<<"Can ohne RTR"<<endz;
-
-   }
-   else
-   {
-      scom<<"Anderer Buchstabe"<<endz;
-      sortCanMessageIntoBuffer(*(new Canmsg{0x105, 0x0, false, true, 0x1000, 8, 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef}));
-      scom<<"Can mit RTR"<<endz;
-   }
-   
-   
-
-  }
-  
+void serialEvent() 
+{
+    while (Serial.available()) 
+    {
+        char inChar = (char)Serial.read();
+        /*
+            Eine Ausgabe nicht beim Interrupt erlaubt, hier nur Testweise. // Bis das gesamt Konzept feststeht.
+        */
+        scom << "Charakter recieved:" << inChar << endz;
+    }
 }

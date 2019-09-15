@@ -10,66 +10,130 @@ XFile::XFile(SdFat& sdCard)
     :sdCard{sdCard}
 { }
 
-// override file with string
-bool XFile::writeStr(String const& text)
+// // override file with string
+// bool XFile::writeStr(String const& text)
+// {
+//     //FUNCTION_TIME_X("bool XFile::writeStr(String const& text)")
+//     bool status = true;
+//     this->orgFile = this->sdCard.open(this->getTotalFilePath().c_str(), O_RDWR | O_CREAT | O_TRUNC);
+//     if(this->orgFile)
+//     {
+//         this->orgFile.print(text.c_str()); // Schreibt Char Array in die Datei
+//     }else{
+//         status = false;
+//     }
+//     this->orgFile.close();
+//     return status;
+// }
+
+// // override fFile with string, with CR&LF
+// bool XFile::writeStrLn(String const& text)
+// {
+//     String text_LF = text + XFile::LINE_FEED;
+//     return this->writeStr(text_LF);
+// }
+
+/*
+    Open/Create the file on SD-Card.
+    Before appendStr() must be called.
+    input: ---
+    return: true - succesful
+            false - failure
+*/
+bool XFile::open()
 {
-    //FUNCTION_TIME_X("bool XFile::writeStr(String const& text)")
-    bool status = true;
-    this->orgFile = this->sdCard.open(this->getTotalFilePath().c_str(), O_RDWR | O_CREAT | O_TRUNC);
-    if(this->orgFile)
+    this->orgFile = this->sdCard.open(this->getTotalFilePath().c_str(), O_RDWR | O_CREAT); // 9-10 ms
+    if(!this->orgFile)
     {
-        this->orgFile.print(text.c_str()); // Schreibt Char Array in die Datei
-    }else{
-        status = false;
+        return false;
     }
-    this->orgFile.close();
-    return status;
+    return true;
 }
 
-// override fFile with string, with CR&LF
-bool XFile::writeStrLn(String const& text)
+/*
+    Write the last bytes and close the file. 
+    input: ---
+    return: true - succesful
+            false - failure
+*/
+bool XFile::close()
 {
-    String text_LF = text + XFile::LINE_FEED;
-    return this->writeStr(text_LF);
+    return this->orgFile.close();
 }
 
-// append string on current file
+/*
+    Append a string on the current file.
+    Open() must be called before.
+    input:  text - the text to write into the file
+    return: true - succesful
+            false - failure
+*/
 bool XFile::appendStr(String const& text)
 {
-    //FUNCTION_TIME_X("XFile::appendStr(String const& text)")
+    //FUNCTION_TIME_X("XFile::appendStr(String const& text)") // 5 ms
     bool status = true;
-    this->orgFile = this->sdCard.open(this->getTotalFilePath().c_str(), O_RDWR | O_CREAT);
+
     if(this->orgFile)
     {
-        this->orgFile.seekEnd(0);
-        this->orgFile.print(text.c_str());
+        this->orgFile.seekEnd(0); // 0 ms
+        this->orgFile.print(text.c_str()); // 4-5 ms
     }else{
         status = false;
     }
-    this->orgFile.close();
+    
     return status;
 }
 
-// append string on current file, with CR&LF
+/*
+    Append a string on the current file, with LF&CR.
+    Open() must be called before.
+    input:  text - the text to write into the file
+    return: true - succesful
+            false - failure
+*/
 bool XFile::appendStrLn(String const& text)
 {
     String text_LF = text + XFile::LINE_FEED;
     return this->appendStr(text_LF);
 }
 
-// set filepath of the current file
+/*
+    Clear the hole file. Afterwards the file is empty.
+    input:  
+    return: true - succesful
+            false - failure
+*/
+bool XFile::clear()
+{
+    return this->orgFile.remove();
+}
+
+/*
+    Set the filepath for the file.
+    input:  filePath - filepath like "/folder/.."
+    return:  
+*/
 void XFile::setFilePath(String const& filePath)
 {
     this->filePath = filePath;
 }
 
-// set the filename
+/*
+    Set the filename for the file.
+    input:  fileName - filename like "file.txt"
+    return:  
+*/
 void XFile::setFileName(String const& fileName)
 {
     this->fileName = fileName;
 }
 
-// check if the current file with filepath exists
+/*
+    Check if the file exists.
+    input:  
+    return: true - file exists
+            false - file dosen't exists
+*/
 bool XFile::exists()
 {
     bool ret = this->sdCard.chdir(this->filePath.c_str()); // Workingdirectory setzen
@@ -84,19 +148,31 @@ bool XFile::exists()
     return this->sdCard.exists(this->getFileName().c_str());
 }
 
-// return the current filepath
+/*
+    Return the filepath of the file.
+    input:
+    return: String - the current filepath 
+*/
 String const& XFile::getFilePath() const
 {
     return this->filePath;
 }
 
-// return the current filename
+/*
+    Return the filename of the file.
+    input:
+    return: String - the current filename 
+*/
 String const& XFile::getFileName() const
 {
     return this->fileName;
 }
 
-// return the current total filepath
+/*
+    Return the total filepath of the file.
+    input:
+    return: String - the current total filepath 
+*/
 String XFile::getTotalFilePath() const
 {
     return this->filePath + "/" +this->fileName;

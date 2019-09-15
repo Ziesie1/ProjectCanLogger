@@ -1,4 +1,3 @@
-#include <Arduino.h>
 #include "display/ILI9341.hpp"
 #include "display/ILI9341_Definitions.hpp"
 #include "utilities/SerialCommunication.hpp"
@@ -247,6 +246,9 @@ void ILI9341::SpiXfer(uint8_t Outwert)
     setPinCS();
 }
 
+/*
+	Sendet ein Word an den Displaycontroller.
+*/
 void ILI9341::WriteWord (uint16_t Outwert)
 {
     setPinDC();
@@ -290,12 +292,18 @@ void ILI9341::WriteWord (uint16_t Outwert)
 	setPinCS();
 }
 
+/*
+	Sendet einen Befehl an den Displaycontroller.
+*/
 void ILI9341::LCD_ILI9341_CMD(uint8_t Command)
 {
     this->resetPinDC();
 	this->SpiXfer(Command);
 }
 
+/*
+	Sendet einen Parameter an den Displaycontroller.
+*/
 void ILI9341::LCD_ILI9341_Parameter(uint8_t Parameter)
 {
     this->setPinDC();
@@ -316,6 +324,7 @@ void ILI9341::setDisplayOn(bool statusOn)
 		this->LCD_ILI9341_CMD(ILI9341_DISPLAYOFF_REG); 
 	}
 }
+
 /*
 	Das Display wird in einen minimalen Powermodus versetzt. 
 	DC/DC Wandler, intener oszillator und das Panel scanning werden gestoppt.
