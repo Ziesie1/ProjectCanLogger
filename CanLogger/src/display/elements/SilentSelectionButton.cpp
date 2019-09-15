@@ -6,7 +6,7 @@ SilentSelectionButton::SilentSelectionButton (ILI9341& display, uint16_t startX,
                                 uint16_t sizeY, unsigned long backColor,
                                 unsigned long textColor, bool isSelected)
                                 :SelectionButton(display, startX,  startY, sizeX, sizeY, backColor, textColor,
-                                    isSelected, RING_BUFF_VALUE, silentBuffSize)
+                                    isSelected, false, silentBuffSize)
                                 {   
                                     this->textBuff = new string[this->textBuffSize];
 
@@ -17,10 +17,6 @@ SilentSelectionButton::SilentSelectionButton (ILI9341& display, uint16_t startX,
                                     this->readValue();
                                     this->initText();
                                     drawButton();
-                                    if(isSelected)
-                                    {
-                                    selectButton();
-                                    }
                                 }
 
 /*

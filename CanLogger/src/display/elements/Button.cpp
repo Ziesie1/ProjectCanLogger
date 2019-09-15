@@ -16,13 +16,9 @@
 Button::Button(ILI9341& display, uint16_t startX, uint16_t startY, uint16_t sizeX, 
         uint16_t sizeY, unsigned long backColor, byte offsetX, byte offsetY, string text, unsigned long textColor,
         bool isSelected)
-       :display{display}, startX{startX}, startY{startY}, sizeX{sizeX}, sizeY{sizeY}, backColor{backColor}, offsetX{offsetX}, offsetY{offsetY}, text{text}, textColor{textColor}, isSelected{false}
+       :display{display}, startX{startX}, startY{startY}, sizeX{sizeX}, sizeY{sizeY}, backColor{backColor}, offsetX{offsetX}, offsetY{offsetY}, text{text}, textColor{textColor}, isSelected{isSelected}
        {
            drawButton();
-           if(isSelected)
-           {
-               selectButton();
-           }
        }
 
  /*
@@ -41,15 +37,10 @@ Button::Button(ILI9341& display, uint16_t startX, uint16_t startY, uint16_t size
 Button::Button(ILI9341& display, uint16_t startX, uint16_t startY, uint16_t sizeX, 
         uint16_t sizeY, unsigned long backColor,string text, unsigned long textColor,
         bool isSelected)
-       :display{display}, startX{startX}, startY{startY}, sizeX{sizeX}, sizeY{sizeY}, backColor{backColor}, text{text}, textColor{textColor}, isSelected{false}
+       :display{display}, startX{startX}, startY{startY}, sizeX{sizeX}, sizeY{sizeY}, backColor{backColor}, text{text}, textColor{textColor}, isSelected{isSelected}
        {
            setTextOffset();
            drawButton();
-           if(isSelected)
-           {
-               selectButton();
-           }
-
        }
 
  /*
@@ -65,10 +56,36 @@ Button::Button(ILI9341& display, uint16_t startX, uint16_t startY, uint16_t size
 */
 Button::Button(ILI9341& display, uint16_t startX, uint16_t startY, uint16_t sizeX, 
         uint16_t sizeY, unsigned long backColor, unsigned long textColor, bool isSelected)
-       :display{display}, startX{startX}, startY{startY}, sizeX{sizeX}, sizeY{sizeY}, backColor{backColor}, textColor{textColor}, isSelected{false}
+       :display{display}, startX{startX}, startY{startY}, sizeX{sizeX}, sizeY{sizeY}, backColor{backColor}, textColor{textColor}, isSelected{isSelected}
        {
        }
-       
+
+
+/*
+    declarate both text offset for text in middle positon
+*/
+void Button::setTextOffset()
+{
+    this->setTextOffsetX();
+    this->setTextOffsetY();
+}
+
+/*
+    declarate the text x-offset for text in middle positon in 
+*/
+void Button::setTextOffsetX()
+{
+    this->offsetX =(this->sizeX - (text.length() * 8))/2;
+}
+
+/*
+    declarate the text y-offset for text in middle positon in 
+*/
+void Button::setTextOffsetY()
+{
+    this->offsetY =(this->sizeY - 16) / 2;
+}
+
 /*
     This methode prints the button.
 */
@@ -76,6 +93,10 @@ void Button::drawButton()
 {
     this->display.drawFillRect(this->startX, this->startY, this->sizeX, this->sizeY, this->backColor);
     this->printText();
+    if(isSelected)
+    {
+        selectButton();
+    }
 }
 
 /*
@@ -143,13 +164,4 @@ uint16_t Button::getPosY()
 uint16_t Button::getSizeY()
 {
     return this->sizeY;
-}
-
-/*
-    declarate the text offset for text in middle positon
-*/
-void Button::setTextOffset()
-{
-    this->offsetY =(this->sizeY - 14) / 2;
-    this->offsetX =(this->sizeX - (text.length() * 8))/2;
 }

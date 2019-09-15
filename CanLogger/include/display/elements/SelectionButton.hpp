@@ -16,6 +16,7 @@ protected:
     
     bool isPressed = false;
     bool ringBuff = false;
+    
     int buffPos = 0;
     byte textBuffSize = 0;
     string* textBuff = nullptr;

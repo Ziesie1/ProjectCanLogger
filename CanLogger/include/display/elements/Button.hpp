@@ -32,6 +32,9 @@ protected:
             uint16_t sizeY, unsigned long backColor, unsigned long textColor, bool isSelected);
     void printText();
     void setTextOffset();
+    void setTextOffsetX();
+    void setTextOffsetY();
+    void drawButton();
 
 public:
     Button (ILI9341& display, uint16_t startX, uint16_t startY, uint16_t sizeX, 
@@ -39,7 +42,6 @@ public:
     Button (ILI9341& display, uint16_t startX, uint16_t startY, uint16_t sizeX, 
             uint16_t sizeY, unsigned long backColor, string text, unsigned long textColor, bool isSelected);
     bool getStatus();
-    void drawButton();
     void selectButton();
     void unselectButton();
     void drawArrow();

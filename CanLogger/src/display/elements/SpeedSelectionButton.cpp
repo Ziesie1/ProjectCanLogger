@@ -6,7 +6,7 @@ SpeedSelectionButton::SpeedSelectionButton (ILI9341& display, uint16_t startX, u
                                 uint16_t sizeY, unsigned long backColor,
                                 unsigned long textColor, bool isSelected)
                                 :SelectionButton(display, startX,  startY, sizeX, sizeY, backColor, textColor,
-                                    isSelected, RING_BUFF_VALUE, speeBuffSize)
+                                    isSelected, SPEED_RING_BUFF_VALUE, speeBuffSize)
                                 {
                                     this->textBuff = new string[this->textBuffSize];
 
@@ -22,40 +22,7 @@ SpeedSelectionButton::SpeedSelectionButton (ILI9341& display, uint16_t startX, u
                                     selectButton();
                                     }
                                 }
-/* 
-SpeedSelectionButton::SpeedSelectionButton (ILI9341& display, uint16_t startX, uint16_t startY, uint16_t sizeX, 
-                                uint16_t sizeY, unsigned long backColor,
-                                unsigned long textColor, bool isSelected)
-                                :SelectionButton(display, startX,  startY, sizeX, sizeY, backColor, textColor,
-                                    isSelected, true, 6)
-                                {
-                                    this->text = "speed";
-                                    this->setTextOffset();
-                                    this->drawButton();
-                                    if(isSelected)
-                                    {
-                                    selectButton();
-                                    }
-                                
-                                    this->textBuff = new string[6];
 
-                                    textBuff[0] = "100_KBIT";
-                                    textBuff[1] = "125_KBIT";
-                                    textBuff[2] = "200_KBIT";
-                                    textBuff[3] = "250_KBIT";
-                                    textBuff[4] = "400_KBIT";
-                                    textBuff[5] = "500_KBIT";
-                                    
-                                    this->readValue();
-                                    this->initText();
-                                    drawButton();
-                                    if(isSelected)
-                                    {
-                                    selectButton();
-                                    }
-                                    
-                                }
-*/
 SpeedSelectionButton::~SpeedSelectionButton()
 {
       if(this->textBuff)
