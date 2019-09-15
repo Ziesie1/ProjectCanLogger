@@ -128,5 +128,8 @@ void LogPage::closeView()
     CanUtility_resetDiscardcounter();
     
     if(this->statusSD)
+    {
         stopWriting();
+        scom << "Die Datei: " << getFullLogFilePath() << ", wurde erfolgreich gespeichert."<< endz;
+    }
 }
