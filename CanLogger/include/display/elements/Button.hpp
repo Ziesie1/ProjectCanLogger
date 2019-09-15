@@ -30,17 +30,18 @@ protected:
 
     Button (ILI9341& display, uint16_t startX, uint16_t startY, uint16_t sizeX, 
             uint16_t sizeY, unsigned long backColor, unsigned long textColor, bool isSelected);
-    void printText();
     void setTextOffset();
     void setTextOffsetX();
     void setTextOffsetY();
     void drawButton();
+    virtual void printText();
 
 public:
     Button (ILI9341& display, uint16_t startX, uint16_t startY, uint16_t sizeX, 
             uint16_t sizeY, unsigned long backColor,byte offsetX, byte offsetY, string text, unsigned long textColor, bool isSelected);
     Button (ILI9341& display, uint16_t startX, uint16_t startY, uint16_t sizeX, 
             uint16_t sizeY, unsigned long backColor, string text, unsigned long textColor, bool isSelected);
+    virtual ~Button();
     bool getStatus();
     void selectButton();
     void unselectButton();

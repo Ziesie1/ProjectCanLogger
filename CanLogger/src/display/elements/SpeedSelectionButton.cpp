@@ -1,7 +1,17 @@
 #include "display\elements\SpeedSelectionButton.hpp"
 #include "can/CanUtility.hpp"
 
-
+/*
+    Constructor of the class SpeedSelectionButton
+    input:  display     - reference of the display where the Button will be printed
+            startx      - start position on x-axis
+            starty      - start position on y-axis
+            sizeX       - button width
+            sizeY       - button hight
+            backColor   - button collor
+            textColor   - collor of the text
+            isSelected  - Status of the button
+*/
 SpeedSelectionButton::SpeedSelectionButton (ILI9341& display, uint16_t startX, uint16_t startY, uint16_t sizeX, 
                                 uint16_t sizeY, unsigned long backColor,
                                 unsigned long textColor, bool isSelected)
@@ -17,12 +27,10 @@ SpeedSelectionButton::SpeedSelectionButton (ILI9341& display, uint16_t startX, u
                                     this->readValue();
                                     this->initText();
                                     drawButton();
-                                    if(isSelected)
-                                    {
-                                    selectButton();
-                                    }
                                 }
-
+/*
+    destructor of the class SpeedSelectionButton
+*/
 SpeedSelectionButton::~SpeedSelectionButton()
 {
       if(this->textBuff)
@@ -32,6 +40,9 @@ SpeedSelectionButton::~SpeedSelectionButton()
      } 
 }
 
+/*
+    Saving the placed changes
+*/
 void SpeedSelectionButton::saveValue()
 {
     switch (this->buffPos)
@@ -46,6 +57,9 @@ void SpeedSelectionButton::saveValue()
     
 }
 
+/*
+    reeding the actual value 
+*/
 void SpeedSelectionButton::readValue()
 {
     switch (CanUtility_getTransmissionSpeed())

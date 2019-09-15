@@ -5,15 +5,16 @@
 #include "can/CanUtility.hpp"
 
 /*
-    This Class is the virtual parent class vor the selektion class in the settings screen 
+    This Class creates the Button seleczt the transmission speed 
 */
 class SpeedSelectionButton : public SelectionButton
 {
 protected:
 
     static const byte speeBuffSize = 6;
+    static const bool SPEED_RING_BUFF_VALUE = true;
     const string speedTextBuff[speeBuffSize] = {"100 kBit","125 kBit","200 kBit","250 kBit","400 kBit","500 kBit"};
-    const bool SPEED_RING_BUFF_VALUE = true;
+    
 
     virtual void readValue();
 

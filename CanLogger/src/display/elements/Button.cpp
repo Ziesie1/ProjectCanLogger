@@ -60,6 +60,12 @@ Button::Button(ILI9341& display, uint16_t startX, uint16_t startY, uint16_t size
        {
        }
 
+/*
+    Dstructor of the class Button
+*/
+ Button::~Button()
+{
+}
 
 /*
     declarate both text offset for text in middle positon

@@ -10,7 +10,9 @@
 #include "display/elements/SpeedSelectionButton.hpp"
 #include "display/elements/SilentSelectionButton.hpp"
 
-
+/*
+    This Class creates the displaypage where settings cam be done. 
+*/
 class SettingPage : public DisplayPage
 {
 protected:

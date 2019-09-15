@@ -30,9 +30,10 @@ protected:
 
     void unpressButton();
     bool getPressed();
-    virtual void setText();
+    void setText();
     void initText();
-    
+
+    virtual void printText();
     virtual void readValue() = 0;
 
 public:

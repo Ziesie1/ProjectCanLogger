@@ -5,15 +5,16 @@
 
 
 /*
-    This Class is the virtual parent class vor the selektion class in the settings screen 
+    This Class creates the Button to enabel and disable teh silent mode 
 */
 class SilentSelectionButton : public SelectionButton
 {
 
 protected:
     static const byte silentBuffSize = 2;
+    static const bool RING_BUFF_VALUE = false;
     const string silentTextBuff[2] = {"on", "off"};
-    const bool RING_BUFF_VALUE = false;
+    
 
     virtual void readValue();
 
