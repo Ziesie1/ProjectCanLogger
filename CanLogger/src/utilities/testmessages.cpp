@@ -12,7 +12,8 @@ bool testmessagesSend = false;
     functionality of different settings of the recieve mode. 
     the function automatically resets the hardware to the settings before the test was startet
     note that the funsction is just a system Test and provides only benefit to test the controller 
-    while lacking a physical bus system
+    while lacking a physical bus system.
+    to configure the send messages use the switch command.
 */
 void sendTestmessages(void)
 {
@@ -33,7 +34,7 @@ void sendTestmessages(void)
         Canmsg send{};
         for(int i=0;i<SCREEN_BUFFER_SIZE+1;i++)
         {
-            send = Canmsg{0x100+i, 0, false, false, 1000, 8, 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0};
+            send = Canmsg{static_cast<uint16_t>(0x100+i), 0, false, false, 1000, 8, 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0};
             switch(i)
             {
                 case 1: send = Canmsg{0x2, 0, false, false, 1000, 8, 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0}; 

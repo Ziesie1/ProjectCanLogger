@@ -1,21 +1,20 @@
 #include "can/CanUtility.hpp"
 #include "utilities/SerialCommunication.hpp"
 
-CAN_HandleTypeDef CanUtility_hcan;
-bool CanUtility_CanRecieveActive = false;
+CAN_HandleTypeDef CanUtility_hcan; //variable to store all the information needed to initialize the peripherals
+bool CanUtility_CanRecieveActive = false; //storage for the recive state of the peripherals
+bool CanUtility_initialized = false; //storage to check whether the peripherals are currently initialized
 
-Canmsg** CanUtility_bufferCanRecMessages;
-int CanUtility_bufferCanRecPointer;
+Canmsg** CanUtility_bufferCanRecMessages; //in the concept it is called "Empfangsbuffer" it stores the rcived messages
+int CanUtility_bufferCanRecPointer; //pointer to the first empty message object of "CanUtility_bufferCanRecMessages"
 
-int CanUtility_discardedMessages = 0;
-int CanUtility_discardedMessagesLastState = 0;
-bool CanUtility_toManyMsgs = false;
-int CanUtility_recievedMessages = 0;
+int CanUtility_discardedMessages = 0; //counter for discarded messages
+int CanUtility_discardedMessagesLastState = 0; //storage to notice if new messages where discarded 
+bool CanUtility_toManyMsgs = false; //storage to save the information, that an overflow occured
+int CanUtility_recievedMessages = 0; //counter for correct recieved messages (just for debug purposes)
 
-bool CanUtility_initialized = false;
-
-CAN_TransmissionMode CanUtility_currentMode = CAN_TransmissionMode_Normal;
-CAN_SpeedTypedef CanUtility_transmissionSpeed = CAN_500_KBIT;
+CAN_TransmissionMode CanUtility_currentMode = CAN_TransmissionMode_Normal; //storage to check the current transmissionmode
+CAN_SpeedTypedef CanUtility_transmissionSpeed = CAN_500_KBIT; //storage to check the current transmissionspeed
 
 /* 
 	interrupt handler that is called when messages are pending in FIFO 0
@@ -45,15 +44,6 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 }
 
 /* 
-	interrupt handler that is called when FIFO 0 is full
-	Input: hcan	- pointer to CAN-handle
-*/
-/*void HAL_CAN_RxFifo0FullCallback(CAN_HandleTypeDef *hcan)
-{
-		
-}*/
-
-/* 
 	interrupt handler that is called when a overflow in FIFO 0 is occured
 	Input: hcan	- pointer to CAN-handle
 */
@@ -79,9 +69,8 @@ extern "C" {
 #endif
 
 /*
-Interrupt Handler für CAN-RX0
-Wird aufgerufen, wenn:
-	- neue CAN message in FIFO0 verfügbar
+Interrupt Handler for CAN-RX0
+will be called as soon as an new CAN-message is recieved
 */
 void CAN_RX0_IRQHandler(void)
 {
@@ -118,24 +107,11 @@ void CanUtility_leaveInitMode(void)
 
 /* 
 	function that initializes the GPIO-Pins for CAN peripherals
+	and activates the interrupts
 	Input: hcan	- pointer to CAN-handle
 */
 void HAL_CAN_MspInit(CAN_HandleTypeDef *hcan)
 {
-	/*
-	From "stm32f3xx_hal_can.c":
-	(#) Initialize the CAN low level resources by implementing the
-          HAL_CAN_MspInit():
-         (++) Enable the CAN interface clock using __HAL_RCC_CANx_CLK_ENABLE()
-         (++) Configure CAN pins
-             (+++) Enable the clock for the CAN GPIOs
-             (+++) Configure CAN pins as alternate function open-drain
-         (++) In case of using interrupts (e.g. HAL_CAN_ActivateNotification())
-             (+++) Configure the CAN interrupt priority using
-                   HAL_NVIC_SetPriority()
-             (+++) Enable the CAN IRQ handler using HAL_NVIC_EnableIRQ()
-             (+++) In CAN IRQ handler, call HAL_CAN_IRQHandler()
-	*/
 	__HAL_RCC_CAN1_CLK_ENABLE();
 	while(__HAL_RCC_CAN1_IS_CLK_DISABLED())
 	{}
@@ -156,12 +132,16 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef *hcan)
 	canPin.Pin = GPIO_PIN_8;
 	HAL_GPIO_Init(GPIOB, &canPin);	
 
-	// setup Interrupts:
-	
+	// setup Interrupts:	
 	HAL_NVIC_SetPriority(CAN_RX0_IRQn,0,2);
 	HAL_NVIC_EnableIRQ(CAN_RX0_IRQn);
 }
 
+/* 
+	function that deinitializes the GPIO-Pins for CAN peripherals
+	and deactivates the interrupts
+	Input: hcan	- pointer to CAN-handle
+*/
 void HAL_CAN_MspDeInit(CAN_HandleTypeDef *hcan)
 {
 	//resetInterrupts:

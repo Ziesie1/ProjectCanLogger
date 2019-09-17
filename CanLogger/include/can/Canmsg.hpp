@@ -1,8 +1,5 @@
 /* 
-Um die CAN-funktion nutzen zu können muss in der Detei "stm32f3xx_hal_conf.h" 
-(C:\Users\<User>\.platformio\packages\framework-arduinoststm32\variants\NUCLEO_F303RE)
-die Zeile 55 entkommentiert werden ("//" löschen). 
-Die Zeile muss dann lauten: "#define HAL_CAN_MODULE_ENABLED"
+Um die CAN-funktion nutzen zu können muss "HAL_CAN_MODULE_ENABLED" definiert sein
 */
 
 #ifndef CANMSG_HPP
@@ -13,12 +10,12 @@ Die Zeile muss dann lauten: "#define HAL_CAN_MODULE_ENABLED"
 class Canmsg
 {
 public:
-	static constexpr uint8_t maxLength = 8;
-	static constexpr uint16_t maxTime = 0xffff;
-	static constexpr uint16_t maxStdId = 0x7ff;
-	static constexpr uint32_t maxExtId = 0x3ffff;
-	static constexpr uint32_t maxFullId = 0x1fffffff;
-	static constexpr uint8_t maxDataVal = 0xff;
+	static constexpr uint8_t maxLength = 8; //highest possbible value for canLength
+	static constexpr uint16_t maxTime = 0xffff; //highest possbible value for time
+	static constexpr uint16_t maxStdId = 0x7ff; //highest possbible value for stdIdentifier
+	static constexpr uint32_t maxExtId = 0x3ffff; //highest possbible value for extIdentifier
+	static constexpr uint32_t maxFullId = 0x1fffffff; //highest possbible value for the combination of stdIdentifier and extIdentifier
+	static constexpr uint8_t maxDataVal = 0xff; //highest possbible value of the single data Bytes
 
 private:
     uint32_t stdIdentifier;	//Standart identifier or MSB of the extended identifier
