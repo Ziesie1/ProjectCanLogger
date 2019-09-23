@@ -13,7 +13,7 @@ int CanUtility_discardedMessagesLastState = 0; //storage to notice if new messag
 bool CanUtility_toManyMsgs = false; //storage to save the information, that an overflow occured
 int CanUtility_recievedMessages = 0; //counter for correct recieved messages (just for debug purposes)
 
-CAN_TransmissionMode CanUtility_currentMode = CAN_TransmissionMode_Normal; //storage to check the current transmissionmode
+CAN_TransmissionMode CanUtility_currentMode = CAN_TransmissionMode_Silent; //storage to check the current transmissionmode
 CAN_SpeedTypedef CanUtility_transmissionSpeed = CAN_500_KBIT; //storage to check the current transmissionspeed
 
 /* 
@@ -166,7 +166,7 @@ void FillCAN_Handle(CAN_HandleTypeDef& hcan, CAN_SpeedTypedef speed)
 {
 	hcan.Instance = CAN1;
 	hcan.Init.Prescaler = speed;
-	hcan.Init.Mode = CAN_MODE_NORMAL;
+	hcan.Init.Mode = CAN_MODE_SILENT;
 	hcan.Init.SyncJumpWidth = CAN_SJW_1TQ;
 	hcan.Init.TimeSeg1 = CAN_BS1_12TQ;
 	hcan.Init.TimeSeg2 = CAN_BS2_5TQ;
@@ -218,7 +218,7 @@ HAL_StatusTypeDef CanUtility_Init(CAN_SpeedTypedef speed)
 			s += String(HAL_CAN_GetError(&CanUtility_hcan),HEX); 
 			utilities::scom.printError(s);
 			return HAL_ERROR;
-			CanUtility_currentMode = CAN_TransmissionMode_Normal;
+			CanUtility_currentMode = CAN_TransmissionMode_Silent;
 			CanUtility_transmissionSpeed = speed;
 		}
 		else
