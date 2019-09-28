@@ -1,12 +1,22 @@
 #include "display\elements\SilentSelectionButton.hpp"
 #include "can/CanUtility.hpp"
 
-
+/*
+    Constructor of the class SilentSelectionButton
+    input:  display     - reference of the display where the Button will be printed
+            startx      - start position on x-axis
+            starty      - start position on y-axis
+            sizeX       - button width
+            sizeY       - button hight
+            backColor   - button collor
+            textColor   - collor of the text
+            isSelected  - Status of the button
+*/
 SilentSelectionButton::SilentSelectionButton (ILI9341& display, uint16_t startX, uint16_t startY, uint16_t sizeX, 
                                 uint16_t sizeY, unsigned long backColor,
                                 unsigned long textColor, bool isSelected)
                                 :SelectionButton(display, startX,  startY, sizeX, sizeY, backColor, textColor,
-                                    isSelected, RING_BUFF_VALUE, silentBuffSize)
+                                    isSelected, false, silentBuffSize)
                                 {   
                                     this->textBuff = new string[this->textBuffSize];
 
@@ -17,34 +27,10 @@ SilentSelectionButton::SilentSelectionButton (ILI9341& display, uint16_t startX,
                                     this->readValue();
                                     this->initText();
                                     drawButton();
-                                    if(isSelected)
-                                    {
-                                    selectButton();
-                                    }
                                 }
 
 /*
-SilentSelectionButton::SilentSelectionButton (ILI9341& display, uint16_t startX, uint16_t startY, uint16_t sizeX, 
-                                uint16_t sizeY, unsigned long backColor,
-                                unsigned long textColor, bool isSelected)
-                                :SelectionButton(display, startX,  startY, sizeX, sizeY, backColor, textColor,
-                                    isSelected, false, 2)
-                                {   
-                                    
-                                    this->textBuff = new string{2};
-
-                                    textBuff[0] = "ön";
-                                    textBuff[1] = "öff";
-
-                                    this->readValue();
-                                    this->initText(); 
-                                    drawButton();
-                                    if(isSelected)
-                                    {
-                                    selectButton();
-                                    }
-                                    
-                                }
+    destructor of the class SilentSelectionButton
 */
 SilentSelectionButton::~SilentSelectionButton()
 {
@@ -55,6 +41,9 @@ SilentSelectionButton::~SilentSelectionButton()
      } 
 }
 
+/*
+    Saving the placed changes
+*/
 void SilentSelectionButton::saveValue()
 {
     
@@ -80,7 +69,9 @@ void SilentSelectionButton::saveValue()
     
 }
 
-
+/*
+    reeding the actual value 
+*/
 void SilentSelectionButton::readValue()
 {
     if((CanUtility_getTransmissionMode() == CAN_TransmissionMode_Normal) || (CanUtility_getTransmissionMode() == CAN_TransmissionMode_Loopback))

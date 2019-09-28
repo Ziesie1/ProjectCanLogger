@@ -171,8 +171,8 @@ void SettingPage::closeView()
 void SettingPage::setElements()
 {
     //Strings
-    this->display.printString(this->TRANSFER_RATE_SILENT_MODE_POS_X, this->TRANSFER_RATE_POS_Y, this->TRANSFER_RATE.c_str(), this->COLOR_BLACK_SETTING_WRITING, this->COLOR_WHITE_BACKGROUND_SETTING, 1);
-    this->display.printString(this->TRANSFER_RATE_SILENT_MODE_POS_X, this->SILENT_MODE_POS_Y, this->SILENT_MODE.c_str(), this->COLOR_BLACK_SETTING_WRITING, this->COLOR_WHITE_BACKGROUND_SETTING, 1);
+    this->display.printString(this->TRANSFER_RATE_SILENT_MODE_POS_X, this->TRANSFER_RATE_POS_Y + 7, this->TRANSFER_RATE.c_str(), this->COLOR_BLACK_SETTING_WRITING, this->COLOR_WHITE_BACKGROUND_SETTING, 1);
+    this->display.printString(this->TRANSFER_RATE_SILENT_MODE_POS_X, this->SILENT_MODE_POS_Y + 7, this->SILENT_MODE.c_str(), this->COLOR_BLACK_SETTING_WRITING, this->COLOR_WHITE_BACKGROUND_SETTING, 1);
 
     //Buttons
     this->buttonDiscard = new Button{this->display, static_cast<uint16_t>((this->DISPLAY_X / 2-this->BUTTON_WIDTH) / 2), this->BUTTON_POS_Y, this->BUTTON_WIDTH, this->BUTTON_HIGH, this->COLOR_BUTTON_DEFAULT, this->BUTTON_DISCARD_TEXT.c_str(), this->COLOR_BUTTON_TEXT, false};

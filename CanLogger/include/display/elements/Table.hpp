@@ -38,7 +38,6 @@ public:
     static constexpr unsigned long COLOR_WRITING_HEADER = WHITE;
     static constexpr unsigned long COLOR_WRITING_BODY_DEFAULT = BLACK;
     static constexpr unsigned long COLOR_BACKGROUND_BODY = WHITE;
-    static constexpr unsigned long COLOR_DISCARD_MASSAGE_COUNTER = RED100;
     static constexpr unsigned long COLOR_BLUE_BACKGROUND_HEADER = 0x007200; //R,G,B = 1,64,118
     static constexpr unsigned long COLOR_WRITING_BODY_NEXT_BYTE = 0x007BEF; // R,G,B = 127,127,127
     static constexpr unsigned long COLOR_ORANGE_WRITING_BODY_ISRTR = 0x0033FD; //R,G,B = 237,125,49
@@ -56,8 +55,7 @@ public:
     void updateHeadlineBackground();
     void updateMessages();
     void printSingleMessage(int pos);
-    void setDiscardMassagesCounter();
-    
+  
 };
 
 

@@ -10,7 +10,9 @@
 #include "display/elements/SpeedSelectionButton.hpp"
 #include "display/elements/SilentSelectionButton.hpp"
 
-
+/*
+    This Class creates the displaypage where settings cam be done. 
+*/
 class SettingPage : public DisplayPage
 {
 protected:
@@ -24,11 +26,11 @@ protected:
     const String SILENT_MODE = "Silent-Mode:";
     const uint16_t TRANSFER_RATE_SILENT_MODE_POS_X = 2;
     const uint16_t TRANSFER_RATE_POS_Y = 32;
-    const uint16_t SILENT_MODE_POS_Y = 60;
+    const uint16_t SILENT_MODE_POS_Y = 70;
     const byte BUTTON_WIDTH = 100;
     const byte BUTTON_HIGH = 32;
     const byte BUTTON_SPECIAL_WIDTH = 90;
-    const byte BUTTON_SPECIAL_HIGH = 20;
+    const byte BUTTON_SPECIAL_HIGH = 30;
     const byte BUTTON_SPECIAL_POS_X = 147;
     const uint16_t BUTTON_POS_Y = 280;
     const String BUTTON_DISCARD_TEXT = "Verwerfen";
