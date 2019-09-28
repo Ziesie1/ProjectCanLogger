@@ -1,20 +1,20 @@
 #include "can/CanUtility.hpp"
 #include "utilities/SerialCommunication.hpp"
 
-CAN_HandleTypeDef CanUtility_hcan;
-bool CanUtility_CanRecieveActive = false;
+CAN_HandleTypeDef CanUtility_hcan; //variable to store all the information needed to initialize the peripherals
+bool CanUtility_CanRecieveActive = false; //storage for the recive state of the peripherals
+bool CanUtility_initialized = false; //storage to check whether the peripherals are currently initialized
 
-Canmsg** CanUtility_bufferCanRecMessages;
-int CanUtility_bufferCanRecPointer;
+Canmsg** CanUtility_bufferCanRecMessages; //in the concept it is called "Empfangsbuffer" it stores the rcived messages
+int CanUtility_bufferCanRecPointer; //pointer to the first empty message object of "CanUtility_bufferCanRecMessages"
 
-int CanUtility_discardedMessages = 0;
-int CanUtility_discardedMessagesLastState = 0;
-bool CanUtility_toManyMsgs = false;
+int CanUtility_discardedMessages = 0; //counter for discarded messages
+int CanUtility_discardedMessagesLastState = 0; //storage to notice if new messages where discarded 
+bool CanUtility_toManyMsgs = false; //storage to save the information, that an overflow occured
+int CanUtility_recievedMessages = 0; //counter for correct recieved messages (just for debug purposes)
 
-bool CanUtility_initialized = false;
-
-CAN_TransmissionMode CanUtility_currentMode = CAN_TransmissionMode_Normal;
-CAN_SpeedTypedef CanUtility_transmissionSpeed = CAN_500_KBIT;
+CAN_TransmissionMode CanUtility_currentMode = CAN_TransmissionMode_Silent; //storage to check the current transmissionmode
+CAN_SpeedTypedef CanUtility_transmissionSpeed = CAN_500_KBIT; //storage to check the current transmissionspeed
 
 /* 
 	interrupt handler that is called when messages are pending in FIFO 0
@@ -32,6 +32,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 			}
 			CanUtility_RecieveMessage(0, CanUtility_bufferCanRecMessages[CanUtility_bufferCanRecPointer]);
 			CanUtility_bufferCanRecPointer++;
+			CanUtility_recievedMessages++;
 		}
 		else
 		{
@@ -43,14 +44,9 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 }
 
 /* 
-	interrupt handler that is called when FIFO 0 is full
+	interrupt handler that is called when a overflow in FIFO 0 is occured
 	Input: hcan	- pointer to CAN-handle
 */
-/*void HAL_CAN_RxFifo0FullCallback(CAN_HandleTypeDef *hcan)
-{
-		
-}*/
-
 void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *hcan)
 {
 	if(hcan->ErrorCode == HAL_CAN_ERROR_RX_FOV0)
@@ -73,9 +69,8 @@ extern "C" {
 #endif
 
 /*
-Interrupt Handler für CAN-RX0
-Wird aufgerufen, wenn:
-	- neue CAN message in FIFO0 verfügbar
+Interrupt Handler for CAN-RX0
+will be called as soon as an new CAN-message is recieved
 */
 void CAN_RX0_IRQHandler(void)
 {
@@ -86,6 +81,12 @@ void CAN_RX0_IRQHandler(void)
 }
 #endif
 
+/*
+	function that enters the initialization mode of the CAN hardware
+	note:   to leave the initilization mode call the function "CanUtility_leaveInitMode()"
+			it is highly recommended to leave the initialization mode in the same function 
+			it is entered to ensure the usability of the CAN hardware
+*/
 void CanUtility_enterInitMode(void)
 {
 	CanUtility_hcan.Instance->MCR |= CAN_MCR_INRQ;
@@ -93,6 +94,10 @@ void CanUtility_enterInitMode(void)
     {}
 }
 
+/*
+	function that leaves the initialization mode of the CAN hardware
+	intended to be called after "CanUtility_enterInitMode()" and applying some settings
+*/
 void CanUtility_leaveInitMode(void)
 {
 	CanUtility_hcan.Instance->MCR &= ~CAN_MCR_INRQ;
@@ -102,24 +107,11 @@ void CanUtility_leaveInitMode(void)
 
 /* 
 	function that initializes the GPIO-Pins for CAN peripherals
+	and activates the interrupts
 	Input: hcan	- pointer to CAN-handle
 */
 void HAL_CAN_MspInit(CAN_HandleTypeDef *hcan)
 {
-	/*
-	From "stm32f3xx_hal_can.c":
-	(#) Initialize the CAN low level resources by implementing the
-          HAL_CAN_MspInit():
-         (++) Enable the CAN interface clock using __HAL_RCC_CANx_CLK_ENABLE()
-         (++) Configure CAN pins
-             (+++) Enable the clock for the CAN GPIOs
-             (+++) Configure CAN pins as alternate function open-drain
-         (++) In case of using interrupts (e.g. HAL_CAN_ActivateNotification())
-             (+++) Configure the CAN interrupt priority using
-                   HAL_NVIC_SetPriority()
-             (+++) Enable the CAN IRQ handler using HAL_NVIC_EnableIRQ()
-             (+++) In CAN IRQ handler, call HAL_CAN_IRQHandler()
-	*/
 	__HAL_RCC_CAN1_CLK_ENABLE();
 	while(__HAL_RCC_CAN1_IS_CLK_DISABLED())
 	{}
@@ -140,12 +132,16 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef *hcan)
 	canPin.Pin = GPIO_PIN_8;
 	HAL_GPIO_Init(GPIOB, &canPin);	
 
-	// setup Interrupts:
-	
+	// setup Interrupts:	
 	HAL_NVIC_SetPriority(CAN_RX0_IRQn,0,2);
 	HAL_NVIC_EnableIRQ(CAN_RX0_IRQn);
 }
 
+/* 
+	function that deinitializes the GPIO-Pins for CAN peripherals
+	and deactivates the interrupts
+	Input: hcan	- pointer to CAN-handle
+*/
 void HAL_CAN_MspDeInit(CAN_HandleTypeDef *hcan)
 {
 	//resetInterrupts:
@@ -170,7 +166,7 @@ void FillCAN_Handle(CAN_HandleTypeDef& hcan, CAN_SpeedTypedef speed)
 {
 	hcan.Instance = CAN1;
 	hcan.Init.Prescaler = speed;
-	hcan.Init.Mode = CAN_MODE_NORMAL;
+	hcan.Init.Mode = CAN_MODE_SILENT;
 	hcan.Init.SyncJumpWidth = CAN_SJW_1TQ;
 	hcan.Init.TimeSeg1 = CAN_BS1_12TQ;
 	hcan.Init.TimeSeg2 = CAN_BS2_5TQ;
@@ -222,7 +218,7 @@ HAL_StatusTypeDef CanUtility_Init(CAN_SpeedTypedef speed)
 			s += String(HAL_CAN_GetError(&CanUtility_hcan),HEX); 
 			utilities::scom.printError(s);
 			return HAL_ERROR;
-			CanUtility_currentMode = CAN_TransmissionMode_Normal;
+			CanUtility_currentMode = CAN_TransmissionMode_Silent;
 			CanUtility_transmissionSpeed = speed;
 		}
 		else
@@ -566,9 +562,13 @@ bool CanUtility_hasFiFoOverflowOccured(void)
 			false	- no messages were discarded 
 */
 bool CanUtility_whereNewMessagesDiscarded(void)
-{
+{	
 	bool temp = CanUtility_discardedMessages != CanUtility_discardedMessagesLastState;
 	CanUtility_discardedMessagesLastState = CanUtility_discardedMessages;
+	if(CanUtility_discardedMessages == 0)
+	{
+		return false;
+	}
 	return temp;
 }
 
@@ -589,19 +589,34 @@ void CanUtility_resetDiscardcounter(void)
 	CanUtility_discardedMessages = 0;
 }
 
+/*
+	returns the current transmission mode 
+	return:	CAN_TransmissionMode	- value that represents the current transmission mode of the CAN hardware
+*/
 CAN_TransmissionMode CanUtility_getTransmissionMode(void)
 {
 	return CanUtility_currentMode;
 }
 
+/*
+	returns the current transmission speed 
+	return:	CAN_SpeedTypedef	- value that represents the current transmission baud rate of the CAN hardware
+*/
 CAN_SpeedTypedef CanUtility_getTransmissionSpeed(void)
 {
 	return CanUtility_transmissionSpeed;
 }
 
+/*
+    sets the transmission mode of the CAN hardware
+    Input:	mode that the CAN hardware should be set in
+	return: HAL_OK		- everything is working as it is supposed to be
+			HAL_ERROR	- an error occured while setting up the peripherals, 
+						  check if the Peripherals are allready initialized
+*/
 HAL_StatusTypeDef CanUtility_setTransmissionMode(CAN_TransmissionMode const mode)
 {
-	if(CanUtility_initialized)
+	if(CanUtility_initialized && (mode <= CAN_TransmissionMode_Silent_Loopback))
 	{
 		CanUtility_enterInitMode();
 		/*Silent*/
@@ -629,14 +644,22 @@ HAL_StatusTypeDef CanUtility_setTransmissionMode(CAN_TransmissionMode const mode
 	return HAL_ERROR;
 }
 
+/*
+    sets the transmission baud rate of the CAN hardware
+    Input:	baud rate that the CAN hardware should communicate with
+	return: HAL_OK		- everything is working as it is supposed to be
+			HAL_ERROR	- an error occured while setting up the peripherals, 
+						  check if the Peripherals are allready initialized
+*/
 HAL_StatusTypeDef CanUtility_setTransmissionSpeed(CAN_SpeedTypedef speed)
 {
-	if(CanUtility_initialized)
+	if(CanUtility_initialized && (speed <= (CAN_BTR_BRP_Msk+1)))
 	{
 		CanUtility_enterInitMode();
 		CanUtility_hcan.Instance->BTR &= ~CAN_BTR_BRP;
-		CanUtility_hcan.Instance->BTR |= (speed - 1);
+		CanUtility_hcan.Instance->BTR |= ((speed - 1) & CAN_BTR_BRP);
 		CanUtility_leaveInitMode();
+		CanUtility_transmissionSpeed = speed;
 		return HAL_OK;
 	}
 	return HAL_ERROR;

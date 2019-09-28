@@ -100,7 +100,7 @@ void LogPage::startView()
     {
         init_SD();
         createNewCanLogFile();
-        startSD();
+        startWriting();
         this->kopfzeile = new Kopfzeile{this->display,getFullLogFilePath().c_str()};
     }
     else
@@ -129,5 +129,8 @@ void LogPage::closeView()
     CanUtility_resetDiscardcounter();
     
     if(this->statusSD)
-        closeSD();
+    {
+        stopWriting();
+        scom << "Die Datei: " << getFullLogFilePath() << ", wurde erfolgreich gespeichert."<< endz;
+    }
 }

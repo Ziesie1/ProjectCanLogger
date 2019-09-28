@@ -3,15 +3,15 @@
 
 #include "can/Canmsg.hpp"
 
-constexpr int SCREEN_BUFFER_SIZE = 10;
+constexpr int SCREEN_BUFFER_SIZE = 18; 
+/*
+size of the "screenBuffer" and "screenBufferUserView"
+also known as Anzeigebuffer
+*/
 
 //Debug:
 void printScreenBufferSerial(void);
 void printScreenBufferUserViewSerial(void);
-
-//behandlung einzelner Nachrichten (interne)
-void sortCanMessageIntoBuffer(Canmsg const& msg);
-//void insertMessageHere(Canmsg const& msg, int pos);
 
 // initialisierungsfunktionen
 void screenBufferInit(void);

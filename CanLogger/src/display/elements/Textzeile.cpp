@@ -26,7 +26,7 @@ Textzeile::Textzeile(ILI9341& display, bool isSelected, uint8_t offsetXSpalte1,
     This methode prints the most important content of the CAN-messages of the frontend buffer into the logtable shown on the display
     input: posY     - Y coordinate of the printing start 
 */
-void Textzeile::printImportantContent(uint8_t posY)
+void Textzeile::printImportantContent(uint16_t posY)
 {
     unsigned long farbe = Table::COLOR_WRITING_BODY_DEFAULT;
     if(this->message.GetRtr())

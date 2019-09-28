@@ -3,17 +3,23 @@
 #include "utilities/SerialCommunication.hpp"
 #include "sd/SD.hpp"
 
-//extern:
-int screenBufferFillLevel = 0;
-int screenBufferUserViewFillLevel = 0;
-Canmsg** screenBuffer = nullptr;
+int screenBufferFillLevel = 0; //pointer to the last empty element of screenBuffer
+int screenBufferUserViewFillLevel = 0; //pointer to the last empty element of screenBufferUserView
+Canmsg** screenBuffer = nullptr; 
+/*
+Buffer to store all incomming messages from CanUtility.hpp
+in the concept it is named "Backendbuffer"
+*/
 Canmsg** screenBufferUserView = nullptr;
+/*
+Buffer to store all messages that will currently be shown on the display
+in the concept it is named "Frontendbuffer"
+*/
 
-//intern:
-bool updateUserView = false;
-bool somethingChanged = false;
-bool whatChanged[SCREEN_BUFFER_SIZE];
-bool screenBufferInitialized = false;
+bool updateUserView = false; //displays if screenBufferUserView will be updated
+bool somethingChanged = false;  //signals if something changed in screenBufferUserView
+bool whatChanged[SCREEN_BUFFER_SIZE]; //signals if single elements of screenBufferUserView changed
+bool screenBufferInitialized = false; //variable to check if the screenbuffers are initialized
 
 /* 
     sets up the front- and the backendbuffer
@@ -86,7 +92,8 @@ void screenBufferDeinit(void)
 }
 
 /* 
-    erases the content of the front- and backendbuffer
+    erases the content of the front- and backendbuffer 
+    (sadly very unperformant, there sould be better solutions)
     return  true  - buffers erased
             false - error occured
 */
@@ -165,8 +172,9 @@ void printScreenBufferUserViewSerial(void)
 
 /* 
     inserts the surpassed message at the surpassed position
+    and shifts all the rearward messages by one position
     Input:  msg - reference to the message that should be inserted
-            pos - position the message should be Placed
+            pos - position the message should be placed
                   note that if the buffer is allready filled, the last message will be discarded
                   possible values: 0 - screenBufferFillLevel
 */
@@ -199,6 +207,8 @@ void insertMessageHere(Canmsg const& msg, int pos)
 
 /* 
     function that processes all the pending CAN-messages in the Canmsg_bufferCanRecMessages
+    and inserts them at there destined position
+    Input:  msg - reference to the message that should be sort into the buffer
 */
 void sortCanMessageIntoBuffer(Canmsg const& msg)
 {
@@ -274,7 +284,7 @@ void sortCanMessageIntoBuffer(Canmsg const& msg)
 }
 
 /* 
-    copies the messages from the Backendbuffer to the Frontendbuffer
+    copies the messages from the Backendbuffer to the Frontendbuffer and marks changes
 */
 void makeBufferVisible(void)
 {
@@ -342,11 +352,10 @@ bool screenBuffer_hasThisMessageChanged(int pos)
 }
 
 /* 
-    function that processes the last message of the "Canmsg_bufferCanRecMessages"
+    function that processes the first message of the "Canmsg_bufferCanRecMessages"
 */
 void loopScreenBuffer(void)
 {
-    // FUNCTION_TIME_X("loopScreenBuffer(void)") //-> für eine Nachricht 10-20 ms
     if(CanUtility_isRecieveActive() && screenBufferInitialized)
     {
         if(CanUtility_getbufferCanRecMessagesFillLevel() > 0)
@@ -375,20 +384,6 @@ void loopScreenBuffer(void)
                 delete curMsg;
             }
         }
-        /*    
-        if(CanUtility_whereNewMessagesDiscarded())
-        {
-            String s = "Anzahl verworfener Nachrichten: ";
-            s += String(CanUtility_howManyMessagesWhereDiscarded(), DEC);
-            utilities::scom.printDebug(s);
-        }
-    
-        if(CanUtility_hasFiFoOverflowOccured())
-        {
-            utilities::scom.printDebug("FIFO ueberfuellt");
-            //HAL_NVIC_EnableIRQ(CAN_RX0_IRQn);
-        }
-        */
     }
 
     if(updateUserView && screenBufferInitialized)

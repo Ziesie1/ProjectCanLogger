@@ -5,7 +5,11 @@
 #include <Arduino.h>
 #include "can/Canmsg.hpp"
 
-constexpr int CanUtility_CAN_BUFFER_REC_SIZE = 50;
+constexpr int CanUtility_CAN_BUFFER_REC_SIZE = 50; 
+/*   
+    size of the "CanUtility_bufferCanRecMessages"
+    also known as recieveBuffer or Empfangsbuffer
+*/
 
 typedef enum
 {
@@ -20,10 +24,10 @@ typedef enum
 
 typedef enum
 {
-    CAN_TransmissionMode_Normal             =   0,  /*Messages can be send, recieved and the controller will send ack bit*/
-    CAN_TransmissionMode_Silent             =   1,  /*Messages can recieved, but neither send nor will the controller send ack bit*/
-    CAN_TransmissionMode_Loopback           =   2,  /*Messages can be send, recieved and the controller will send ack bit*/
-    CAN_TransmissionMode_Silent_Loopback    =   3   /*Messages can be send, recieved and the controller will send ack bit*/
+    CAN_TransmissionMode_Normal             =   0,  /*Messages can be send and recieved, furtheremore the controller will send ack bit*/
+    CAN_TransmissionMode_Silent             =   1,  /*Messages can be recieved, but neither send nor will the controller send ack bit*/
+    CAN_TransmissionMode_Loopback           =   2,  /*Messages can't be send, but can recieved and the controller will send ack bit*/
+    CAN_TransmissionMode_Silent_Loopback    =   3   /*Messages can't be send nor recieved and the controller will not send an ack bit*/
 } CAN_TransmissionMode;
 
 HAL_StatusTypeDef CanUtility_Init(CAN_SpeedTypedef speed);

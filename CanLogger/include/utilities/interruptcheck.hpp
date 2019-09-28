@@ -3,7 +3,10 @@
 
 /* 
 this file is to check in which interrupt caused problems with the µC
-please set the interrupts that you don't want to check as a comment
+please set the interrupts that you don't want to check as a comment.
+If a interrupt is called the Program will end up in one of the endless loops.
+use a debugger to check which interrupt is called, or help yourself with the serial monitor, 
+as the programm will not leave the interrupt either way ;)
 */
 
 

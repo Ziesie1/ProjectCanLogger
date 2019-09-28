@@ -2,7 +2,7 @@
 #include "utilities/utilities.hpp"
 #include "utilities/SerialCommunication.hpp"
 
-int messagesWithNew = 0;
+int messagesWithNew = 0; //counter of the ammount of currently existing objects of Canmsg (for debug purposes)
 
 /*
     creates a default CAN-message used e.g. in tests 

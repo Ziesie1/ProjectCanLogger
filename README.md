@@ -14,10 +14,11 @@
 ## Einleitung
 
 Bei diesem Projekt handelt es sich um eine studentische Gruppenarbeit an der [Ostfalia Hochschule für angewandte Wissenschaften](https://www.ostfalia.de/cms/de/) in Wolfenbüttel. Betreut wird die Arbeit von Prof. Dr.-Ing. Karl-Dieter Tieste von der Fakultät Elektrotechnik.
-Ziel des Projektes ist die Programmierung eines [Can Loggers](https://de.wikipedia.org/wiki/Datenlogger). Dieser soll eingehende [CAN-Bus-Nachrichten](https://de.wikipedia.org/wiki/Controller_Area_Network) über ein (Display) grafisch darstellen und zusätzlich die Möglichkeit bieten diese auf einer [SD Speicherkarte](https://de.wikipedia.org/wiki/SD-Karte) abzuspeichern.  
-Als Hardwearegrundlage dient das [STM32 Nucleo-64 development board](https://www.st.com/en/evaluation-tools/nucleo-f303re.html#) mit der [STM32F303RE](STM32F303RE) MCU. Dieses Bord wird durch eine zusätzlich erstellte Platine ergänzt. Hier sind unter anderem ein [Drehdrücksteller](), ein [Taster](), ein [CAN-Controller]() und ein [QVAG 2.2 TFT SPI 240X230]() Farbdisplay verbaut. Das Display verfügt auf der Unterseite über einen SD-Speicherkarten-Sockel.  
+Ziel des Projektes ist die Programmierung eines [CAN-Loggers](https://de.wikipedia.org/wiki/Datenlogger). Dieser soll eingehende [CAN-Bus-Nachrichten](https://de.wikipedia.org/wiki/Controller_Area_Network) über ein (Display) grafisch darstellen und zusätzlich die Möglichkeit bieten diese auf einer [SD Speicherkarte](https://de.wikipedia.org/wiki/SD-Karte) abzuspeichern.  
+Als Hardwearegrundlage dient das [STM32 Nucleo-64 development board](https://www.st.com/en/evaluation-tools/nucleo-f303re.html#) mit der [STM32F303RE](STM32F303RE) MCU. Dieses Bord wird durch eine zusätzlich erstellte Platine ergänzt. Hier sind unter anderem ein [Drehdrücksteller](), ein [Taster](), ein [CAN-Interface]() und ein [QVAG 2.2 TFT SPI 240X230]() Farbdisplay verbaut. Das Display verfügt auf der Unterseite über einen SD-Speicherkarten-Sockel.  
 Programmiert wird in der Entwicklungsumgebung [Microsoft Visual Studio Code](https://code.visualstudio.com/) mit [C++](https://de.wikipedia.org/wiki/C%2B%2B).
 
+<img src="https://github.com/Ziesie1/ProjectCanLogger/blob/master/Images/CanLogger.png?raw=true" height="40%" width="40%">
 
 <a name="pinbelegung"></a>
 ## Pinbelegung
