@@ -18,6 +18,7 @@ Ziel des Projektes ist die Programmierung eines [Can Loggers](https://de.wikiped
 Als Hardwearegrundlage dient das [STM32 Nucleo-64 development board](https://www.st.com/en/evaluation-tools/nucleo-f303re.html#) mit der [STM32F303RE](STM32F303RE) MCU. Dieses Bord wird durch eine zusätzlich erstellte Platine ergänzt. Hier sind unter anderem ein [Drehdrücksteller](), ein [Taster](), ein [CAN-Controller]() und ein [QVAG 2.2 TFT SPI 240X230]() Farbdisplay verbaut. Das Display verfügt auf der Unterseite über einen SD-Speicherkarten-Sockel.  
 Programmiert wird in der Entwicklungsumgebung [Microsoft Visual Studio Code](https://code.visualstudio.com/) mit [C++](https://de.wikipedia.org/wiki/C%2B%2B).
 
+![alt text](https://github.com/Ziesie1/ProjectCanLogger/Images/CanLogger.png "CAN-Logger")
 
 <a name="pinbelegung"></a>
 ## Pinbelegung
