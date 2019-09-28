@@ -48,7 +48,7 @@ void Kopfzeile::loop()
 */
 void Kopfzeile::setDiscardMessagesCounter()
 {
-    String counter = "( " + String(CanUtility_howManyMessagesWhereDiscarded(), DEC) + " )";
+    String counter = "(" + String(CanUtility_howManyMessagesWhereDiscarded(), DEC) + ")";
     this->display.printString(0, 0, counter.c_str(), this->COLOR_DISCARD_MASSAGE_COUNTER, this->COLOR_BLUE_BACKGROUND, 1);
 }
 
