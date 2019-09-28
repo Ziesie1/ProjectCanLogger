@@ -50,6 +50,7 @@ LogPage::~LogPage()
 void LogPage::loop()
 {
     this->logTable->loop();
+    this->kopfzeile->loop();
 
     if(wasSingleTasterPressed())
     {

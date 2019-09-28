@@ -131,10 +131,6 @@ void Table::loop()
             updateMessages();
         }
     }
-    if(CanUtility_whereNewMessagesDiscarded())
-    {
-        setDiscardMassagesCounter();
-    }
 }
 /*
     Updating the titelline background adiccted to the pausing status
@@ -196,13 +192,3 @@ void Table::printSingleMessage(int pos)
     uint8_t posYMessage = (pos*this->ZEILENHOEHE) + startOffsetY;
     this->nachrichten[pos]->printImportantContent(posYMessage);
 }
-
-/* 
-    Prints in the upper right-hand corner an counter of the discard messanges.
-*/
-void Table::setDiscardMassagesCounter()
-{
-    String counter = "( " + String(CanUtility_howManyMessagesWhereDiscarded(), DEC) + " )";
-    this->display.printString(0, 0, counter.c_str(), this->COLOR_DISCARD_MASSAGE_COUNTER, this->COLOR_BLUE_BACKGROUND_HEADER, 1);
-}
-
